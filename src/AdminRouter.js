@@ -119,7 +119,6 @@ export class AdminRouter extends React.Component {
         this.removeHomeSingleArticle = this.removeHomeSingleArticle.bind(this);
 
 
-
         //New Article
         this.addSubCategory = this.addSubCategory.bind(this);
         this.uploadImage = this.uploadImage.bind(this);
@@ -155,6 +154,26 @@ export class AdminRouter extends React.Component {
 
 
         this.myPathTo = this.myPathTo.bind(this);
+        this.updateDbState = this.updateDbState.bind(this);
+        this.deleteTo = this.deleteTo.bind(this);
+    }
+
+
+    deleteTo(path, object) {
+        axios.delete(`http://localhost:8080/${path}`, object)
+            .then(function (response) {
+                console.log(response);
+                return response;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+
+
+    updateDbState() { ///  Saves the new State to the Data base
+        this.postTo('NewState', this.state);
     }
 
 
@@ -248,7 +267,7 @@ export class AdminRouter extends React.Component {
         newState.newGroup.articleBody = this.newGroupBody;
         newState.groups.push(newState.newGroup);
         console.log("new state", newState)
-        this.postTo('newArticle', newState)
+        this.postTo('NewGroup', newState.newGroup)
         this.setState({
             groups: newState.groups,
         }, () => { console.log(this.state) })
@@ -451,6 +470,7 @@ export class AdminRouter extends React.Component {
                     removeSingleArticle={() => {
                         console.log(this.removeHomeSingleArticle);
                         this.removeHomeSingleArticle(i);
+                        this.postTo(`DeleteArticle/${articles[i]._id}`)
                     }}
                     index={i}
                     category={articles[i].category}
@@ -462,6 +482,7 @@ export class AdminRouter extends React.Component {
                 {listToRender}
             </div>
         )
+
     }
 
 
@@ -484,6 +505,7 @@ export class AdminRouter extends React.Component {
 
     deepRemoveGroup(i) {
         let groupName = this.state.groups[i].name;
+        this.postTo(`DeleteGroup/${this.state.groups[i]._id}` , {name: groupName, arr: this.state.allArticles})
         let newState = { ...this.state };
         newState.groups = [...this.state.groups];
         newState.groups.splice(i, 1);
@@ -550,6 +572,7 @@ export class AdminRouter extends React.Component {
         axios.post(`http://localhost:8080/${path}`, object)
             .then(function (response) {
                 console.log(response);
+                return response;
             })
             .catch(function (error) {
                 console.log(error);
@@ -709,7 +732,7 @@ export class AdminRouter extends React.Component {
         newState.newArticle.subCategorys = [...this.newArticleSubCategorys];
         newState.allArticles.push(newState.newArticle);
         console.log("new state", newState)
-        this.postTo('newArticle', newState)
+        this.postTo('NewArticle', newState.newArticle);
         this.myPath = '/';
         this.setState({
             allArticles: newState.allArticles,
@@ -764,6 +787,28 @@ export class AdminRouter extends React.Component {
     };
 
 
+    componentWillMount() {
+        if (this.state.allArticles.length === 0) {
+            let that = this;
+            axios.get('http://localhost:8080/GetState')
+                .then(function (response) {
+                    console.log(response);
+                    that.setState({
+                        allArticles: response.data.allArticles,
+                        groups: response.data.groups,
+                        health: response.data.health,
+                        heroObjects: response.data.heroObjects,
+                        scince: response.data.scince,
+                        subCategorys: response.data.subCategorys,
+                        technology: response.data.technology,
+                        _id: response.data.id
+                    }, () => { console.log(that.state) })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    }
 
     shouldComponentUpdate(nextProps, nextState) {
         if (this.props.titleValue !== nextState.newArticle.name ||
@@ -785,6 +830,7 @@ export class AdminRouter extends React.Component {
                     <Route exact path="/" render={(props) => {
                         return (
                             <HomeAdmin
+                                updateDbState={this.updateDbState}
                                 addCategory={this.addCategory}
                                 newSubCategoryButton={this.newSubCategoryButton}
                                 newSubCategory={this.state.newSubCategory}

@@ -122,6 +122,9 @@ class HomeAdmin extends Component {
                 <div>
                     {groupVar}
                 </div>
+                <div>
+                    <button onClick={this.props.updateDbState}>Update The Web</button>
+                </div>
 
             </div>
         );
