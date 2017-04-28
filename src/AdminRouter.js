@@ -16,57 +16,6 @@ import NewGroup from './NewGroup';
 import GroupHomeArticle from './GroupHomeArticle';
 
 
-
-
-const Home = (props) => {
-    console.log(props)
-    return (
-        <div>
-            <h2>Home</h2>
-        </div>
-    )
-}
-
-const About = () => (
-    <div>
-        <h2>About</h2>
-    </div>
-)
-
-const Topic = ({ match }) => (
-    <div>
-        <h3>{match.params.topicId}</h3>
-    </div>
-)
-
-const Topics = ({ match }) => (
-    <div>
-        <h2>Topics</h2>
-        <ul>
-            <li>
-                <Link to={`${match.url}/rendering`}>
-                    Rendering with React
-        </Link>
-            </li>
-            <li>
-                <Link to={`${match.url}/components`}>
-                    Components
-        </Link>
-            </li>
-            <li>
-                <Link to={`${match.url}/props-v-state`}>
-                    Props v. State
-        </Link>
-            </li>
-        </ul>
-
-        <Route path={`${match.url}/:topicId`} component={Topic} />
-        <Route exact path={match.url} render={() => (
-            <h3>Please select a topic.</h3>
-        )} />
-    </div>
-)
-
 const NavBar = () => (
     <div>
         <ul>
@@ -85,6 +34,8 @@ export class AdminRouter extends React.Component {
     constructor() {
         super()
         this.state = {
+            newSubCategory: false,
+            subCategorys: ["Antripology", 'Sports'],
             heroObjects: [],// {type:'' , url: '' , title:'' , credit: '' name: ''}
             allArticles: [],
             scince: [],
@@ -98,6 +49,7 @@ export class AdminRouter extends React.Component {
                 articleBody: undefined,
                 articleGroups: [], // group name
                 category: undefined,
+                subCategorys: [],
                 date: undefined,
                 showAtHomePage: true,
                 summery: undefined
@@ -123,6 +75,7 @@ export class AdminRouter extends React.Component {
             articleBody: undefined,
             articleGroups: [], // group name
             category: undefined,
+            subCategorys: [],
             date: undefined,
             showAtHomePage: true,
             summery: undefined
@@ -141,7 +94,20 @@ export class AdminRouter extends React.Component {
             isInProccese: false
         }
 
+        // STUFF THAT I DIDNT WANT TO MAKE MY APP RERENDER
+
+        this.newArticleSubCategorys = [];
+
+        this.newArticleBody = '';
+
+        this.newGroupBody = '';
+
+        this.myPath = undefined;
+
         //Home
+        this.addCategory = this.addCategory.bind(this);
+        this.newSubCategoryButton = this.newSubCategoryButton.bind(this);
+        this.removeSubCategory = this.removeSubCategory.bind(this);
         this.postTo = this.postTo.bind(this);
         this.uploadFile = this.uploadFile.bind(this);
         this.onHomeUploadFilesFormSubmit = this.onHomeUploadFilesFormSubmit.bind(this);
@@ -155,6 +121,7 @@ export class AdminRouter extends React.Component {
 
 
         //New Article
+        this.addSubCategory = this.addSubCategory.bind(this);
         this.uploadImage = this.uploadImage.bind(this);
         this.onEditorStateChange = this.onEditorStateChange.bind(this);
         this.editorContentToHtml = this.editorContentToHtml.bind(this);
@@ -185,6 +152,18 @@ export class AdminRouter extends React.Component {
         this.onNewGroupHomePageChange = this.onNewGroupHomePageChange.bind(this);
         this.creatNewGroup = this.creatNewGroup.bind(this);
 
+
+
+        this.myPathTo = this.myPathTo.bind(this);
+    }
+
+
+    myPathTo(path) {
+        if (path) {
+            this.myPath = path
+        } else {
+            this.myPath = undefined
+        }
     }
 
 
@@ -255,6 +234,7 @@ export class AdminRouter extends React.Component {
         this.setState({
             newGroup: newState.newGroup
         }, () => { console.log(this.state) })
+        this.newGroupBody = '';
     }
 
 
@@ -265,24 +245,26 @@ export class AdminRouter extends React.Component {
         let newState = { ...this.state };
         newState.groups = [...this.state.groups];
         newState.newGroup.date = date;
+        newState.newGroup.articleBody = this.newGroupBody;
         newState.groups.push(newState.newGroup);
         console.log("new state", newState)
         this.postTo('newArticle', newState)
         this.setState({
             groups: newState.groups,
         }, () => { console.log(this.state) })
-        // hashHistory.push('/'); /// NEED TO LINK
+        this.myPath = '/'
         this.resetNewGroupState();
     }
 
 
     onNewGroupEditorStateChange(editorContent) { // ON EDITOR CHANGE 
         const articleBodyString = this.editorContentToHtml(editorContent);
-        const newState = { ...this.state };
-        newState.newGroup.articleBody = articleBodyString;
-        this.setState({
-            newGroup: newState.newGroup
-        })
+        // const newState = { ...this.state };
+        // newState.newGroup.articleBody = articleBodyString;
+        this.newGroupBody = articleBodyString
+        // this.setState({
+        //     newGroup: newState.newGroup
+        // })
     };
 
 
@@ -361,7 +343,6 @@ export class AdminRouter extends React.Component {
 
     isGrouped(index) {
         let name = this.state.newGroup.name;
-        let newState = { ...this.state };
         let articlesArray = [...this.state.allArticles]
         if (articlesArray[index].articleGroups) {
             let thisGroups = articlesArray[index].articleGroups;
@@ -408,13 +389,40 @@ export class AdminRouter extends React.Component {
     // HOME PAGE FUNCTIONS
 
 
+    addCategory() {
+        let newCategory = document.getElementById("newCategoryInput").value;
+        let newSubCategorys = [...this.state.subCategorys];
+        newSubCategorys.push(newCategory);
+        this.setState({
+            subCategorys: newSubCategorys,
+            newSubCategory: false,
+        }, () => { console.log(this.state) })
+    }
+
+
+    newSubCategoryButton() {
+        this.setState({
+            newSubCategory: true,
+        })
+    }
+
+
+    removeSubCategory(index) {
+        console.log('running', index);
+        let newSubCategorys = [...this.state.subCategorys]
+        newSubCategorys.splice(index, 1);
+        this.setState({
+            subCategorys: newSubCategorys,
+        })
+    }
+
+
     removeHomeSingleArticle(i) {
         console.log(this.state);
         let newState = { ...this.state };
         newState.allArticles = [...this.state.allArticles];
         // all this removes the article from groups that he is related to
         for (let z = 0; z < newState.allArticles[i].articleGroups.length; z++) {//loops through the article that is removed groups
-            let groupName = newState.allArticles[i].articleGroups[z]
             for (let w = 0; w < newState.groups.length; w++) { // loops through the groups array
                 for (let t = 0; t < newState.groups[w].relatedArticles.length; t++) { // loops through the related articles of each group
                     if (newState.groups[w].relatedArticles[t] === newState.allArticles[i]) {
@@ -488,9 +496,9 @@ export class AdminRouter extends React.Component {
         let newState = { ...this.state };
         newState.newGroup.name = groupName;
         this.setState({
-            newGroup: newState.newGroup
-        })
-        // hashHistory.push('/newgroup')/// NEED TO LINK
+            newGroup: newState.newGroup,
+        }, () => { console.log(this.state) })
+        this.myPath = '/newgroup'
     }
 
 
@@ -549,8 +557,26 @@ export class AdminRouter extends React.Component {
     }
 
 
-
     // NEW ARTICLE FUNCTIONS
+
+
+    addSubCategory(categoryIndex) {
+        let thisSubCategory = this.state.subCategorys[categoryIndex];
+        let newSubArray = [...this.newArticleSubCategorys];
+        let notFound = true;
+        for (let i = 0; i < newSubArray.length; i++) {
+            if (newSubArray[i] === thisSubCategory) {
+                notFound = false;
+                newSubArray.splice(i, 1);
+                this.newArticleSubCategorys = newSubArray;
+                console.log(this.newArticleSubCategorys);
+            }
+        } if (notFound) {
+            newSubArray.push(thisSubCategory);
+            this.newArticleSubCategorys = newSubArray;
+            console.log(this.newArticleSubCategorys);
+        }
+    }
 
 
     removeSingleArticle(i) {
@@ -558,7 +584,6 @@ export class AdminRouter extends React.Component {
         let newState = { ...this.state };
         // all this removes the article from groups that he is related to
         for (let z = 0; z < newState.allArticles[i].articleGroups.length; z++) {//loops through the article that is removed groups
-            let groupName = newState.allArticles[i].articleGroups[z]
             for (let w = 0; w < newState.groups.length; w++) { // loops through the groups array
                 for (let t = 0; t < newState.groups[w].relatedArticles.length; t++) { // loops through the related articles of each group
                     if (newState.groups[w].relatedArticles[t] === newState.allArticles[i]) {
@@ -576,6 +601,8 @@ export class AdminRouter extends React.Component {
         document.getElementById("summeryInput").value = "";
         document.getElementById("homePageCheckbox").checked = true;
         document.getElementById("categoryOptions").value = "Chose a Catagory";
+        this.newArticleBody = '';
+        this.newArticleSubCategorys = [];
         let newState = { ...this.state }
         newState.newArticle = { ...this.defaultNewArticleState };
         newState.newArticle.heroObjects = [];
@@ -678,13 +705,15 @@ export class AdminRouter extends React.Component {
         let newState = { ...this.state };
         newState.allArticles = [...this.state.allArticles]
         newState.newArticle.date = date;
+        newState.newArticle.articleBody = this.newArticleBody;
+        newState.newArticle.subCategorys = [...this.newArticleSubCategorys];
         newState.allArticles.push(newState.newArticle);
         console.log("new state", newState)
         this.postTo('newArticle', newState)
+        this.myPath = '/';
         this.setState({
             allArticles: newState.allArticles,
         })
-        // hashHistory.push('/');/// NEED TO LINK
         this.resetNewArticleState();
     }
 
@@ -729,21 +758,12 @@ export class AdminRouter extends React.Component {
         const articleBodyString = this.editorContentToHtml(editorContent);
         const newState = { ...this.state };
         newState.newArticle.articleBody = articleBodyString;
-        this.setState({
-            newArticle: newState.newArticle
-        })
+        this.newArticleBody = newState.newArticle.articleBody;
+        console.log(this.newArticleBody)
+
     };
 
 
-    postTo(path, object) {// POST FUNC THAT TAKES PATH AND OBJECT 
-        axios.post(`http://localhost:8080/${path}`, object)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    };
 
     shouldComponentUpdate(nextProps, nextState) {
         if (this.props.titleValue !== nextState.newArticle.name ||
@@ -762,26 +782,39 @@ export class AdminRouter extends React.Component {
             <Router>
                 <div>
                     <NavBar />
-                    <Route exact path="/" component={(props) => (
-                        <HomeAdmin
-                            startNewGroup={this.newGroupOnClick}
-                            isInProccese={this.state.newGroup.isInProccese}
-                            creatNewGroup={this.creatNewGroup}
-                            arrayToRender={this.arrayToRender}
-                            onUploadFilesFormSubmit={this.onHomeUploadFilesFormSubmit}
-                            heroObjects={this.state.heroObjects}
-                            removeSingleHero={this.removeHomeSingleHero}
-                            scienceList={this.state.scince}
-                            healthList={this.state.health}
-                            technologyList={this.state.technology}
-                            removeSingleArticle={this.removeHomeSingleArticle}
-                            groupsArray={this.state.groups}
-                            removeGroup={this.deepRemoveGroup}
-                            allArticlesList={this.state.allArticles}
-                        />
-                    )} />
+                    <Route exact path="/" render={(props) => {
+                        return (
+                            <HomeAdmin
+                                addCategory={this.addCategory}
+                                newSubCategoryButton={this.newSubCategoryButton}
+                                newSubCategory={this.state.newSubCategory}
+                                removeSubCategory={this.removeSubCategory}
+                                subCategorys={this.state.subCategorys}
+                                articleBody={this.state.newArticle.articleBody}
+                                pathTo={this.myPathTo}
+                                path={this.myPath}
+                                startNewGroup={this.newGroupOnClick}
+                                isInProccese={this.state.newGroup.isInProccese}
+                                creatNewGroup={this.creatNewGroup}
+                                arrayToRender={this.arrayToRender}
+                                onUploadFilesFormSubmit={this.onHomeUploadFilesFormSubmit}
+                                heroObjects={this.state.heroObjects}
+                                removeSingleHero={this.removeHomeSingleHero}
+                                scienceList={this.state.scince}
+                                healthList={this.state.health}
+                                technologyList={this.state.technology}
+                                removeSingleArticle={this.removeHomeSingleArticle}
+                                groupsArray={this.state.groups}
+                                removeGroup={this.deepRemoveGroup}
+                                allArticlesList={this.state.allArticles}
+                            />
+                        )
+                    }} />
                     <Route path="/newarticle" component={(props) => (<App
-                        {...props}
+                        addSubCategory={this.addSubCategory}
+                        subCategorys={this.state.subCategorys}
+                        pathTo={this.myPathTo}
+                        path={this.myPath}
                         summeryValue={this.state.newArticle.summery}
                         titleValue={this.state.newArticle.name}
                         heroObjects={this.state.newArticle.heroObjects}
@@ -806,6 +839,8 @@ export class AdminRouter extends React.Component {
 
                     <Route path="/newgroup" component={() => (
                         <NewGroup
+                            pathTo={this.myPathTo}
+                            path={this.myPath}
                             arrayToRender={this.newGroupArrayToRender}
                             groupTitleValue={this.state.newGroup.title}
                             groupSummeryValue={this.state.newGroup.summery}

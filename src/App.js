@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import './App.css';
 
 //COMPONENTS
@@ -8,21 +9,32 @@ import SingleFile from './Singlefile';
 
 
 class App extends Component {
-
-  
   componentDidMount() {
-    document.getElementById("homePageCheckbox").checked = true
+    if (this.props.path !== '/') {
+      document.getElementById("homePageCheckbox").checked = true
+    }
   }
-  componentWillMount() {
-    console.log(this.props)
-  }
-  // shouldComponentUpdate(nextProps, nextState){
-  //   if(this.props.titleValue !== nextProps.titleValue){
-  //     return false
-  //   }
-  // }
 
   render() {
+    if (this.props.path === '/') {
+      this.props.pathTo();
+      return (<Redirect to='/' />)
+    }
+
+
+
+    let subCategorysRender = [];
+    let ourSubCategorys = this.props.subCategorys
+    for (let i = 0; i < ourSubCategorys.length; i++) {
+      subCategorysRender.push(
+        <div>
+          {ourSubCategorys[i]}
+          <input type="checkbox" onChange={() => { this.props.addSubCategory(i) }} />
+        </div>
+      );
+    }
+
+
     let heroList = this.props.heroObjects;
     let filesList = []
     for (let i = 0; i < heroList.length; i++) {
@@ -31,20 +43,15 @@ class App extends Component {
           singleFileTitle={heroList[i].title}
           singleFileCredit={heroList[i].credit}
           singleFileName={heroList[i].name}
-          onClick={() => { 
+          onClick={() => {
             this.props.removeSingleHero(i);
-            {/*let newState = {...this.state};
-            newState.newArticle.heroObjects.splice(i,1);
-            this.setState({
-              newArticle: newState.newArticle
-            })*/}
-           }}
+          }}
         />
       )
     }
     return (
       <div className="App" >
-        <h1>NEW ARTICAL</h1>
+        <h1>New Article</h1>
         <div className="uploadFiles">
           <form id='uploadFilesForm'>
             <input
@@ -103,19 +110,16 @@ class App extends Component {
             <option value="Technology">Technology</option>
           </select>
         </div>
+        <div>
+          <h4>Sub Categorys</h4>
+          {subCategorysRender}
+        </div>
         <div className="articleBodyBox" >
           <h2>artical Body</h2>
           {this.props.editor}
         </div>
         <div className="publish">
-          <button onClick={()=>{
-            this.props.onPublishClick();
-            let newState = {...this.state};
-            newState.newArticle.heroObjects = [];
-            this.setState({
-              newArticle: newState.newArticle,
-            })
-            }}>
+          <button onClick={this.props.onPublishClick}>
             publish
           </button>
         </div>

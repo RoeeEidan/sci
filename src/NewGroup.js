@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import SingleHomeArticle from './SingleHomeArticle';
-import App from './App';
+import {Redirect} from 'react-router-dom';
 import SingleFile from './Singlefile';
 
 import './App.css';
@@ -13,6 +12,11 @@ class NewGroup extends Component {
     }
 
     render() {
+
+        if(this.props.path === '/'){
+            this.props.pathTo();
+            return(<Redirect to='/'/>)
+        }
 
         const articlesList = this.props.arrayToRender(this.props.allArticles);
 
@@ -34,6 +38,7 @@ class NewGroup extends Component {
 
         return (
             <div>
+                <h1> New Group </h1>
                 <div>
                    ARTICLES
                    {articlesList}

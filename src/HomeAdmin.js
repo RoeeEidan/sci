@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import SingleHomeArticle from './SingleHomeArticle';
+import { Redirect } from 'react-router-dom';
 import './App.css';
 
 //COMPONENTS
@@ -11,6 +11,36 @@ import SingleFile from './Singlefile';
 class HomeAdmin extends Component {
 
     render() {
+
+        if (this.props.path === '/newgroup') {
+            this.props.pathTo();
+            return (<Redirect to='/newgroup' />)
+        }
+        if (this.props.path === '/newarticle') {
+            this.props.pathTo();
+            return (<Redirect to='/newarticle' />)
+        }
+
+
+        let newSubCategoryButton = (<button className="newGroupButton" onClick={this.props.newSubCategoryButton}>New Sub Category</button>);
+        if (this.props.newSubCategory) {
+            newSubCategoryButton = (
+                <form id="newSubCategoryForm">
+                    Sub Category: <input type="text" id="newCategoryInput" className="newCategoryInput" />
+                    <input type="button" value="Create" onClick={this.props.addCategory} />
+                </form>
+            )
+        }
+
+
+        let subCategorysRender = [];
+        let subCategorys = this.props.subCategorys;
+        for(let i = 0; i < subCategorys.length; i++){
+            subCategorysRender.push(
+                <li>{subCategorys[i]}<button onClick={()=>{this.props.removeSubCategory(i)}}>remove</button></li>
+            )
+        }
+
 
         let groupsArray = this.props.groupsArray;// creating the list of groups
         let groupList = [];
@@ -24,8 +54,8 @@ class HomeAdmin extends Component {
         }
 
         let groupVar = (<button className="newGroupButton" onClick={this.props.creatNewGroup}>New Group</button>);// diplaying the new group form
-        if(this.props.isInProccese){
-        groupVar = (
+        if (this.props.isInProccese) {
+            groupVar = (
                 <form id="newGroupForm">
                     Group Name: <input type="text" id="groupNameInput" className="groupNameInput" />
                     <input type="button" value="Create" onClick={this.props.startNewGroup} />
@@ -73,17 +103,26 @@ class HomeAdmin extends Component {
                 </div>
                 <div className="listOfHeros">
                     {filesList}
-
-                    <div>
-                        ARTICLES
-                        {allArticlesList}
-                    </div>
-                    <div>
-                        Groups
-                         {groupList}
-                        {groupVar}
-                    </div>
                 </div>
+                <div>
+                    Sub Categorys
+                    <ul>
+                        {subCategorysRender}
+                    </ul>
+                    {newSubCategoryButton}
+                </div>
+                <div>
+                    ARTICLES
+                        {allArticlesList}
+                </div>
+                <div>
+                    Groups
+                         {groupList}
+                </div>
+                <div>
+                    {groupVar}
+                </div>
+
             </div>
         );
     }
