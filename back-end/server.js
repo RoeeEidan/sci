@@ -13,6 +13,7 @@ var env = require('node-env-file');
 // functions
 
 let deepGroupRemove = require('./functions/deepGroupRemove');
+let deepGroupAdd = require('./functions/deepGroupAdd');
 
 env(__dirname + '/.env');
 
@@ -55,11 +56,102 @@ const PORT = process.env.PORT || 8080;
 
 let StateID = '5902e27baca2984a1299180a';
 
+
+//HOME PAGE CHANGES
+
+
+app.post('/NewHero', function (req, res) {//add new hero
+  console.log(req.body)
+  let thisHero = req.body;
+  SciFare.findById(StateID)
+    .then(scifare => {
+      scifare.heroObjects.push(thisHero);
+      console.log(scifare);
+      res.send(scifare);
+      return scifare.save();
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
+
+app.post('/RemoveHero', function (req, res) {//Remove Home Hero
+  console.log(req.body)
+  let id = req.body.index;
+  SciFare.findById(StateID)
+    .then(scifare => {
+      scifare.heroObjects.splice(id, 1);
+      console.log(scifare);
+      res.send(scifare);
+      return scifare.save();
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
+
+app.post('/NewCategory', function (req, res) {//Add New Category
+  console.log(req.body.category)
+  let category = req.body.category;
+  SciFare.findById(StateID)
+    .then(scifare => {
+      scifare.subCategorys.push(category)
+      console.log(scifare);
+      res.send(scifare);
+      return scifare.save();
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
+
+app.post('/RemoveCategory', function (req, res) {//remove a  Category
+  console.log(req.body.index)
+  let index = req.body.index;
+  SciFare.findById(StateID)
+    .then(scifare => {
+      scifare.subCategorys.splice(index, 1);
+      console.log(scifare);
+      res.send(scifare);
+      return scifare.save();
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
+
+
+
+
+
+
+
+
 app.get('/GetState', (req, res) => { // get the entire state 
 
   SciFare.findById(StateID)
     .then(scifare => {
       res.json(scifare);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400)
+        .json({ err });
+    })
+});
+
+
+app.get('/GetArticle/:id', (req, res) => { // get article by id 
+
+  SciFare.findById(StateID)
+    .then(scifare => {
+      let article = scifare.allArticles[req.params.id];
+
+      res.json(article);
     })
     .catch(err => {
       console.log(err);
@@ -138,6 +230,63 @@ app.post('/DeleteArticle/:x', (req, res) => { //Delete a article by id
 });
 
 
+app.post('/DeleteArticle/:x', (req, res) => { //Edit a article by id
+  SciFare.findById(StateID)
+    .then(scifare => {
+      console.log(scifare.allArticles)
+      scifare.allArticles.remove({ "_id": req.params.x });
+      scifare.save();
+      console.log(scifare.allArticles)
+      res.json({ scifare });
+
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400)
+        .json({ err });
+    })
+});
+
+
+app.post('/EditArticle/:x', (req, res) => { //edit a article object by id
+  SciFare.findById(StateID)
+    .then(scifare => {
+      console.log(req.body);
+      let article = req.body.article;
+      scifare.allArticles[req.body.index] = article;
+      scifare.save();
+      res.json({ article });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400)
+        .json({ err });
+    })
+});
+
+
+// app.put('/:objectId', (req,res) => {
+// 	let __object = req.body;
+// 	let update = {
+// 			property1:__object.property1,
+// 			property2:__object.property2,
+// 			property3:__object.property3,
+// 		}
+
+// 	let query = {"_id":req.params.objectId}
+
+// 	[YOUR_MODEL_NAME].findOneAndUpdate(query, update, { new:true, runValidators:true })
+// 		.then(updatedObject => {
+// 			res.json(updatedObject);
+// 		})
+// 		.catch(err => {
+// 			console.log(err)
+// 			res.status(400).json({err});
+// 		})
+
+// });
+
+
 app.post('/NewGroup', function (req, res) {//adding a group to the state
   console.log('we got a post')
   let newGroup = {
@@ -149,9 +298,22 @@ app.post('/NewGroup', function (req, res) {//adding a group to the state
     date: req.body.date,
     showAtHomePage: req.body.showAtHomePage,
     summery: req.body.summery,
+    subCategorys: req.body.subCategorys
   }
   SciFare.findById(StateID)
     .then(scifare => {
+      console.log('started the thn()')
+      let allArticles = [...scifare.allArticles];
+      for (let i = 0; i < newGroup.relatedArticles.length; i++) { // adds the group to the related articles
+        console.log('started the 1st for loop')
+        for (let z = 0; z < scifare.allArticles.length; z++) {
+          console.log('started the 2nd for loop')
+          if (scifare.allArticles[z].name === newGroup.relatedArticles[i].name) {
+            console.log('found a match')
+            scifare.allArticles[z].articleGroups.push(newGroup.name)
+          }
+        }
+      }
       scifare.groups.push(newGroup);
       console.log(scifare);
       res.send(scifare);
@@ -163,28 +325,22 @@ app.post('/NewGroup', function (req, res) {//adding a group to the state
 });
 
 
-//    PROBLEMMMMMMMM
 
-app.post('/DeleteGroup/:x', (req, res) => { //Delete a article by id
-     SciFare.findById(StateID)
+app.post('/DeleteGroup/:x', (req, res) => { //Delete a group by id
+  SciFare.findById(StateID)
     .then(scifare => {
-      // console.log('SciFare',scifare)// allArticles
-      // deepGroupRemove(scifare.allArticles , req.body.name)
-      // let arr = scifare.allArticles;
-      let arr = scifare.allArticles; //    PROBLEMMMMMMMM
       let name = req.body.name;
-      for (let i = 0; i < arr.length; i++) {
-        for (let z = 0; z < arr[i].relatedArticles.length; z++) {
-          if (arr[i].relatedArticles[z].name === name) {
-            arr[i].relatedArticles.splice(z, 1);
+      for (let i = 0; i < scifare.allArticles.length; i++) { // removes the group from the related articles
+        for (let z = 0; z < scifare.allArticles[i].articleGroups.length; z++) {
+          if (scifare.allArticles[i].articleGroups[z] === name) {
+            scifare.allArticles[i].articleGroups.splice(z, 1);
             console.log('removed');
           }
         }
       }
-      scifare.allArticles = arr
+      console.log('id', req.params.x)
       scifare.groups.remove({ "_id": req.params.x });
       scifare.save();
-      // console.log(scifare.allArticles)
       res.json({ scifare });
 
     })

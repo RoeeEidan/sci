@@ -12,14 +12,11 @@ class HomeAdmin extends Component {
 
     render() {
 
-        if (this.props.path === '/newgroup') {
+        if (this.props.path ) {
+            return (<Redirect to={this.props.path} />)
             this.props.pathTo();
-            return (<Redirect to='/newgroup' />)
         }
-        if (this.props.path === '/newarticle') {
-            this.props.pathTo();
-            return (<Redirect to='/newarticle' />)
-        }
+
 
 
         let newSubCategoryButton = (<button className="newGroupButton" onClick={this.props.newSubCategoryButton}>New Sub Category</button>);

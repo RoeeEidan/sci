@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Redirect} from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import SingleFile from './Singlefile';
 
 import './App.css';
@@ -8,15 +8,30 @@ import './App.css';
 class NewGroup extends Component {
 
     componentDidMount() {
-        document.getElementById("homePageCheckbox").checked = true
+        if (this.props.path != '/') {
+            document.getElementById("homePageCheckbox").checked = true
+        }
     }
 
     render() {
 
-        if(this.props.path === '/'){
+        if (this.props.path === '/') {
             this.props.pathTo();
-            return(<Redirect to='/'/>)
+            return (<Redirect to='/' />)
         }
+
+
+        let subCategorysRender = [];
+        let ourSubCategorys = this.props.subCategorys
+        for (let i = 0; i < ourSubCategorys.length; i++) {
+            subCategorysRender.push(
+                <div>
+                    {ourSubCategorys[i]}
+                    <input type="checkbox" onChange={() => { this.props.groupAddSubCategory(i) }} />
+                </div>
+            );
+        }
+
 
         const articlesList = this.props.arrayToRender(this.props.allArticles);
 
@@ -40,7 +55,7 @@ class NewGroup extends Component {
             <div>
                 <h1> New Group </h1>
                 <div>
-                   ARTICLES
+                    ARTICLES
                    {articlesList}
                 </div>
                 <div className="uploadFiles">
@@ -89,6 +104,10 @@ class NewGroup extends Component {
                         className="homePageCheckbox"
                         onChange={this.props.onHomePageChange}
                     />
+                </div>
+                <div>
+                    <p>Sub Categorys</p>
+                    {subCategorysRender}
                 </div>
                 <div className="articleBodyBox" >
                     <h2>artical Body</h2>

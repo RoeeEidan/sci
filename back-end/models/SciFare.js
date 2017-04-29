@@ -2,12 +2,22 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
 //Defining the schema for reviews
+
+const heroSchema = new Schema({
+    type: String,
+    title: String,
+    credit: String,
+    url: String,
+    name: String
+})
+
+
 const articleSchema = new Schema({
-    heroObjects: Array,
+    heroObjects: [heroSchema],
     title: String,
     name: String,
     articleBody: String,
-    articleGroups: Array, 
+    articleGroups: Array,
     category: String,
     subCategorys: Array,
     date: String,
@@ -16,10 +26,11 @@ const articleSchema = new Schema({
 })
 
 const groupSchema = new Schema({
-    heroObjects: Array,
+    heroObjects: [heroSchema],
     relatedArticles: [articleSchema],
     title: String,
     name: String,
+    subCategorys: Array,
     articleBody: String,
     date: String,
     showAtHomePage: Boolean,
@@ -28,14 +39,14 @@ const groupSchema = new Schema({
 
 
 const sciFareSchema = new Schema({
-            subCategorys: Array,
-            heroObjects: Array,
-            allArticles: [articleSchema],
-            scince: [articleSchema],
-            health: [articleSchema],
-            technology: [articleSchema],
-            groups: [groupSchema], 
-        });
+    subCategorys: Array,
+    heroObjects: [heroSchema],
+    allArticles: [articleSchema],
+    scince: [articleSchema],
+    health: [articleSchema],
+    technology: [articleSchema],
+    groups: [groupSchema],
+});
 
 
 
