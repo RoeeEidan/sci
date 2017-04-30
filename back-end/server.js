@@ -265,26 +265,45 @@ app.post('/EditArticle/:x', (req, res) => { //edit a article object by id
 });
 
 
-// app.put('/:objectId', (req,res) => {
-// 	let __object = req.body;
-// 	let update = {
-// 			property1:__object.property1,
-// 			property2:__object.property2,
-// 			property3:__object.property3,
-// 		}
+app.post('/RemoveGroupFromArticle', (req, res) => { //remove a group from article
+  SciFare.findById(StateID)
+    .then(scifare => {
+      console.log(req.body);
+      for(let i = 0; i < scifare.allArticles[req.body.articleIndex].articleGroups.length; i++){
+        console.log(scifare.allArticles[req.body.articleIndex].articleGroups[i], scifare.groups[req.body.groupIndex].name)
+        if(scifare.allArticles[req.body.articleIndex].articleGroups[i] === scifare.groups[req.body.groupIndex].name){
+          console.log('FOUNDDD')
+          scifare.allArticles[req.body.articleIndex].articleGroups.splice( i , 1 )
+        }
+      }
+      scifare.save();
+      res.send('yess');
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400)
+        .json({ err });
+    })
+});
 
-// 	let query = {"_id":req.params.objectId}
 
-// 	[YOUR_MODEL_NAME].findOneAndUpdate(query, update, { new:true, runValidators:true })
-// 		.then(updatedObject => {
-// 			res.json(updatedObject);
-// 		})
-// 		.catch(err => {
-// 			console.log(err)
-// 			res.status(400).json({err});
-// 		})
+app.post('/AddGroupToArticle', (req, res) => { //add a group to article 
+  SciFare.findById(StateID)
+    .then(scifare => {
+      console.log(req.body);
+      // thisAllArticles[index].articleGroups.splice(groupIndex, 1)
+      scifare.allArticles[req.body.articleIndex].articleGroups.push( scifare.groups[req.body.groupIndex].name)
+      scifare.save();
+      res.send('yess');
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400)
+        .json({ err });
+    })
+});
 
-// });
+//AddGroupToArticle'
 
 
 app.post('/NewGroup', function (req, res) {//adding a group to the state
@@ -343,6 +362,20 @@ app.post('/DeleteGroup/:x', (req, res) => { //Delete a group by id
       scifare.save();
       res.json({ scifare });
 
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400)
+        .json({ err });
+    })
+});
+
+
+app.get('/GetGroup/:id', (req, res) => { // get group by id 
+  SciFare.findById(StateID)
+    .then(scifare => {
+      let group = scifare.groups[req.params.id];
+      res.json(group);
     })
     .catch(err => {
       console.log(err);

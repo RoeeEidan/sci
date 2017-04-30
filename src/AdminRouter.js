@@ -24,7 +24,8 @@ const NavBar = () => (
             <li><Link to="/">Home</Link></li>
             <li><Link to="/newarticle">New Article</Link></li>
             <li><Link to="/newgroup">New Group</Link></li>
-            <li><Link to="/editArticle/5">Edit Article </Link></li>
+            <li><Link to="/editArticle/0">Edit Article </Link></li>
+            {/*<li><Link to="/DditGroup/0">Edit Group </Link></li>*/}
         </ul>
 
         <hr />
@@ -112,6 +113,7 @@ export class AdminRouter extends React.Component {
         this.myPath = undefined;
 
         //Home
+
         this.addCategory = this.addCategory.bind(this);
         this.newSubCategoryButton = this.newSubCategoryButton.bind(this);
         this.removeSubCategory = this.removeSubCategory.bind(this);
@@ -125,6 +127,7 @@ export class AdminRouter extends React.Component {
         this.arrayToRender = this.arrayToRender.bind(this);
         this.removeHomeSingleArticle = this.removeHomeSingleArticle.bind(this);
         this.editSingleArticle = this.editSingleArticle.bind(this);
+        this.editGroup = this.editGroup.bind(this);
 
 
         //New Article
@@ -418,19 +421,34 @@ export class AdminRouter extends React.Component {
     }
 
 
-    isGrouped(index) {
-        let name = this.state.newGroup.name;
-        let articlesArray = [...this.state.allArticles]
-        if (articlesArray[index].articleGroups) {
-            let thisGroups = articlesArray[index].articleGroups;
-            for (let i = 0; i < thisGroups.length; i++) {
-                if (thisGroups[i] === name) {
-                    return i;
+    isGrouped(index, NAME) {
+        if (NAME) {
+            let articlesArray = [...this.state.allArticles]
+            if (articlesArray[index].articleGroups) {
+                let thisGroups = articlesArray[index].articleGroups;
+                for (let i = 0; i < thisGroups.length; i++) {
+                    if (thisGroups[i] === NAME) {
+                        return i;
+                    }
                 }
+                return false;
+            } else {
+                alert("problem at AdminRouter at isGrouped Func")
             }
-            return false;
         } else {
-            alert("problem at AdminRouter at isGrouped Func")
+            let name = this.state.newGroup.name;
+            let articlesArray = [...this.state.allArticles]
+            if (articlesArray[index].articleGroups) {
+                let thisGroups = articlesArray[index].articleGroups;
+                for (let i = 0; i < thisGroups.length; i++) {
+                    if (thisGroups[i] === name) {
+                        return i;
+                    }
+                }
+                return false;
+            } else {
+                alert("problem at AdminRouter at isGrouped Func")
+            }
         }
     }
 
@@ -452,11 +470,11 @@ export class AdminRouter extends React.Component {
             newState.newGroup.relatedArticles = [...this.state.newGroup.relatedArticles];
             thisArticle.articleGroups.push(newState.newGroup.name) // pushs the group to the article
             newState.newGroup.relatedArticles.push(thisArticle); // pushs the article to the group related array
-            this.setState({
-                newGroup: newState.newGroup,
-                allArticles: newState.allArticles
-            })
         }
+        this.setState({
+            newGroup: newState.newGroup,
+            allArticles: newState.allArticles
+        })
         console.log(this.state);
     }
 
@@ -466,10 +484,17 @@ export class AdminRouter extends React.Component {
     // HOME PAGE FUNCTIONS
 
 
+    editGroup(index) {
+        this.myPath = `editGroup/${index}`;
+        this.forceUpdate();
+        this.mypathTo();
+    }
+
+
     editSingleArticle(index) {
         this.myPath = `editArticle/${index}`;
         this.forceUpdate();
-        this.pathTo();
+        this.mypathTo();
     }
 
 
@@ -901,6 +926,7 @@ export class AdminRouter extends React.Component {
                     <Route exact path="/" render={(props) => {
                         return (
                             <HomeAdmin
+                                editGroup={this.editGroup}
                                 updateDbState={this.updateDbState}
                                 addCategory={this.addCategory}
                                 newSubCategoryButton={this.newSubCategoryButton}
@@ -993,6 +1019,7 @@ export class AdminRouter extends React.Component {
                                 id={id}
                                 subCategorys={this.state.subCategorys}
                                 onPublishClick={this.onEditPublishClick}
+                                uploadFile={this.uploadFile}
                             /*
                                                             getArticleByID={this.getArticleByID}
                                                             addSubCategory={this.addSubCategory}
@@ -1026,11 +1053,14 @@ export class AdminRouter extends React.Component {
                     }} />
                     <Route path='/EditGroup/:i' component={(path) => {
                         let id = path.match.params.i;
-                        return
-                        (<EditGroup
+                        return (<EditGroup
+                            isGrouped={this.isGrouped}
                             id={id}
                             subCategorys={this.state.subCategorys}
+                            allArticles={this.state.allArticles}
                             onPublishClick={this.onEditPublishClick}
+                            uploadFile={this.uploadFile}
+                            postTo={this.postTo}
                         />)
                     }} />
                 </div>

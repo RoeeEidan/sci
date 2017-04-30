@@ -13,8 +13,8 @@ class HomeAdmin extends Component {
     render() {
 
         if (this.props.path ) {
-            return (<Redirect to={this.props.path} />)
             this.props.pathTo();
+            return (<Redirect to={this.props.path} />)
         }
 
 
@@ -44,6 +44,7 @@ class HomeAdmin extends Component {
         for (let i = 0; i < groupsArray.length; i++) {
             groupList.push(
                 <div>
+                    <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
                     {groupsArray[i].name}
                     <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
                 </div>

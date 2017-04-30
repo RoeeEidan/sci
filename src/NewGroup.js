@@ -8,7 +8,7 @@ import './App.css';
 class NewGroup extends Component {
 
     componentDidMount() {
-        if (this.props.path != '/') {
+        if (this.props.path !== '/') {
             document.getElementById("homePageCheckbox").checked = true
         }
     }

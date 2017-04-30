@@ -43,6 +43,33 @@ class EditArticle extends Component {
         this.onHomePageChange = this.onHomePageChange.bind(this);
         this.onCategoryChange = this.onCategoryChange.bind(this);
         this.editorContentToHtml = this.editorContentToHtml.bind(this);
+        this.onUploadHeroForm = this.onUploadHeroForm.bind(this);
+    }
+
+
+        onUploadHeroForm() {
+        let file = document.getElementById("uploadFilesFile").files[0];
+        let title = document.getElementById("uploadFilesTitle").value;
+        let credit = document.getElementById("uploadFilesCredit").value;
+        if (file && title && credit) {
+            document.getElementById("uploadFilesForm").reset();
+            let heroObject = {
+                type: file.type,
+                title: title,
+                credit: credit,
+                url: `https://s3.amazonaws.com/roeetestbucket123/${file.name}`,
+                name: `${file.name}`
+            };
+            let article = { ...this.state.article };
+            article.heroObjects.push(heroObject);
+            this.setState({
+                article: article
+            })
+            // this.props.uploadFile(file)
+        } else {
+            alert('you forgot somthing')
+        }
+
     }
 
 
@@ -228,7 +255,7 @@ class EditArticle extends Component {
                             credit: <input type='text' id='uploadFilesCredit' />
                         </p>
                         <p>
-                            <input type="button" value="Submit" onClick={this.props.onUploadFilesFormSubmit} />
+                            <input type="button" value="Submit" onClick={this.onUploadHeroForm} />
                         </p>
                     </form>
                 </div>

@@ -8,31 +8,32 @@ import './App.css';
 
 import { EditorState, ContentState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
-import draftToHtml from 'draftjs-to-html'; 
-import { convertToRaw } from 'draft-js'; 
+import draftToHtml from 'draftjs-to-html';
+import { convertToRaw } from 'draft-js';
 
 //COMPONENTS
 
 import SingleFile from './Singlefile';
+import SingleGroupArticle from './EditGroupHomeArticle'
 
 
 
-class EditArticle extends Component {
+class EditGroup extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            article: {
+            group: {
                 heroObjects: [],// {type:'' , url: '' , title:'' , credit ''}
+                relatedArticles: [],
                 title: undefined,
                 name: undefined,
                 articleBody: undefined,
-                articleGroups: [], // group name
-                category: undefined,
-                subCategorys: [],
                 date: undefined,
                 showAtHomePage: true,
-                summery: undefined
+                summery: undefined,
+                subCategorys: [],
+                isInProccese: false
             },
         };
         this.onEditorStateChange = this.onEditorStateChange.bind(this);
@@ -43,6 +44,74 @@ class EditArticle extends Component {
         this.onHomePageChange = this.onHomePageChange.bind(this);
         this.onCategoryChange = this.onCategoryChange.bind(this);
         this.editorContentToHtml = this.editorContentToHtml.bind(this);
+        this.onUploadHeroForm = this.onUploadHeroForm.bind(this);
+        this.groupSingleArticle = this.groupSingleArticle.bind(this);
+        this.removeGroup = this.removeGroup.bind(this);
+
+
+    }
+
+
+    removeGroup(index, name) {
+        let newState = { ...this.state };
+        for (let i = 0; i < newState.group.relatedArticles.length; i++) {
+            if (newState.group.relatedArticles[i] === this.props.allArticles[index]) {
+                newState.group.relatedArticles.splice(i, 1) // removes the article from the group
+            }
+        }
+        this.props.postTo('RemoveGroupFromArticle', { groupIndex: this.props.id, articleIndex: index })
+        this.setState({
+            group: newState.group
+        })
+    }
+
+
+    groupSingleArticle(index, articleName) {
+        let newState = { ...this.state };
+        newState.group.relatedArticles = [...this.state.group.relatedArticles];
+        let isGrouped = this.props.isGrouped(index , this.state.group.name); //returns either false or the index of the group
+        if (isGrouped || isGrouped === 0) {
+            this.removeGroup(index, newState.group.name); // removes the group from the article
+            for (let i = 0; i < newState.group.relatedArticles.length; i++) {//this is the way to the articles  
+                if (newState.group.relatedArticles[i].name === articleName) {// removers the article from the group
+                    newState.group.relatedArticles.splice(i, 1);
+                }
+            }
+        } else {
+            let thisArticle = this.props.allArticles[index];
+            this.props.postTo('AddGroupToArticle', { groupIndex: this.props.id, articleIndex: index })
+            newState.group.relatedArticles.push(thisArticle); // pushs the article to the group related array
+        }
+        this.setState({
+            group: newState.group,
+        })
+        console.log(this.state);
+    }
+
+
+    onUploadHeroForm() {
+        let file = document.getElementById("uploadFilesFile").files[0];
+        let title = document.getElementById("uploadFilesTitle").value;
+        let credit = document.getElementById("uploadFilesCredit").value;
+        if (file && title && credit) {
+            document.getElementById("uploadFilesForm").reset();
+            let heroObject = {
+                type: file.type,
+                title: title,
+                credit: credit,
+                url: `https://s3.amazonaws.com/roeetestbucket123/${file.name}`,
+                name: `${file.name}`
+            };
+            let group = { ...this.state.group };
+            group.heroObjects.push(heroObject);
+            this.setState({
+                group: group
+            })
+            this.props.uploadFile(file)
+        } else {
+            alert('you forgot somthing')
+        }
+
     }
 
 
@@ -55,28 +124,28 @@ class EditArticle extends Component {
 
     onCategoryChange() {
         const category = document.getElementById("categoryOptions").value;
-        let newArticle = { ...this.state.article };
-        newArticle.category = category;
+        let newGroup = { ...this.state.group };
+        newGroup.category = category;
         this.setState({
-            article: newArticle
+            group: newGroup
         }, () => { console.log(this.state) })
     }
 
 
     onHomePageChange() {
         const val = document.getElementById("homePageCheckbox").checked;
-        let newArticle = { ...this.state.article };
+        let newGroup = { ...this.state.group };
         switch (val) {
             case false:
-                newArticle.showAtHomePage = false;
+                newGroup.showAtHomePage = false;
                 this.setState({
-                    article: newArticle
+                    group: newGroup
                 }, () => { console.log(this.state) })
                 break;
             case true:
-                newArticle.showAtHomePage = true;
+                newGroup.showAtHomePage = true;
                 this.setState({
-                    article: newArticle
+                    group: newGroup
                 }, () => { console.log(this.state) })
                 break;
             default: alert("this shouldnt happen")
@@ -86,20 +155,20 @@ class EditArticle extends Component {
 
     onSummeryChange() {
         const text = document.getElementById("summeryInput").value;
-        let newArticle = { ...this.state.article };
-        newArticle.summery = `${text}`;
+        let newGroup = { ...this.state.group };
+        newGroup.summery = `${text}`;
         this.setState({
-            article: newArticle
+            group: newGroup
         }, () => { console.log(this.state) })
     }
 
 
     removeSingleHero(i) {
-        let newArticle = { ...this.state.article };
-        newArticle.heroObjects = [... this.state.article.heroObjects];
-        newArticle.heroObjects.splice(i, 1);
+        let newGroup = { ...this.state.group };
+        newGroup.heroObjects = [... this.state.group.heroObjects];
+        newGroup.heroObjects.splice(i, 1);
         this.setState({
-            article: newArticle
+            group: newGroup
         }, console.log(this.state))
     }
 
@@ -107,62 +176,63 @@ class EditArticle extends Component {
     onTitleChange() {// LISTINING ON CHANGE OF TITLE INPUT
         const text = document.getElementById("titleInput").value;
         let newState = { ...this.state };
-        newState.article.name = `${text}`;
-        newState.article.title = `<h1>${text}</h1>`;
+        newState.group.name = `${text}`;
+        newState.group.title = `<h1>${text}</h1>`;
         this.setState({
-            article: newState.article
+            group: newState.group
         }, () => { console.log(this.state) })
     }
 
 
     addSubCategory(categoryIndex) {
-        let newArticle = { ...this.state.article }
-        newArticle.subCategorys = [...this.state.article.subCategorys];
+        let newGroup = { ...this.state.group }
+        newGroup.subCategorys = [...this.state.group.subCategorys];
         let thisSubCategory = this.props.subCategorys[categoryIndex];
         let notFound = true;
-        for (let i = 0; i < newArticle.subCategorys.length; i++) {
-            if (newArticle.subCategorys[i] === thisSubCategory) {
+        for (let i = 0; i < newGroup.subCategorys.length; i++) {
+            if (newGroup.subCategorys[i] === thisSubCategory) {
                 notFound = false;
-                newArticle.subCategorys.splice(i, 1);
+                newGroup.subCategorys.splice(i, 1);
             }
         } if (notFound) {
-            newArticle.subCategorys.push(thisSubCategory);
+            newGroup.subCategorys.push(thisSubCategory);
         } this.setState({
-            article: newArticle
+            group: newGroup
         }, () => { console.log(this.state) })
     }
 
 
     onEditorStateChange = (editorState) => {
         let markup = this.editorContentToHtml(editorState);
-        let newArticle = {...this.state.article};
-        newArticle.articleBody = markup;
+        let newGroup = { ...this.state.group };
+        newGroup.articleBody = markup;
         this.setState({
             editorState: editorState,
-            article: newArticle
+            group: newGroup
         })
     }
 
 
     componentWillMount() {
         let that = this;
-        axios.get(`http://localhost:8080/GetArticle/${this.props.id}`)
+        axios.get(`http://localhost:8080/GetGroup/${this.props.id}`)
             .then(function (response) {
                 that.setState({
-                    article: response.data
+                    group: response.data
                 }, () => {
-                    document.getElementById("homePageCheckbox").checked = that.state.article.showAtHomePage;
-                    document.getElementById("titleInput").value = that.state.article.name;
-                    document.getElementById("summeryInput").value = that.state.article.summery;
-                    document.getElementById("categoryOptions").value = that.state.article.category;
+                    let title = that.state.group.title.slice(4, (that.state.group.title.length - 5));
+                    document.getElementById("homePageCheckbox").checked = that.state.group.showAtHomePage;
+                    document.getElementById("titleInput").value = title;
+                    document.getElementById("summeryInput").value = that.state.group.summery;
+                    // document.getElementById("categoryOptions").value = that.state.group.category;
 
-                    let ourSubCategorys = that.state.article.subCategorys;
+                    let ourSubCategorys = that.state.group.subCategorys;
                     for (let i = 0; i < ourSubCategorys.length; i++) {
                         console.log('checkingggg')
                         document.getElementById(`${ourSubCategorys[i]}`).checked = true
                     }
                     that.setState({
-                        editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.article.articleBody).contentBlocks))
+                        editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.group.articleBody).contentBlocks))
                     }, () => {
                         console.log('editorState Changedd', that.state)
                     })
@@ -183,6 +253,21 @@ class EditArticle extends Component {
         }
 
 
+        let articlesButtonRender = [];
+        for (let i = 0; i < this.props.allArticles.length; i++) {
+            articlesButtonRender.push(
+                <SingleGroupArticle
+                    /*article = {this.props.allArticles[i]}*/
+                    groupName={this.state.group.name}
+                    relatedArticles={this.state.group.relatedArticles}
+                    Index={i}
+                    articleName={this.props.allArticles[i].name}
+                    groupSingleArticle={this.groupSingleArticle}
+                />
+            )
+        }
+
+
         let subCategorysRender = [];
         console.log(this.props.subCategorys);
         let ourSubCategorys = this.props.subCategorys
@@ -196,7 +281,7 @@ class EditArticle extends Component {
         }
 
 
-        let heroList = this.state.article.heroObjects;
+        let heroList = this.state.group.heroObjects;
         let filesList = []
         for (let i = 0; i < heroList.length; i++) {
             filesList.push(
@@ -211,9 +296,12 @@ class EditArticle extends Component {
             )
         }
         return (
-            <div className="EditArticle" >
-
-                <h1>{this.state.article.name}</h1>
+            <div className="EditGroup" >
+                <h1>{this.state.group.name}</h1>
+                <div>
+                    <p className="  ">All Articles</p>
+                    {articlesButtonRender}
+                </div>
                 <div className="uploadFiles">
                     <form id='uploadFilesForm'>
                         <input
@@ -228,7 +316,7 @@ class EditArticle extends Component {
                             credit: <input type='text' id='uploadFilesCredit' />
                         </p>
                         <p>
-                            <input type="button" value="Submit" onClick={this.props.onUploadFilesFormSubmit} />
+                            <input type="button" value="Submit" onClick={this.onUploadHeroForm} />
                         </p>
                     </form>
                 </div>
@@ -241,7 +329,6 @@ class EditArticle extends Component {
                     <input
                         id='titleInput'
                         type='text'
-                        value={this.state.article.name}
                         onChange={this.onTitleChange}
                     />
                 </div>
@@ -262,7 +349,7 @@ class EditArticle extends Component {
                         onChange={this.onHomePageChange}
                     />
                 </div>
-                <div className="categoryBox">
+                {/*<div className="categoryBox">
                     <h3>Category</h3>
                     <select id='categoryOptions' onChange={this.onCategoryChange}>
                         <option>Chose a Category</option>
@@ -270,12 +357,12 @@ class EditArticle extends Component {
                         <option value="Health">Health</option>
                         <option value="Technology">Technology</option>
                     </select>
-                </div>
+                </div>*/}
                 <div>
                     <h4>Sub Categorys</h4>
                     {subCategorysRender}
                 </div>
-                <div className="articleBodyBox" >
+                <div className="groupBodyBox" >
                     <h2>artical Body</h2>
                     <Editor
                         editorState={this.state.editorState}
@@ -283,7 +370,7 @@ class EditArticle extends Component {
                     />
                 </div>
                 <div className="publish">
-                    <button onClick={() => { this.props.onPublishClick(this.props.id, this.state.article) }}>
+                    <button onClick={() => { console.log(this.state.group)/* this.props.onPublishClick(this.props.id, this.state.group) */ }}>
                         publish
                     </button>
                 </div>
@@ -292,5 +379,5 @@ class EditArticle extends Component {
     }
 }
 
-export default EditArticle;
+export default EditGroup;
 
