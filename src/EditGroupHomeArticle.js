@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './App.css';
 
 // Props
 // GroupName is group name

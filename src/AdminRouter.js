@@ -281,6 +281,7 @@ export class AdminRouter extends React.Component {
 
 
     onNewGroupHomePageChange() {
+        console.log('running');
         const val = document.getElementById("homePageCheckbox").checked;
         let newState = { ...this.state };
         switch (val) {
@@ -288,13 +289,13 @@ export class AdminRouter extends React.Component {
                 newState.newGroup.showAtHomePage = false;
                 this.setState({
                     newGroup: newState.newGroup
-                })
+                },()=>{console.log(this.state.newGroup)})
                 break;
             case true:
                 newState.newGroup.showAtHomePage = true;
                 this.setState({
                     newGroup: newState.newGroup
-                })
+                },()=>{console.log(this.state.newGroup)})
                 break;
             default: alert("this shouldnt happen")
         }
@@ -555,23 +556,46 @@ export class AdminRouter extends React.Component {
 
     arrayToRender(articles) {
         let listToRender = [];
+        let listToRender2 = [];
         for (let i = 0; i < articles.length; i++) {
-            listToRender.push(
-                <SingleHomeArticle
-                    editSingleArticle={this.editSingleArticle}
-                    name={articles[i].name}
-                    removeSingleArticle={() => {
-                        this.removeHomeSingleArticle(i);
-                        this.postTo(`DeleteArticle/${articles[i]._id}`)
-                    }}
-                    index={i}
-                    category={articles[i].category}
-                />
-            )
+            if(i < (articles.length/2)){
+                listToRender.push(
+                    <SingleHomeArticle
+                        editSingleArticle={this.editSingleArticle}
+                        name={articles[i].name}
+                        removeSingleArticle={() => {
+                            this.removeHomeSingleArticle(i);
+                            this.postTo(`DeleteArticle/${articles[i]._id}`)
+                        }}
+                        index={i}
+                        category={articles[i].category}
+                    />
+                )
+            }else if(i >= (articles.length/2)){
+                listToRender2.push(
+                    <SingleHomeArticle
+                        editSingleArticle={this.editSingleArticle}
+                        name={articles[i].name}
+                        removeSingleArticle={() => {
+                            this.removeHomeSingleArticle(i);
+                            this.postTo(`DeleteArticle/${articles[i]._id}`)
+                        }}
+                        index={i}
+                        category={articles[i].category}
+                    />
+                )
+            }else{
+                alert("Check file AdminRouter line 287")
+            }
         }
         return (
-            <div>
-                {listToRender}
+            <div className="articleListBoxToRender flex-container">
+                <div className="articleListToRender flex-item flex-container">
+                    {listToRender}
+                </div>
+                <div className="articleListToRender articleListToRender2 flex-item flex-container">
+                    {listToRender2}
+                </div>
             </div>
         )
 
@@ -906,10 +930,18 @@ export class AdminRouter extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
+        if(document.getElementById("homePageCheckbox")){
+            if(this.state.newArticle.showAtHomePage !== document.getElementById("homePageCheckbox").checked ||
+                this.state.newGroup.showAtHomePage !== document.getElementById("homePageCheckbox").checked){
+                    return false
+                }
+        }
         if (this.props.titleValue !== nextState.newArticle.name ||
             this.props.summeryValue !== nextState.newArticle.summery ||
             this.props.groupTitleValue !== nextState.newGroup.title ||
-            this.props.groupSummeryValue !== nextState.newGroup.summery
+            this.props.groupSummeryValue !== nextState.newGroup.summery ||
+            this.props.showAtHomePage !== nextProps.showAtHomePage 
+
         ) {
             return false
         } else {
@@ -955,6 +987,7 @@ export class AdminRouter extends React.Component {
                     }} />
                     <Route path="/newarticle" component={(props) => (
                         <App
+                            showAtHomePage={this.state.newArticle.showAtHomePage}
                             addSubCategory={this.addSubCategory}
                             subCategorys={this.state.subCategorys}
                             pathTo={this.myPathTo}
@@ -983,6 +1016,7 @@ export class AdminRouter extends React.Component {
 
                     <Route path="/newgroup" component={() => (
                         <NewGroup
+                            showAtHomePage={this.state.newGroup.showAtHomePage}
                             groupAddSubCategory={this.groupAddSubCategory}
                             subCategorys={this.state.subCategorys}
                             pathTo={this.myPathTo}

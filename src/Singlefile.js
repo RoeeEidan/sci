@@ -1,21 +1,20 @@
 import React, { Component } from 'react';
-import './App.css';
 
 
 class SingleFile extends Component {
     render(){
         return(
-            <ul className='singleFileBox'>
-                <li className="singleFileName">
+            <ul className='singleFileBox flex-container'>
+                <li className="singleFileName flex-item">
                     {this.props.singleFileName}
                 </li>
-                <li className="singleFileTitle">
+                <li className="singleFileTitle flex-item">
                     {this.props.singleFileTitle}
                 </li>
-                <li className="singleFileCredit">
+                <li className="singleFileCredit flex-item">
                     {this.props.singleFileCredit}
                 </li>
-                <button className="removeSingleFile" onClick={this.props.onClick}>
+                <button className="removeSingleFile flex-item" onClick={this.props.onClick}>
                     remove
                 </button>
             </ul>

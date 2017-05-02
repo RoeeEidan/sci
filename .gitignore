@@ -19,3 +19,4 @@ yarn-error.log*
 # db
 /back-end/data
 /back-end/data/db
+/back-end/data/db/diagnostic.data

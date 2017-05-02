@@ -3,7 +3,6 @@ import { Redirect } from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg';
 import axios from 'axios';
 
-import './App.css';
 
 
 import { EditorState, ContentState } from 'draft-js';
