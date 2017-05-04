@@ -41,6 +41,7 @@ const groupSchema = new Schema({
 const sciFareSchema = new Schema({
     subCategorys: Array,
     heroObjects: [heroSchema],
+    inProcess:[articleSchema],
     allArticles: [articleSchema],
     scince: [articleSchema],
     health: [articleSchema],

@@ -196,6 +196,15 @@ class App extends Component {
             </div>
           </div>
         </div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
         <div className="articleBodyBox" >
           <h2>Artical Body</h2>
           {this.props.editor}
