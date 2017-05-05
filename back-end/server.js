@@ -145,6 +145,41 @@ app.get('/GetState', (req, res) => { // get the entire state
 });
 
 
+app.get('/GetHomePageContent', (req, res) => { // get the home page state 
+  SciFare.findById(StateID)
+    .then(scifare => {
+      let homePageObject = {};
+      homePageObject.heroObjects = scifare.heroObjects;
+      homePageObject.subCategorys = scifare.subCategorys;
+      homePageObject.articles =[];
+      homePageObject.groups =[];
+      homePageObject.inProcess = [];
+      for(let i = 0; i < scifare.allArticles.length; i++){
+        let article = {
+          index: i,
+          name: scifare.allArticles[i].name,
+          _id: scifare.allArticles[i]._id
+        }
+        homePageObject.articles.push(article);
+      }
+      for(let i = 0; i < scifare.groups.length; i++){
+        let group = {
+          index: i,
+          name: scifare.groups[i].name,
+          _id: scifare.groups[i]._id
+        }
+        homePageObject.groups.push(group);
+      }
+      res.json(homePageObject);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400)
+        .json({ err });
+    })
+});
+
+
 app.get('/GetArticle/:id', (req, res) => { // get article by id 
 
   SciFare.findById(StateID)
@@ -335,7 +370,7 @@ app.post('/NewGroup', function (req, res) {//adding a group to the state
       }
       scifare.groups.push(newGroup);
       console.log(scifare);
-      res.send(scifare);
+      res.send(scifare.groups[scifare.groups.length-1]._id);
       return scifare.save();
     })
     .catch(err => {
@@ -357,7 +392,7 @@ app.post('/DeleteGroup/:x', (req, res) => { //Delete a group by id
           }
         }
       }
-      console.log('id', req.params.x)
+      // console.log('IDDDDDD', scifare.groups[req.body.index]._id)
       scifare.groups.remove({ "_id": req.params.x });
       scifare.save();
       res.json({ scifare });

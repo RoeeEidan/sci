@@ -1,27 +1,25 @@
 import React, { Component } from 'react';
-import { Redirect , Link } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
+import axios from 'axios';
 
 //COMPONENTS
 
 import SingleFile from './Singlefile';
 
 
-
 class HomeAdmin extends Component {
-
     render() {
+        console.log("Home page statttte!!!! ", this.props)
 
-        if (this.props.path ) {
+        if (this.props.path) {
             this.props.pathTo();
             return (<Redirect to={this.props.path} />)
         }
 
-
-
         let newSubCategoryButton = (<div className="newCategoryButtonDiv"> <button className="newGroupButton" onClick={this.props.newSubCategoryButton}>New Sub Category</button></div>);
         if (this.props.newSubCategory) {
             newSubCategoryButton = (
-                <div className="newCategoryButtonDiv">        
+                <div className="newCategoryButtonDiv">
                     <form id="newSubCategoryForm">
                         Sub Category: <input type="text" id="newCategoryInput" className="newCategoryInput" />
                         <input type="button" value="Create" onClick={this.props.addCategory} />
@@ -32,14 +30,14 @@ class HomeAdmin extends Component {
 
 
         let subCategorysRender = [];
-        let subCategorys = this.props.subCategorys;
-        for(let i = 0; i < subCategorys.length; i++){
+        let subCategorys = this.props.homePageState.subCategorys || [];
+        for (let i = 0; i < subCategorys.length; i++) {
             subCategorysRender.push(
                 <li className="flex-item">
                     <span className="subCategorysText">
                         {subCategorys[i]}
-                    </span>     
-                    <button onClick={()=>{this.props.removeSubCategory(i)}}>
+                    </span>
+                    <button onClick={() => { this.props.removeSubCategory(i) }}>
                         remove
                     </button>
                 </li>
@@ -47,57 +45,58 @@ class HomeAdmin extends Component {
         }
 
 
-        let groupsArray = this.props.groupsArray;// creating the list of groups
+        let groupsArray = this.props.homePageState.groups || [];// creating the list of groups
         let groupList1 = [];
         let groupList2 = [];
         let groupList3 = [];
         for (let i = 0; i < groupsArray.length; i++) {
-            if(i < (groupsArray.length/3) ){
+            if (i < (groupsArray.length / 3)) {
                 groupList1.push(
-                <div className="singleGroupList flex-item flex-container">
-                    <div className="singleGroupButtons">
-                        <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
+                    <div className="singleGroupList flex-item flex-container">
+                        <div className="singleGroupButtons">
+                            <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
+                        </div>
+                        <div className="singleGroupName">
+                            {groupsArray[i].name}
+                        </div>
+                        <div className="singleGroupButtons">
+                            <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
+                        </div>
                     </div>
-                    <div className="singleGroupName">
-                        {groupsArray[i].name}
-                    </div>
-                    <div className="singleGroupButtons">
-                    <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
-                    </div>
-                </div>
-            )
-            }else if( (groupsArray.length/3) <= i && i < (( groupsArray.length / 3 )*2 ) ){
+                )
+            } else if ((groupsArray.length / 3) <= i && i < ((groupsArray.length / 3) * 2)) {
                 groupList2.push(
-                <div className="singleGroupList flex-item flex-container singleGroupList2">
-                    <div className="singleGroupButtons">
-                        <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
+                    <div className="singleGroupList flex-item flex-container singleGroupList2">
+                        <div className="singleGroupButtons">
+                            <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
+                        </div>
+                        <div className="singleGroupName">
+                            {groupsArray[i].name}
+                        </div>
+                        <div className="singleGroupButtons">
+                            <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
+                        </div>
                     </div>
-                    <div className="singleGroupName">
-                        {groupsArray[i].name}
-                    </div>
-                    <div className="singleGroupButtons">
-                    <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
-                    </div>
-                </div>
-            )
-            }else if( (( groupsArray.length / 3 )*2 ) <= i ){
+                )
+            } else if (((groupsArray.length / 3) * 2) <= i) {
                 groupList3.push(
-                <div className="singleGroupList flex-item flex-container">
-                    <div className="singleGroupButtons">
-                        <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
+                    <div className="singleGroupList flex-item flex-container">
+                        <div className="singleGroupButtons">
+                            <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
+                        </div>
+                        <div className="singleGroupName">
+                            {groupsArray[i].name}
+                        </div>
+                        <div className="singleGroupButtons">
+                            <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
+                        </div>
                     </div>
-                    <div className="singleGroupName">
-                        {groupsArray[i].name}
-                    </div>
-                    <div className="singleGroupButtons">
-                    <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
-                    </div>
-                </div>
-            )
-            }else{
+                )
+            } else {
                 alert("check HomeAdmin at line 60")
             }
         }
+
 
         let groupVar = (<button className="newGroupButton" onClick={this.props.creatNewGroup}>New Group</button>);// diplaying the new group form
         if (this.props.isInProccese) {
@@ -110,7 +109,7 @@ class HomeAdmin extends Component {
         }
 
 
-        let heroList = this.props.heroObjects; // HOME HERO LIST
+        let heroList = this.props.homePageState.heroObjects || []; // HOME HERO LIST
         let filesList = [];
         for (let i = 0; i < heroList.length; i++) {
             filesList.push(
@@ -123,7 +122,7 @@ class HomeAdmin extends Component {
             )
         }
 
-        let allArticlesList = this.props.arrayToRender(this.props.allArticlesList);
+        let allArticlesList = this.props.arrayToRender(this.props.homePageState.articles || []);
 
 
         return (
@@ -140,10 +139,10 @@ class HomeAdmin extends Component {
                                 accept="image/video"
                             />
                             <p>
-                                Title: <textarea  rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />
+                                Title: <textarea rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />
                             </p>
                             <p>
-                                Credit: <textarea rows="2" type='text' id='uploadFilesCredit' className="uploadFilesCreditInput flex-item"/>
+                                Credit: <textarea rows="2" type='text' id='uploadFilesCredit' className="uploadFilesCreditInput flex-item" />
                             </p>
                             <p>
                                 <input type="button" value="Submit" className="flex-item" onClick={this.props.onUploadFilesFormSubmit} />
@@ -151,24 +150,24 @@ class HomeAdmin extends Component {
                         </form>
                     </div>
                     <div className="listOfHeros">
-                            <ul className='singleFileBox flex-container'>
-                                <li className="singleFileName flex-item">
-                                    Name
+                        <ul className='singleFileBox flex-container'>
+                            <li className="singleFileName flex-item">
+                                Name
                                 </li>
-                                <li className="singleFileTitle flex-item">
-                                    Title
+                            <li className="singleFileTitle flex-item">
+                                Title
                                 </li>
-                                <li className="singleFileCredit flex-item">
-                                    Credit
+                            <li className="singleFileCredit flex-item">
+                                Credit
                                 </li>
-                                <div className="removeSingleFile flex-item">
-                                </div>
-                            </ul>
+                            <div className="removeSingleFile flex-item">
+                            </div>
+                        </ul>
                         {filesList}
                     </div>
                 </div>
                 <div>
-                    <p className="subCategorysTitle">   
+                    <p className="subCategorysTitle">
                         Sub Categories
                     </p>
                     <ul className="flex-contaiter subCategorysUl">
@@ -180,13 +179,13 @@ class HomeAdmin extends Component {
                     <p className="articlesTitle">
                         ARTICLES
                     </p>
-                        {allArticlesList}
-                        <div className="newArticleButton">
-                            <Link to="newarticle"><button>New Article</button></Link>
-                        </div>
+                    {allArticlesList}
+                    <div className="newArticleButton">
+                        <Link to="newarticle"><button>New Article</button></Link>
+                    </div>
                 </div>
                 <p className="groupsTitle">
-                        GROUPS
+                    GROUPS
                 </p>
                 <div className="groupListDiv flex-container">
                     <div className="groupList flex-item flex-container">

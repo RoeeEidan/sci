@@ -181,7 +181,6 @@ class EditArticle extends Component {
                     document.getElementById("titleInput").value = that.state.article.name;
                     document.getElementById("summeryInput").value = that.state.article.summery;
                     document.getElementById("categoryOptions").value = that.state.article.category;
-
                     let ourSubCategorys = that.state.article.subCategorys;
                     for (let i = 0; i < ourSubCategorys.length; i++) {
                         console.log('checkingggg')
