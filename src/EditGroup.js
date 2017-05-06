@@ -46,15 +46,30 @@ class EditGroup extends Component {
         this.onUploadHeroForm = this.onUploadHeroForm.bind(this);
         this.groupSingleArticle = this.groupSingleArticle.bind(this);
         this.removeGroup = this.removeGroup.bind(this);
+        this.isGrouped = this.isGrouped.bind(this);
 
 
+    }
+
+
+    isGrouped(index) { //NAME is group name and index is 
+        let relatedArticles = this.state.group.relatedArticles;
+        for (let i = 0; i < relatedArticles.length; i++) {
+            if (relatedArticles[i].name === this.props.articles[index].name) {
+                return ({
+                    relatedArticlesIndex: i,
+                    articleIndex: index
+                })
+            }
+        }
+        return false
     }
 
 
     removeGroup(index, name) {
         let newState = { ...this.state };
         for (let i = 0; i < newState.group.relatedArticles.length; i++) {
-            if (newState.group.relatedArticles[i] === this.props.allArticles[index]) {
+            if (newState.group.relatedArticles[i] === this.props.articles[index]) {
                 newState.group.relatedArticles.splice(i, 1) // removes the article from the group
             }
         }
@@ -68,8 +83,8 @@ class EditGroup extends Component {
     groupSingleArticle(index, articleName) {
         let newState = { ...this.state };
         newState.group.relatedArticles = [...this.state.group.relatedArticles];
-        let isGrouped = this.props.isGrouped(index, this.state.group.name); //returns either false or the index of the group
-        if (isGrouped || isGrouped === 0) {
+        let isGrouped = this.isGrouped(index, this.state.group.name); //returns either false or the index of the group
+        if (isGrouped) {
             this.removeGroup(index, newState.group.name); // removes the group from the article
             for (let i = 0; i < newState.group.relatedArticles.length; i++) {//this is the way to the articles  
                 if (newState.group.relatedArticles[i].name === articleName) {// removers the article from the group
@@ -77,7 +92,7 @@ class EditGroup extends Component {
                 }
             }
         } else {
-            let thisArticle = this.props.allArticles[index];
+            let thisArticle = this.props.articles[index];
             this.props.postTo('AddGroupToArticle', { groupIndex: this.props.id, articleIndex: index })
             newState.group.relatedArticles.push(thisArticle); // pushs the article to the group related array
         }
@@ -219,7 +234,10 @@ class EditGroup extends Component {
                 that.setState({
                     group: response.data
                 }, () => {
-                    let title = that.state.group.title.slice(4, (that.state.group.title.length - 5));
+                    let title = '';
+                    if(that.state.group.title){
+                        title = that.state.group.title.slice(4, (that.state.group.title.length - 5));
+                    }
                     document.getElementById("homePageCheckbox").checked = that.state.group.showAtHomePage;
                     document.getElementById("titleInput").value = title;
                     document.getElementById("summeryInput").value = that.state.group.summery;
@@ -227,25 +245,26 @@ class EditGroup extends Component {
 
                     let ourSubCategorys = that.state.group.subCategorys;
                     for (let i = 0; i < ourSubCategorys.length; i++) {
-                        console.log('checkingggg')
-                        document.getElementById(`${ourSubCategorys[i]}`).checked = true
+                        if(document.getElementById(`${ourSubCategorys[i]}`)){
+                            console.log('checkingggg')
+                            document.getElementById(`${ourSubCategorys[i]}`).checked = true
+                        }  
                     }
                     that.setState({
                         editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.group.articleBody).contentBlocks))
                     }, () => {
-                        console.log('editorState Changedd', that.state)
+                        console.log('editorState Changedd!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', that.state)
                     })
                 })
 
             })
             .catch(function (error) {
-                console.log(error);
+                console.log(error); // slice type
             });
     }
 
 
     render() {
-
         if (this.props.path === '/') {
             this.props.pathTo();
             return (<Redirect to='/' />)
@@ -253,14 +272,15 @@ class EditGroup extends Component {
 
 
         let articlesButtonRender = [];
-        for (let i = 0; i < this.props.allArticles.length; i++) {
+        let articles = this.props.articles || [];
+        for (let i = 0; i < articles.length; i++) {
             articlesButtonRender.push(
-                <SingleGroupArticle
+                <SingleGroupArticle  // loops through the related articles and checks for the articleName
                     /*article = {this.props.allArticles[i]}*/
                     groupName={this.state.group.name}
                     relatedArticles={this.state.group.relatedArticles}
                     Index={i}
-                    articleName={this.props.allArticles[i].name}
+                    articleName={this.props.articles[i].name}
                     groupSingleArticle={this.groupSingleArticle}
                 />
             )
@@ -271,27 +291,27 @@ class EditGroup extends Component {
         let subCategorysRender1 = [];
         let subCategorysRender2 = [];
         let subCategorysRender3 = [];
-        let ourSubCategorys = this.props.subCategorys
+        let ourSubCategorys = this.props.subCategorys || [];
         for (let i = 0; i < ourSubCategorys.length; i++) {
             if (i < (ourSubCategorys.length / 3)) {
                 subCategorysRender1.push(
                     <div className="singleSubCategoryDiv flex-item">
                         {ourSubCategorys[i]}
-                        <input type="checkbox" onChange={() => { this.addSubCategory(i) }} />
+                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
                     </div>
                 );
             } else if (i >= (ourSubCategorys.length / 3) && i < ((ourSubCategorys.length / 3) * 2)) {
                 subCategorysRender2.push(
                     <div className="singleSubCategoryDiv flex-item">
                         {ourSubCategorys[i]}
-                        <input type="checkbox" onChange={() => { this.addSubCategory(i) }} />
+                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
                     </div>
                 );
             } else if (i >= ((ourSubCategorys.length / 3) * 2)) {
                 subCategorysRender3.push(
                     <div className="singleSubCategoryDiv flex-item">
                         {ourSubCategorys[i]}
-                        <input type="checkbox" onChange={() => { this.addSubCategory(i) }} />
+                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
                     </div>
                 );
             } else {
@@ -435,7 +455,7 @@ class EditGroup extends Component {
                     />
                 </div>
                 <div className="publish">
-                    <button onClick={() => { console.log(this.state.group)/* this.props.onPublishClick(this.props.id, this.state.group) */ }}>
+                    <button onClick={() => {  this.props.onPublishClick(this.props.id, this.state.group)  }}>
                         publish
                     </button>
                 </div>

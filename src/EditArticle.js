@@ -214,27 +214,27 @@ class EditArticle extends Component {
         let subCategorysRender1 = [];
         let subCategorysRender2 = [];
         let subCategorysRender3 = [];
-        let ourSubCategorys = this.props.subCategorys;
+        let ourSubCategorys = this.props.subCategorys || [];
         for (let i = 0; i < ourSubCategorys.length; i++) {
             if (i < (ourSubCategorys.length / 3)) {
                 subCategorysRender1.push(
                     <div className="singleSubCategoryDiv flex-item">
                         {ourSubCategorys[i]}
-                        <input type="checkbox" onChange={() => { this.addSubCategory(i) }} />
+                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
                     </div>
                 );
             } else if (i >= (ourSubCategorys.length / 3) && i < ((ourSubCategorys.length / 3) * 2)) {
                 subCategorysRender2.push(
                     <div className="singleSubCategoryDiv flex-item">
                         {ourSubCategorys[i]}
-                        <input type="checkbox" id={`${ourSubCategorys[i]}`} onChange={() => { this.addSubCategory(i) }} />
+                        <input id={`${ourSubCategorys[i]}`} type="checkbox" id={`${ourSubCategorys[i]}`} onChange={() => { this.addSubCategory(i) }} />
                     </div>
                 );
             } else if (i >= ((ourSubCategorys.length / 3) * 2)) {
                 subCategorysRender3.push(
                     <div className="singleSubCategoryDiv flex-item">
                         {ourSubCategorys[i]}
-                        <input type="checkbox" onChange={() => { this.addSubCategory(i) }} />
+                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
                     </div>
                 );
             } else {

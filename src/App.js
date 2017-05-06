@@ -29,13 +29,11 @@ class App extends Component {
       this.props.pathTo();
       return (<Redirect to='/' />)
     }
-
-
-
+    
     let subCategorysRender1 = [];
     let subCategorysRender2= [];
     let subCategorysRender3 = [];
-    let ourSubCategorys = this.props.subCategorys
+    let ourSubCategorys = this.props.subCategorys || [];
     for (let i = 0; i < ourSubCategorys.length; i++) {
       if( i < (ourSubCategorys.length/3)){
         subCategorysRender1.push(
@@ -196,15 +194,6 @@ class App extends Component {
             </div>
           </div>
         </div>
-        
-        
-        
-        
-        
-        
-        
-        
-        
         <div className="articleBodyBox" >
           <h2>Artical Body</h2>
           {this.props.editor}

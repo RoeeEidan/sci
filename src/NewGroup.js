@@ -66,7 +66,7 @@ class NewGroup extends Component {
         }
 
 
-        const articlesList = this.props.arrayToRender(this.props.allArticles);
+        const articlesList = this.props.arrayToRender(this.props.articles || []);
 
         // list of hero's
         let heroList = this.props.newGroupleHeros;

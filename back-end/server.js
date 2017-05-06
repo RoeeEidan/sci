@@ -56,6 +56,62 @@ const PORT = process.env.PORT || 8080;
 
 let StateID = '5902e27baca2984a1299180a';
 
+// Checking if article is grouped and if it is it retuns what index in the articleGroups he is 
+
+// function isGrouped(index, NAME) {
+//   if (NAME) {
+//     let articlesArray = [...this.state.allArticles]
+//     if (articlesArray[index].articleGroups) {
+//       let thisGroups = articlesArray[index].articleGroups;
+//       for (let i = 0; i < thisGroups.length; i++) { // loops through the article related groups
+//         if (thisGroups[i] === NAME) {
+//           return i;
+//         }
+//       }
+//       return false;
+//     } else {
+//       alert("problem at AdminRouter at isGrouped Func")
+//     }
+//   } else {
+//     let name = this.state.newGroup.name;
+//     let articlesArray = [...this.state.allArticles]
+//     if (articlesArray[index].articleGroups) {
+//       let thisGroups = articlesArray[index].articleGroups;
+//       for (let i = 0; i < thisGroups.length; i++) {
+//         if (thisGroups[i] === name) {
+//           return i;
+//         }
+//       }
+//       return false;
+//     } else {
+//       alert("problem at AdminRouter at isGrouped Func")
+//     }
+//   }
+// }
+
+app.post('/isGrouped', function (req, res) {//add new hero
+  console.log(req.body)
+  let thisHero = req.body;
+  SciFare.findById(StateID)
+    .then(scifare => {
+      let articlesArray = [...scifare.allArticles]
+      if (articlesArray[req.body.index].articleGroups) {
+        let thisGroups = articlesArray[req.body.index].articleGroups;
+        for (let i = 0; i < thisGroups.length; i++) { // loops through the article related groups
+          if (thisGroups[i] === req.body.name) {
+            res.send(i);
+          }
+        }
+        res.send(false);
+      } else {
+        alert("problem at server.js 107")
+      }
+      return true
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
 
 //HOME PAGE CHANGES
 
@@ -151,18 +207,19 @@ app.get('/GetHomePageContent', (req, res) => { // get the home page state
       let homePageObject = {};
       homePageObject.heroObjects = scifare.heroObjects;
       homePageObject.subCategorys = scifare.subCategorys;
-      homePageObject.articles =[];
-      homePageObject.groups =[];
+      homePageObject.articles = [];
+      homePageObject.groups = [];
       homePageObject.inProcess = [];
-      for(let i = 0; i < scifare.allArticles.length; i++){
+      for (let i = 0; i < scifare.allArticles.length; i++) {
         let article = {
           index: i,
           name: scifare.allArticles[i].name,
+          articleGroups: scifare.allArticles[i].articleGroups,
           _id: scifare.allArticles[i]._id
         }
         homePageObject.articles.push(article);
       }
-      for(let i = 0; i < scifare.groups.length; i++){
+      for (let i = 0; i < scifare.groups.length; i++) {
         let group = {
           index: i,
           name: scifare.groups[i].name,
@@ -300,15 +357,32 @@ app.post('/EditArticle/:x', (req, res) => { //edit a article object by id
 });
 
 
+app.post('/EditGroup/:x', (req, res) => { //edit a group object by id
+  SciFare.findById(StateID)
+    .then(scifare => {
+      console.log(req.body);
+      let article = req.body.article;
+      scifare.groups[req.body.index] = article;
+      scifare.save();
+      res.send('yess');
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400)
+        .json({ err });
+    })
+});
+
+
 app.post('/RemoveGroupFromArticle', (req, res) => { //remove a group from article
   SciFare.findById(StateID)
     .then(scifare => {
       console.log(req.body);
-      for(let i = 0; i < scifare.allArticles[req.body.articleIndex].articleGroups.length; i++){
+      for (let i = 0; i < scifare.allArticles[req.body.articleIndex].articleGroups.length; i++) {
         console.log(scifare.allArticles[req.body.articleIndex].articleGroups[i], scifare.groups[req.body.groupIndex].name)
-        if(scifare.allArticles[req.body.articleIndex].articleGroups[i] === scifare.groups[req.body.groupIndex].name){
+        if (scifare.allArticles[req.body.articleIndex].articleGroups[i] === scifare.groups[req.body.groupIndex].name) {
           console.log('FOUNDDD')
-          scifare.allArticles[req.body.articleIndex].articleGroups.splice( i , 1 )
+          scifare.allArticles[req.body.articleIndex].articleGroups.splice(i, 1)
         }
       }
       scifare.save();
@@ -327,7 +401,7 @@ app.post('/AddGroupToArticle', (req, res) => { //add a group to article
     .then(scifare => {
       console.log(req.body);
       // thisAllArticles[index].articleGroups.splice(groupIndex, 1)
-      scifare.allArticles[req.body.articleIndex].articleGroups.push( scifare.groups[req.body.groupIndex].name)
+      scifare.allArticles[req.body.articleIndex].articleGroups.push(scifare.groups[req.body.groupIndex].name)
       scifare.save();
       res.send('yess');
     })
@@ -360,17 +434,17 @@ app.post('/NewGroup', function (req, res) {//adding a group to the state
       let allArticles = [...scifare.allArticles];
       for (let i = 0; i < newGroup.relatedArticles.length; i++) { // adds the group to the related articles
         console.log('started the 1st for loop')
-        for (let z = 0; z < scifare.allArticles.length; z++) {
+        for (let z = 0; z < scifare.allArticles.length; z++) { // 
           console.log('started the 2nd for loop')
           if (scifare.allArticles[z].name === newGroup.relatedArticles[i].name) {
             console.log('found a match')
-            scifare.allArticles[z].articleGroups.push(newGroup.name)
+            scifare.allArticles[z].articleGroups.push(newGroup.name) // pushs the group in to each related article
           }
         }
       }
       scifare.groups.push(newGroup);
       console.log(scifare);
-      res.send(scifare.groups[scifare.groups.length-1]._id);
+      res.send(scifare.groups[scifare.groups.length - 1]._id);
       return scifare.save();
     })
     .catch(err => {

@@ -5,8 +5,10 @@ class SingleHomeArticle extends Component {
 
     render() {
         // takes care of the button color
-        let style = { backgroundColor: 'red' };
-        if (typeof (this.props.isGrouped(this.props.index)) === 'number') {
+        let style = { backgroundColor: 'red' }
+        let isGrouped = this.props.isGrouped(this.props.index);
+        let type = typeof (isGrouped);
+        if (typeof (isGrouped) === 'object') {
             style = { backgroundColor: 'green' }
         }
 

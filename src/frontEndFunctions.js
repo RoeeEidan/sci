@@ -14,3 +14,25 @@ export const getHomePageState = async () => {
         throw new Error(response.data)
     return homePageObject
 }
+
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+const checksIfGrouped = ( articleGroups , groupName ) => {
+    for(let i =0 ; i < articleGroups.length; i++){
+        if(articleGroups[i] = groupName){
+            return true
+        }
+    }
+    return false
+}
+
