@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg';
 import axios from 'axios';
 
@@ -179,7 +179,7 @@ class EditGroup extends Component {
 
     removeSingleHero(i) {
         let newGroup = { ...this.state.group };
-        newGroup.heroObjects = [... this.state.group.heroObjects];
+        newGroup.heroObjects = [...this.state.group.heroObjects];
         newGroup.heroObjects.splice(i, 1);
         this.setState({
             group: newGroup
@@ -235,7 +235,7 @@ class EditGroup extends Component {
                     group: response.data
                 }, () => {
                     let title = '';
-                    if(that.state.group.title){
+                    if (that.state.group.title) {
                         title = that.state.group.title.slice(4, (that.state.group.title.length - 5));
                     }
                     document.getElementById("homePageCheckbox").checked = that.state.group.showAtHomePage;
@@ -245,16 +245,18 @@ class EditGroup extends Component {
 
                     let ourSubCategorys = that.state.group.subCategorys;
                     for (let i = 0; i < ourSubCategorys.length; i++) {
-                        if(document.getElementById(`${ourSubCategorys[i]}`)){
+                        if (document.getElementById(`${ourSubCategorys[i]}`)) {
                             console.log('checkingggg')
                             document.getElementById(`${ourSubCategorys[i]}`).checked = true
-                        }  
+                        }
                     }
-                    that.setState({
-                        editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.group.articleBody).contentBlocks))
-                    }, () => {
-                        console.log('editorState Changedd!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', that.state)
-                    })
+                    if (that.state.group.articleBody) {
+                        that.setState({
+                            editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.group.articleBody).contentBlocks))
+                        }, () => {
+                            console.log('editorState Changedd!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', that.state)
+                        })
+                    }
                 })
 
             })
@@ -351,6 +353,9 @@ class EditGroup extends Component {
         }
         return (
             <div className="EditGroup" >
+                <Link to="/">
+                    <input type="button" value="Back Home" className="backHome" />
+                </Link>
                 <h1>{this.state.group.name}</h1>
                 <div>
                     <p className="  ">All Articles</p>
@@ -455,10 +460,17 @@ class EditGroup extends Component {
                     />
                 </div>
                 <div className="publish">
-                    <button onClick={() => {  this.props.onPublishClick(this.props.id, this.state.group)  }}>
+                    <button onClick={() => { this.props.onPublishClick(this.props.id, this.state.group) }}>
                         publish
                     </button>
                 </div>
+                <button onClick={() => {
+                    let newState = { ...this.state }
+                    newState.group.isHidden = true;
+                    this.props.saveHiddenGroup(newState.group, this.props.id)
+                }}>
+                    Save
+                </button>
             </div>
         );
     }

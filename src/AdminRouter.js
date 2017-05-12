@@ -22,19 +22,19 @@ import EditGroup from './EditGroup';
 
 import { getHomePageState } from './frontEndFunctions';
 
-const NavBar = () => (
+/*const NavBar = () => (
     <div>
         <ul>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/newarticle">New Article</Link></li>
             <li><Link to="/newgroup">New Group</Link></li>
             <li><Link to="/editArticle/0">Edit Article </Link></li>
-            {/*<li><Link to="/DditGroup/0">Edit Group </Link></li>*/}
+            <li><Link to="/DditGroup/0">Edit Group </Link></li>
         </ul>
 
         <hr />
     </div>
-)
+)*/
 
 
 
@@ -44,7 +44,7 @@ export class AdminRouter extends React.Component {
         this.state = {
             homePageState: {},
             newSubCategory: false,
-            subCategorys: ["Antripology", 'Sports'],
+            subCategorys: [],
             heroObjects: [],// {type:'' , url: '' , title:'' , credit: '' name: ''}
             allArticles: [],
             scince: [],
@@ -61,7 +61,8 @@ export class AdminRouter extends React.Component {
                 subCategorys: [],
                 date: undefined,
                 showAtHomePage: true,
-                summery: undefined
+                summery: undefined,
+                isHidden: true,
             },
             newGroup: {
                 heroObjects: [],// {type:'' , url: '' , title:'' , credit ''}
@@ -73,7 +74,8 @@ export class AdminRouter extends React.Component {
                 date: undefined,
                 showAtHomePage: true,
                 summery: undefined,
-                isInProccese: false
+                isInProccese: false,
+                isHidden: true,
             },
         }
 
@@ -88,7 +90,8 @@ export class AdminRouter extends React.Component {
             subCategorys: [],
             date: undefined,
             showAtHomePage: true,
-            summery: undefined
+            summery: undefined,
+            isHidden: true,
         }
 
 
@@ -102,7 +105,8 @@ export class AdminRouter extends React.Component {
             showAtHomePage: true,
             summery: undefined,
             subCategorys: [],
-            isInProccese: false
+            isInProccese: false,
+            isHidden: true,
         }
 
         // STUFF THAT I DIDNT WANT TO MAKE MY APP RERENDER
@@ -133,6 +137,8 @@ export class AdminRouter extends React.Component {
         this.removeHomeSingleArticle = this.removeHomeSingleArticle.bind(this);
         this.editSingleArticle = this.editSingleArticle.bind(this);
         this.editGroup = this.editGroup.bind(this);
+        this.stopGroupProccese = this.stopGroupProccese.bind(this);
+        this.stopNewCategory = this.stopNewCategory.bind(this)
 
 
         //New Article
@@ -150,6 +156,7 @@ export class AdminRouter extends React.Component {
         this.onSummeryChange = this.onSummeryChange.bind(this);
         this.resetNewArticleState = this.resetNewArticleState.bind(this);
         this.removeSingleArticle = this.removeSingleArticle.bind(this);
+        this.saveToInProcess = this.saveToInProcess.bind(this);
 
 
         //New Group
@@ -167,15 +174,17 @@ export class AdminRouter extends React.Component {
         this.onNewGroupHomePageChange = this.onNewGroupHomePageChange.bind(this);
         this.creatNewGroup = this.creatNewGroup.bind(this);
         this.groupAddSubCategory = this.groupAddSubCategory.bind(this);
+        this.saveGroupToInProcess = this.saveGroupToInProcess.bind(this);
 
 
         //Edit Article
         this.onEditPublishClick = this.onEditPublishClick.bind(this);
+        this.updateArticlesInProcess = this.updateArticlesInProcess.bind(this);
 
 
         // Edit Group
-        this.onEditGroupPublishClick=this.onEditGroupPublishClick.bind(this);
-
+        this.onEditGroupPublishClick = this.onEditGroupPublishClick.bind(this);
+        this.saveHiddenGroup = this.saveHiddenGroup.bind(this);
 
 
         this.myPathTo = this.myPathTo.bind(this);
@@ -184,6 +193,112 @@ export class AdminRouter extends React.Component {
         this.getArticleByID = this.getArticleByID.bind(this);
     }
 
+
+    saveHiddenGroup(article , articleIndex) {
+        if ((article && articleIndex) || (article && (articleIndex === 0))) {
+            article.isHidden = true;      
+            let homePageState = { ...this.state.homePageState };
+            homePageState.groups[articleIndex].name = article.name;
+            homePageState.groups[articleIndex].isHidden = true;
+            this.postTo(`EditGroup/${article._id}`, { article: article, index: articleIndex })
+            this.myPath = '/';
+            this.setState({
+                homePageState: homePageState
+            })
+        }
+    }
+
+
+    updateArticlesInProcess(article, index) {
+        if ((article && index) || (article && index === 0)) {
+            let newHomePageState = { ...this.state.homePageState };
+            article.isHidden = true;
+            newHomePageState.articles[index].name = article.name
+            newHomePageState.articles[index].isHidden = true;
+            this.postTo(`EditArticle/${index}`, { article: article, index: index });
+            this.myPath = '/';
+            this.setState({
+                homePageState: newHomePageState,
+            })
+        }
+    }
+
+
+
+    saveGroupToInProcess(articleObject) {
+        let newState = { ...this.state }
+        let newHomePageState = { ...newState.homePageState }
+        let _id;
+
+        if (articleObject.heroObjects) {
+            articleObject.isHidden = true;
+            _id = this.postTo("NewGroup", articleObject);
+        } else {
+            let newGroup = { ...this.state.newGroup }
+            console.log(newGroup)
+            newGroup.isHidden = true;
+            _id = this.postTo("NewGroup", newGroup);
+        }
+        newHomePageState.groups.push(
+            {
+                name: newState.newGroup.name,
+                index: newState.homePageState.groups.length,
+                isHidden: true,
+                _id: _id
+            }
+        )
+        this.setState({
+            homePageState: newState.homePageState,
+            groups: newState.groups,
+        }, () => { console.log(this.state) })
+
+        this.myPath = '/';
+        this.resetNewGroupState()
+    }
+
+
+
+    saveToInProcess(articleObject) {
+        let newHomePageState = { ...this.state.homePageState }
+        if (articleObject.heroObjects) {
+            this.postTo("NewArticle", articleObject);
+            newHomePageState.articles.push(
+                articleObject
+            )
+        } else {
+            let newArticle = { ...this.state.newArticle }
+            console.log(newArticle)
+            this.postTo("NewArticle", newArticle);
+            newHomePageState.articles.push(
+                newArticle
+            )
+        }
+        this.setState({
+            homePageState: newHomePageState,
+        })
+        this.myPath = '/';
+        this.resetNewArticleState()
+    }
+
+
+    stopNewCategory() {
+        if (!document.getElementById('newCategoryInput').value) {
+            this.setState({
+                newSubCategory: false
+            })
+        }
+    }
+
+
+    stopGroupProccese() {
+        if (!document.getElementById('groupNameInput').value) {
+            let newGroup = { ...this.state.newGroup };
+            newGroup.isInProccese = false;
+            this.setState({
+                newGroup: newGroup
+            })
+        }
+    }
 
 
     getArticleByID(id) {
@@ -228,10 +343,12 @@ export class AdminRouter extends React.Component {
 
 
     onEditPublishClick(articleIndex, article) {
+        article.isHidden = false;
         this.postTo(`EditArticle/${article._id}`, { article: article, index: articleIndex })
         console.log(articleIndex, article);
-        let homePageState = {...this.state.homePageState};
+        let homePageState = { ...this.state.homePageState };
         homePageState.articles[articleIndex].name = article.name;
+        homePageState.articles[articleIndex].isHidden = false;
         this.myPath = '/';
         this.setState({
             homePageState: homePageState
@@ -240,11 +357,13 @@ export class AdminRouter extends React.Component {
 
     // EDIT GROUP FUNCTIONs
 
-        onEditGroupPublishClick(articleIndex, article) { // article = group object
+    onEditGroupPublishClick(articleIndex, article) { // article = group object
+        article.isHidden = false;
         this.postTo(`EditGroup/${article._id}`, { article: article, index: articleIndex })
         console.log(articleIndex, article);
-        let homePageState = {...this.state.homePageState};
+        let homePageState = { ...this.state.homePageState };
         homePageState.groups[articleIndex].name = article.name;
+        homePageState.groups[articleIndex].isHidden = false;
         this.myPath = '/';
         this.setState({
             homePageState: homePageState
@@ -346,6 +465,7 @@ export class AdminRouter extends React.Component {
         let date = nowDate.getDate() + '/' + (nowDate.getMonth() + 1) + '/' + nowDate.getFullYear();
         let newState = { ...this.state };
 
+        newState.newGroup.isHidden = false;
         newState.newGroup.date = date;
         newState.newGroup.articleBody = this.newGroupBody;
         newState.newGroup.subCategorys = [...this.newGroupSubCategorys];
@@ -362,6 +482,7 @@ export class AdminRouter extends React.Component {
             {
                 name: newState.newGroup.name,
                 index: newState.homePageState.groups.length,
+                isHidden: false,
                 _id: _id
             }
         )
@@ -433,7 +554,7 @@ export class AdminRouter extends React.Component {
             newState.newGroup.heroObjects.push(heroObject);
             this.setState({
                 newGroup: newState.newGroup
-            })
+            }, () => { console.log("STATTEEEE", this.state) })
             // this.uploadFile(file)
         } else {
             alert('you forgot somthing')
@@ -503,14 +624,14 @@ export class AdminRouter extends React.Component {
     editGroup(index) {
         this.myPath = `editGroup/${index}`;
         this.forceUpdate();
-        this.mypathTo();
+        // this.myPath = '/'
     }
 
 
     editSingleArticle(index) {
         this.myPath = `editArticle/${index}`;
         this.forceUpdate();
-        this.mypathTo();
+        // this.myPathTo();
     }
 
 
@@ -562,16 +683,34 @@ export class AdminRouter extends React.Component {
     arrayToRender(articles) {
         let listToRender = [];
         let listToRender2 = [];
+        let hiddenListToRender = [];
         for (let i = 0; i < articles.length; i++) {
-            if (i < (articles.length / 2)) {
-                let _id = articles[i]._id;
+            let _id = articles[i]._id;
+            if (articles[i].isHidden) {
+                hiddenListToRender.push(
+                    <SingleHomeArticle
+                        editSingleArticle={this.editSingleArticle}
+                        name={articles[i].name}
+                        removeSingleArticle={() => {
+                            if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                this.removeHomeSingleArticle(i);
+                                this.postTo(`DeleteArticle/${_id}`)
+                            }
+                        }}
+                        index={i}
+                    />
+                )
+            }
+            else if (i < (articles.length / 2)) {
                 listToRender.push(
                     <SingleHomeArticle
                         editSingleArticle={this.editSingleArticle}
                         name={articles[i].name}
                         removeSingleArticle={() => {
-                            this.removeHomeSingleArticle(i);
-                            this.postTo(`DeleteArticle/${_id}`)
+                            if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                this.removeHomeSingleArticle(i);
+                                this.postTo(`DeleteArticle/${_id}`)
+                            }
                         }}
                         index={i}
                     />
@@ -582,8 +721,10 @@ export class AdminRouter extends React.Component {
                         editSingleArticle={this.editSingleArticle}
                         name={articles[i].name}
                         removeSingleArticle={() => {
-                            this.removeHomeSingleArticle(i);
-                            this.postTo(`DeleteArticle/${articles[i]._id}`)
+                            if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                this.removeHomeSingleArticle(i);
+                                this.postTo(`DeleteArticle/${_id}`)
+                            }
                         }}
                         index={i}
                     />
@@ -592,16 +733,22 @@ export class AdminRouter extends React.Component {
                 alert("Check file AdminRouter line 287")
             }
         }
-        return (
-            <div className="articleListBoxToRender flex-container">
+        return ({
+            showenList: <div className="articleListBoxToRender flex-container">
                 <div className="articleListToRender flex-item flex-container">
                     {listToRender}
                 </div>
                 <div className="articleListToRender articleListToRender2 flex-item flex-container">
                     {listToRender2}
                 </div>
+            </div>,
+            hiddenList: <div className="articleListBoxToRender flex-container">
+                <div className="articleListToRender flex-item flex-container">
+                    {hiddenListToRender}
+                </div>
             </div>
-        )
+
+        })
 
     }
 
@@ -856,6 +1003,7 @@ export class AdminRouter extends React.Component {
         let newState = { ...this.state };
 
         newState.newArticle.date = date;
+        newState.newArticle.isHidden = false;
         newState.newArticle.articleBody = this.newArticleBody;
         newState.newArticle.subCategorys = [...this.newArticleSubCategorys];
 
@@ -928,10 +1076,9 @@ export class AdminRouter extends React.Component {
     async componentDidMount() {
         if (!this.state.homePageState.articles) {
             const homePageState = await getHomePageState();
-            console.log('got the state', homePageState)
             this.setState({
                 homePageState: homePageState,
-            })
+            }, () => { console.log(this.state.homePageState) })
         }
     }
 
@@ -957,15 +1104,15 @@ export class AdminRouter extends React.Component {
     }
 
     render() {
-
-        let that = this;
         return (
             <Router>
                 <div>
-                    <NavBar />
+                    {/*<NavBar />*/}
                     <Route exact path="/" render={(props) => {
                         return (
                             <HomeAdmin
+                                stopNewCategory={this.stopNewCategory}
+                                stopGroupProccese={this.stopGroupProccese}
                                 homePageState={this.state.homePageState}
                                 editGroup={this.editGroup}
                                 /*updateDbState={this.updateDbState}   probobly gonna be removed // this updates the entire state i think*/
@@ -989,6 +1136,7 @@ export class AdminRouter extends React.Component {
                     <Route path="/newarticle" component={(props) => (
                         <App
                             /*showAtHomePage={this.state.newArticle.showAtHomePage} // might be removed??? */
+                            saveToInProcess={this.saveToInProcess}
                             addSubCategory={this.addSubCategory}
                             subCategorys={this.state.homePageState.subCategorys}
                             pathTo={this.myPathTo}
@@ -1014,6 +1162,7 @@ export class AdminRouter extends React.Component {
 
                     <Route path="/newgroup" component={() => (
                         <NewGroup
+                            saveGroupToInProcess={this.saveGroupToInProcess}
                             showAtHomePage={this.state.newGroup.showAtHomePage}
                             groupAddSubCategory={this.groupAddSubCategory}
                             subCategorys={this.state.homePageState.subCategorys}
@@ -1045,13 +1194,14 @@ export class AdminRouter extends React.Component {
                         />
                     )} />
                     <Route path='/editArticle/:i' component={(path) => {
-                          if (this.myPath === '/') {
+                        if (this.myPath === '/') {
                             this.myPathTo();
                             return (<Redirect to='/' />)
                         }
                         let id = path.match.params.i;
                         return (
                             <EditArticle
+                                updateArticlesInProcess={this.updateArticlesInProcess}
                                 id={id}
                                 subCategorys={this.state.homePageState.subCategorys}
                                 onPublishClick={this.onEditPublishClick}
@@ -1074,6 +1224,7 @@ export class AdminRouter extends React.Component {
                             onPublishClick={this.onEditGroupPublishClick}
                             uploadFile={this.uploadFile}
                             postTo={this.postTo}
+                            saveHiddenGroup={this.saveHiddenGroup}
                         />)
                     }} />
                 </div>

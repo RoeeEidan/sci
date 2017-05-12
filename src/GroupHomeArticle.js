@@ -7,7 +7,6 @@ class SingleHomeArticle extends Component {
         // takes care of the button color
         let style = { backgroundColor: 'red' }
         let isGrouped = this.props.isGrouped(this.props.index);
-        let type = typeof (isGrouped);
         if (typeof (isGrouped) === 'object') {
             style = { backgroundColor: 'green' }
         }

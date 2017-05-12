@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Redirect, Link } from 'react-router-dom';
-import axios from 'axios';
 
 //COMPONENTS
 
@@ -8,9 +7,17 @@ import SingleFile from './Singlefile';
 
 
 class HomeAdmin extends Component {
-    render() {
-        console.log("Home page statttte!!!! ", this.props)
 
+    componentDidUpdate() {
+        if (document.getElementById("groupNameInput")) {
+            document.getElementById("groupNameInput").focus()
+        }
+        if (document.getElementById("newCategoryInput")) {
+            document.getElementById("newCategoryInput").focus()
+        }
+    }
+
+    render() {
         if (this.props.path) {
             this.props.pathTo();
             return (<Redirect to={this.props.path} />)
@@ -21,7 +28,7 @@ class HomeAdmin extends Component {
             newSubCategoryButton = (
                 <div className="newCategoryButtonDiv">
                     <form id="newSubCategoryForm">
-                        Sub Category: <input type="text" id="newCategoryInput" className="newCategoryInput" />
+                        Sub Category: <input type="text" id="newCategoryInput" className="newCategoryInput" onBlur={this.props.stopNewCategory} />
                         <input type="button" value="Create" onClick={this.props.addCategory} />
                     </form>
                 </div>
@@ -37,9 +44,16 @@ class HomeAdmin extends Component {
                     <span className="subCategorysText">
                         {subCategorys[i]}
                     </span>
-                    <button onClick={() => { this.props.removeSubCategory(i) }}>
-                        remove
-                    </button>
+                    <img
+                        height="30%"
+                        src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
+                        onClick={() => {
+                            if (confirm(`Are you sure you want to remove ${subCategorys[i]}`) == true) {
+                                this.props.removeSubCategory(i)
+                            } else {
+                                console.log('ok')
+                            }
+                        }} />
                 </li>
             )
         }
@@ -49,18 +63,58 @@ class HomeAdmin extends Component {
         let groupList1 = [];
         let groupList2 = [];
         let groupList3 = [];
+        let hiddenGroupList = [];
         for (let i = 0; i < groupsArray.length; i++) {
-            if (i < (groupsArray.length / 3)) {
-                groupList1.push(
+            if(groupsArray[i].isHidden){
+                hiddenGroupList.push(
                     <div className="singleGroupList flex-item flex-container">
                         <div className="singleGroupButtons">
-                            <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
+                            <img
+                                height="25px"
+                                width="25px"
+                                src="https://s3.amazonaws.com/roeetestbucket123/edit-flat.png"
+                                onClick={() => { this.props.editGroup(i) }}
+                            />
                         </div>
                         <div className="singleGroupName">
                             {groupsArray[i].name}
                         </div>
                         <div className="singleGroupButtons">
-                            <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
+                            <img
+                                height="30%"
+                                src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
+                                onClick={() => {
+                                    if (confirm(`Are you sure you want to delete ${groupsArray[i].name}??`)) {
+                                        this.props.removeGroup(i)
+                                    }
+                                }} />
+                        </div>
+                    </div>
+                )
+            }
+            else if (i < (groupsArray.length / 3)) {
+                groupList1.push(
+                    <div className="singleGroupList flex-item flex-container">
+                        <div className="singleGroupButtons">
+                            <img
+                                height="25px"
+                                width="25px"
+                                src="https://s3.amazonaws.com/roeetestbucket123/edit-flat.png"
+                                onClick={() => { this.props.editGroup(i) }}
+                            />
+                        </div>
+                        <div className="singleGroupName">
+                            {groupsArray[i].name}
+                        </div>
+                        <div className="singleGroupButtons">
+                            <img
+                                height="30%"
+                                src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
+                                onClick={() => {
+                                    if (confirm(`Are you sure you want to delete ${groupsArray[i].name}??`)) {
+                                        this.props.removeGroup(i)
+                                    }
+                                }} />
                         </div>
                     </div>
                 )
@@ -68,13 +122,25 @@ class HomeAdmin extends Component {
                 groupList2.push(
                     <div className="singleGroupList flex-item flex-container singleGroupList2">
                         <div className="singleGroupButtons">
-                            <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
+                            <img
+                                height="25px"
+                                width="25px"
+                                src="https://s3.amazonaws.com/roeetestbucket123/edit-flat.png"
+                                onClick={() => { this.props.editGroup(i) }}
+                            />
                         </div>
                         <div className="singleGroupName">
                             {groupsArray[i].name}
                         </div>
                         <div className="singleGroupButtons">
-                            <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
+                            <img
+                                height="30%"
+                                src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
+                                onClick={() => {
+                                    if (confirm(`Are you sure you want to delete ${groupsArray[i].name}??`)) {
+                                        this.props.removeGroup(i)
+                                    }
+                                }} />
                         </div>
                     </div>
                 )
@@ -82,13 +148,25 @@ class HomeAdmin extends Component {
                 groupList3.push(
                     <div className="singleGroupList flex-item flex-container">
                         <div className="singleGroupButtons">
-                            <button onClick={() => { this.props.editGroup(i) }} >Edit</button>
+                            <img
+                                height="25px"
+                                width="25px"
+                                src="https://s3.amazonaws.com/roeetestbucket123/edit-flat.png"
+                                onClick={() => { this.props.editGroup(i) }}
+                            />
                         </div>
                         <div className="singleGroupName">
                             {groupsArray[i].name}
                         </div>
                         <div className="singleGroupButtons">
-                            <button onClick={() => { this.props.removeGroup(i) }} >remove</button>
+                            <img
+                                height="30%"
+                                src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
+                                onClick={() => {
+                                    if (confirm(`Are you sure you want to delete ${groupsArray[i].name}??`)) {
+                                        this.props.removeGroup(i)
+                                    }
+                                }} />
                         </div>
                     </div>
                 )
@@ -102,7 +180,7 @@ class HomeAdmin extends Component {
         if (this.props.isInProccese) {
             groupVar = (
                 <form id="newGroupForm">
-                    Group Name: <input type="text" id="groupNameInput" className="groupNameInput" />
+                    Group Name: <input type="text" id="groupNameInput" className="groupNameInput" onBlur={this.props.stopGroupProccese} />
                     <input type="button" value="Create" onClick={this.props.startNewGroup} />
                 </form>
             )
@@ -117,7 +195,13 @@ class HomeAdmin extends Component {
                     singleFileTitle={heroList[i].title}
                     singleFileCredit={heroList[i].credit}
                     singleFileName={heroList[i].name}
-                    onClick={() => { this.props.removeSingleHero(i) }}
+                    onClick={() => {
+                        if (confirm(`Are you sure you want to delete ${heroList[i].name} ?`) == true) {
+                            this.props.removeSingleHero(i)
+                        } else {
+                            console.log('ok')
+                        }
+                    }}
                 />
             )
         }
@@ -179,10 +263,19 @@ class HomeAdmin extends Component {
                     <p className="articlesTitle">
                         ARTICLES
                     </p>
-                    {allArticlesList}
+                    {allArticlesList.showenList}
                     <div className="newArticleButton">
                         <Link to="newarticle"><button>New Article</button></Link>
                     </div>
+                </div>
+                <div className="homeArticlesDiv">
+                    <p className="articlesTitle">
+                        ARTICLES IN PROSSEC
+                    </p>
+                    {allArticlesList.hiddenList}
+                    {/*<div className="newArticleButton">
+                        <Link to="newarticle"><button>New Article</button></Link>
+                    </div>*/}
                 </div>
                 <p className="groupsTitle">
                     GROUPS
@@ -201,6 +294,16 @@ class HomeAdmin extends Component {
                 <div className="newGroupButton">
                     {groupVar}
                 </div>
+                <p className="groupsTitle">
+                    GROUPS IN PROSSEC
+                </p>
+                <div className="groupListDiv flex-container">
+                    <div className="groupList flex-item ">
+                        {hiddenGroupList}
+                    </div>
+                </div>
+
+
                 {/*<div>
                     <button onClick={this.props.updateDbState}>Update The Web</button>      // CHECK ON REMOVING THE ON CLICK FUNC
                 </div>*/}

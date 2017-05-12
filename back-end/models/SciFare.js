@@ -22,7 +22,8 @@ const articleSchema = new Schema({
     subCategorys: Array,
     date: String,
     showAtHomePage: Boolean,
-    summery: String
+    summery: String,
+    isHidden: Boolean
 })
 
 const groupSchema = new Schema({
@@ -35,13 +36,15 @@ const groupSchema = new Schema({
     date: String,
     showAtHomePage: Boolean,
     summery: String,
+    isHidden: Boolean
 });
 
 
 const sciFareSchema = new Schema({
     subCategorys: Array,
     heroObjects: [heroSchema],
-    inProcess:[articleSchema],
+    articlesInProcess:[articleSchema],
+    groupsInProcess:[groupSchema],
     allArticles: [articleSchema],
     scince: [articleSchema],
     health: [articleSchema],

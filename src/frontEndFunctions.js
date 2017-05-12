@@ -2,7 +2,6 @@ import axios from 'axios';
 
 export const getHomePageState = async () => {
     const response = await axios.get('http://localhost:8080/GetHomePageContent')
-    console.log("Responseee ", response);
     let homePageObject = {};
     homePageObject.heroObjects = response.data.heroObjects;
     homePageObject.subCategorys = response.data.subCategorys;
@@ -13,26 +12,5 @@ export const getHomePageState = async () => {
     if(response.status !== 200)
         throw new Error(response.data)
     return homePageObject
-}
-
-
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-const checksIfGrouped = ( articleGroups , groupName ) => {
-    for(let i =0 ; i < articleGroups.length; i++){
-        if(articleGroups[i] = groupName){
-            return true
-        }
-    }
-    return false
 }
 

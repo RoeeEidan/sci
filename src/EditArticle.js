@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg';
 import axios from 'axios';
 
@@ -31,7 +31,8 @@ class EditArticle extends Component {
                 subCategorys: [],
                 date: undefined,
                 showAtHomePage: true,
-                summery: undefined
+                summery: undefined,
+                isHidden: undefined
             },
         };
         this.onEditorStateChange = this.onEditorStateChange.bind(this);
@@ -122,7 +123,7 @@ class EditArticle extends Component {
 
     removeSingleHero(i) {
         let newArticle = { ...this.state.article };
-        newArticle.heroObjects = [... this.state.article.heroObjects];
+        newArticle.heroObjects = [...this.state.article.heroObjects];
         newArticle.heroObjects.splice(i, 1);
         this.setState({
             article: newArticle
@@ -227,7 +228,7 @@ class EditArticle extends Component {
                 subCategorysRender2.push(
                     <div className="singleSubCategoryDiv flex-item">
                         {ourSubCategorys[i]}
-                        <input id={`${ourSubCategorys[i]}`} type="checkbox" id={`${ourSubCategorys[i]}`} onChange={() => { this.addSubCategory(i) }} />
+                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
                     </div>
                 );
             } else if (i >= ((ourSubCategorys.length / 3) * 2)) {
@@ -288,7 +289,9 @@ class EditArticle extends Component {
         }
         return (
             <div className="EditArticle" >
-
+                <Link to="/">
+                    <input type="button" value="Back Home" className="backHome" />
+                </Link>
                 <h1>{this.state.article.name}</h1>
                 <div className="heroFilesWrapper flex-container">
                     <div className="uploadFiles flex-item">
@@ -445,6 +448,13 @@ class EditArticle extends Component {
                         publish
                     </button>
                 </div>
+                <button onClick={() => {
+                    let newState = { ...this.state }
+                    newState.article.isHidden = true;
+                    this.props.updateArticlesInProcess(newState.article, this.props.id)
+                }}>
+                    Save
+                </button>
             </div>
         );
     }

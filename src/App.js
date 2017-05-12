@@ -203,6 +203,9 @@ class App extends Component {
             publish
           </button>
         </div>
+        <button className="saveToInProcess" onClick={this.props.saveToInProcess}>
+          Save
+        </button>
       </div>
     );
   }

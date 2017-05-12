@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect , Link } from 'react-router-dom';
 import SingleFile from './Singlefile';
 
 
@@ -21,48 +21,48 @@ class NewGroup extends Component {
 
 
         let subCategorysRender1 = [];
-        let subCategorysRender2= [];
+        let subCategorysRender2 = [];
         let subCategorysRender3 = [];
         let ourSubCategorys = this.props.subCategorys
         for (let i = 0; i < ourSubCategorys.length; i++) {
-        if( i < (ourSubCategorys.length/3)){
-            subCategorysRender1.push(
-            <div className="singleSubCategoryDiv flex-item">
-                {ourSubCategorys[i]}
-                <input type="checkbox" onChange={() => { this.props.groupAddSubCategory(i) }} />
-            </div>
-        );
-        }else if( i >= (ourSubCategorys.length/3) && i < ((ourSubCategorys.length/3)*2)){
-            subCategorysRender2.push(
-            <div className="singleSubCategoryDiv flex-item">
-                {ourSubCategorys[i]}
-                <input type="checkbox" onChange={() => { this.props.groupAddSubCategory(i) }} />
-            </div>
-        );
-        }else if( i >= ((ourSubCategorys.length/3)*2) ){
+            if (i < (ourSubCategorys.length / 3)) {
+                subCategorysRender1.push(
+                    <div className="singleSubCategoryDiv flex-item">
+                        {ourSubCategorys[i]}
+                        <input type="checkbox" onChange={() => { this.props.groupAddSubCategory(i) }} />
+                    </div>
+                );
+            } else if (i >= (ourSubCategorys.length / 3) && i < ((ourSubCategorys.length / 3) * 2)) {
+                subCategorysRender2.push(
+                    <div className="singleSubCategoryDiv flex-item">
+                        {ourSubCategorys[i]}
+                        <input type="checkbox" onChange={() => { this.props.groupAddSubCategory(i) }} />
+                    </div>
+                );
+            } else if (i >= ((ourSubCategorys.length / 3) * 2)) {
+                subCategorysRender3.push(
+                    <div className="singleSubCategoryDiv flex-item">
+                        {ourSubCategorys[i]}
+                        <input type="checkbox" onChange={() => { this.props.groupAddSubCategory(i) }} />
+                    </div>
+                );
+            } else {
+                alert("Check App.js at line 52")
+            }
+        }
+        if (ourSubCategorys.length % 3) {
+            let counter = ourSubCategorys.length;
             subCategorysRender3.push(
-            <div className="singleSubCategoryDiv flex-item">
-                {ourSubCategorys[i]}
-                <input type="checkbox" onChange={() => { this.props.groupAddSubCategory(i) }} />
-            </div>
-        );
-        }else{
-            alert("Check App.js at line 52")
-        }
-        }
-        if(ourSubCategorys.length % 3){
-        let counter = ourSubCategorys.length;
-        subCategorysRender3.push(
-            <div className="singleSubCategoryDiv flex-item">
-            </div>
-        );
-        counter --;
-        if(counter){
-            subCategorysRender2.push(
-            <div className="singleSubCategoryDiv flex-item">
-            </div>
-        )
-        }
+                <div className="singleSubCategoryDiv flex-item">
+                </div>
+            );
+            counter--;
+            if (counter) {
+                subCategorysRender2.push(
+                    <div className="singleSubCategoryDiv flex-item">
+                    </div>
+                )
+            }
         }
 
 
@@ -86,6 +86,9 @@ class NewGroup extends Component {
 
         return (
             <div>
+                <Link to="/">
+                    <input type="button" value="Back Home" className="backHome" />
+                </Link>
                 <h1> New Group </h1>
                 <div className="newGroupArticlesList">
                     ARTICLES
@@ -102,10 +105,10 @@ class NewGroup extends Component {
                                 accept="image/video"
                             />
                             <p>
-                                Title: <textarea  rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />
+                                Title: <textarea rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />
                             </p>
                             <p>
-                                Credit: <textarea rows="2" type='text' id='uploadFilesCredit' className="uploadFilesCreditInput flex-item"/>
+                                Credit: <textarea rows="2" type='text' id='uploadFilesCredit' className="uploadFilesCreditInput flex-item" />
                             </p>
                             <p>
                                 <input type="button" value="Submit" className="flex-item" onClick={this.props.onUploadFilesFormSubmit} />
@@ -140,32 +143,32 @@ class NewGroup extends Component {
                     />
                 </div>
 
-  
-  
+
+
                 <div className="summeryAndCategorysDiv flex-container">
                     <div className="summerybox flex-item flex-container">
                         <h2 className="flex-item">Summery</h2>
                         <textarea
-                        className="newArticleSummeryTextArea flex-item"
-                        id='summeryInput'
-                        type='text'
-                        onChange={this.props.onSummeryChange}
+                            className="newArticleSummeryTextArea flex-item"
+                            id='summeryInput'
+                            type='text'
+                            onChange={this.props.onSummeryChange}
                         />
                     </div>
                     <div className="allCategorysDiv flex-item flex-container">
                         <div className="filler flex-item">
-                        
+
                         </div>
                         <div className="homaPageAndCategory flex-item flex-container">
-                        <div className="showAtHomePageBox flex-item">
-                            <span>show at home page:</span>
-                            <input
-                            id='homePageCheckbox'
-                            type="checkbox"
-                            className="homePageCheckbox"
-                            onChange={this.props.onHomePageChange}
-                            />
-                        </div>
+                            <div className="showAtHomePageBox flex-item">
+                                <span>show at home page:</span>
+                                <input
+                                    id='homePageCheckbox'
+                                    type="checkbox"
+                                    className="homePageCheckbox"
+                                    onChange={this.props.onHomePageChange}
+                                />
+                            </div>
                         </div>
                         <h4 className="newArticleSubCategorysTitle">Sub Categorys</h4>
                         <div className="newArticleSubCategorysDiv flex-item flex-container">
@@ -190,6 +193,9 @@ class NewGroup extends Component {
                         publish
                     </button>
                 </div>
+                <button onClick={this.props.saveGroupToInProcess}>
+                    Save
+                </button>
             </div >
 
         )

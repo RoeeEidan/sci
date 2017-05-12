@@ -56,39 +56,6 @@ const PORT = process.env.PORT || 8080;
 
 let StateID = '5902e27baca2984a1299180a';
 
-// Checking if article is grouped and if it is it retuns what index in the articleGroups he is 
-
-// function isGrouped(index, NAME) {
-//   if (NAME) {
-//     let articlesArray = [...this.state.allArticles]
-//     if (articlesArray[index].articleGroups) {
-//       let thisGroups = articlesArray[index].articleGroups;
-//       for (let i = 0; i < thisGroups.length; i++) { // loops through the article related groups
-//         if (thisGroups[i] === NAME) {
-//           return i;
-//         }
-//       }
-//       return false;
-//     } else {
-//       alert("problem at AdminRouter at isGrouped Func")
-//     }
-//   } else {
-//     let name = this.state.newGroup.name;
-//     let articlesArray = [...this.state.allArticles]
-//     if (articlesArray[index].articleGroups) {
-//       let thisGroups = articlesArray[index].articleGroups;
-//       for (let i = 0; i < thisGroups.length; i++) {
-//         if (thisGroups[i] === name) {
-//           return i;
-//         }
-//       }
-//       return false;
-//     } else {
-//       alert("problem at AdminRouter at isGrouped Func")
-//     }
-//   }
-// }
-
 app.post('/isGrouped', function (req, res) {//add new hero
   console.log(req.body)
   let thisHero = req.body;
@@ -209,13 +176,13 @@ app.get('/GetHomePageContent', (req, res) => { // get the home page state
       homePageObject.subCategorys = scifare.subCategorys;
       homePageObject.articles = [];
       homePageObject.groups = [];
-      homePageObject.inProcess = [];
       for (let i = 0; i < scifare.allArticles.length; i++) {
         let article = {
           index: i,
           name: scifare.allArticles[i].name,
           articleGroups: scifare.allArticles[i].articleGroups,
-          _id: scifare.allArticles[i]._id
+          _id: scifare.allArticles[i]._id,
+          isHidden: scifare.allArticles[i].isHidden,
         }
         homePageObject.articles.push(article);
       }
@@ -223,7 +190,8 @@ app.get('/GetHomePageContent', (req, res) => { // get the home page state
         let group = {
           index: i,
           name: scifare.groups[i].name,
-          _id: scifare.groups[i]._id
+          _id: scifare.groups[i]._id,
+          isHidden: scifare.groups[i].isHidden,
         }
         homePageObject.groups.push(group);
       }
@@ -289,7 +257,8 @@ app.post('/NewArticle', function (req, res) {//adding a article to the state
     subCategorys: req.body.subCategorys,
     date: req.body.date,
     showAtHomePage: req.body.showAtHomePage,
-    summery: req.body.summery
+    summery: req.body.summery,
+    isHidden: req.body.isHidden,
   }
   SciFare.findById(StateID)
     .then(scifare => {
@@ -302,6 +271,91 @@ app.post('/NewArticle', function (req, res) {//adding a article to the state
       console.log(err);
     })
 });
+
+
+app.post('/SaveToArticlesInProcess', function (req, res) {//  save article to inProcess
+  console.log('we got a post', req.body)
+  let newArticle = {
+    heroObjects: req.body.heroObjects,
+    title: req.body.title,
+    name: req.body.name,
+    articleBody: req.body.articleBody,
+    articleGroups: req.body.articleGroups,
+    category: req.body.category,
+    subCategorys: req.body.subCategorys,
+    date: req.body.date,
+    showAtHomePage: req.body.showAtHomePage,
+    summery: req.body.summery
+  }
+  SciFare.findById(StateID)
+    .then(scifare => {
+      scifare.articlesInProcess.push(newArticle);
+      // console.log(scifare.inProcess);
+      res.send("Saved to in process");
+      return scifare.save();
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
+
+
+app.post('/updateArticlesInProcess/:index', function (req, res) {//  save article to inProcess
+  console.log('we got a post', req.body)
+  let newArticle = {
+    isHidden: req.body.isHidden,
+    heroObjects: req.body.heroObjects,
+    title: req.body.title,
+    name: req.body.name,
+    articleBody: req.body.articleBody,
+    articleGroups: req.body.articleGroups,
+    category: req.body.category,
+    subCategorys: req.body.subCategorys,
+    date: req.body.date,
+    showAtHomePage: req.body.showAtHomePage,
+    summery: req.body.summery
+  }
+  SciFare.findById(StateID)
+    .then(scifare => {
+      scifare.articlesInProcess[req.params.index] = newArticle;
+      // console.log(scifare.inProcess);
+      res.send("updated in process");
+      return scifare.save();
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
+
+
+app.post('/saveGroupToInProcess', function (req, res) {//saving a group article
+  console.log('we got a post')
+  let newGroup = {
+    heroObjects: req.body.heroObjects,
+    relatedArticles: req.body.relatedArticles,
+    title: req.body.title,
+    name: req.body.name,
+    articleBody: req.body.articleBody,
+    date: req.body.date,
+    showAtHomePage: req.body.showAtHomePage,
+    summery: req.body.summery,
+    subCategorys: req.body.subCategorys,
+    isHidden: req.body.isHidden,
+  }
+  SciFare.findById(StateID)
+    .then(scifare => {
+      scifare.groupsInProcess.push(newGroup);
+      console.log(scifare);
+      res.send('group saved');
+      return scifare.save();
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
 
 
 app.post('/DeleteArticle/:x', (req, res) => { //Delete a article by id
@@ -343,11 +397,11 @@ app.post('/DeleteArticle/:x', (req, res) => { //Edit a article by id
 app.post('/EditArticle/:x', (req, res) => { //edit a article object by id
   SciFare.findById(StateID)
     .then(scifare => {
-      console.log(req.body);
+      console.log(req.body.article);
       let article = req.body.article;
       scifare.allArticles[req.body.index] = article;
       scifare.save();
-      res.json({ article });
+      res.send('article updated');
     })
     .catch(err => {
       console.log(err);
@@ -418,6 +472,7 @@ app.post('/AddGroupToArticle', (req, res) => { //add a group to article
 app.post('/NewGroup', function (req, res) {//adding a group to the state
   console.log('we got a post')
   let newGroup = {
+    isHidden: req.body.isHidden,
     heroObjects: req.body.heroObjects,
     relatedArticles: req.body.relatedArticles,
     title: req.body.title,
