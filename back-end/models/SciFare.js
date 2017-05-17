@@ -50,6 +50,7 @@ const sciFareSchema = new Schema({
     health: [articleSchema],
     technology: [articleSchema],
     groups: [groupSchema],
+    users: Object,
 });
 
 

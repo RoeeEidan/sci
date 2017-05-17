@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const SciFare = require('./models/SciFare');
 let fs = require('fs');
+const bcrypt = require('bcryptjs');
 let S3FS = require('s3fs');
 let multiparty = require('connect-multiparty');
 let multer = require('multer');
@@ -41,6 +42,9 @@ app.use(bodyParser.json());
 
 app.use(multipartyMiddleware);
 
+const PORT = process.env.PORT || 8080;
+
+
 mongoose.connect('mongodb://localhost/data/db/');
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;
@@ -49,12 +53,63 @@ db.once('open', function () {
   console.log("Connected to db at /data/db/")
 });
 
-const PORT = process.env.PORT || 8080;
+
+let StateID = '5902e27baca2984a1299180a';
+
+
+// Loging Stuff
+
+
+app.post('/newuser', (req, res) => {
+  console.log('GOT THE POST REQUEST')
+  bcrypt.genSalt(10, (err, salt) => {
+    console.log('SALT STARTED')
+    bcrypt.hash(req.body.password, salt, (err, hash) => {
+      console.log('BYCRYPT STARTED Hashh!!!', hash);
+      // Store hash in your password DB.
+      if (err) throw err;
+      SciFare.findById(StateID)
+        .then(scifare => {
+          let username = req.body.username
+          scifare.users = { username: username, hash: hash }
+          res.send('user created');
+          return scifare.save();
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    });
+  });
+});
+
+
+app.post('/login', (req, res) => {
+  var pass = req.body.password;
+  let user;
+  SciFare.findById(StateID)
+    .then(scifare => {
+      user = scifare.users
+      bcrypt.compare(pass, user.hash).then((resault) => {
+        if (resault === true) {
+          res.json(true)
+        }else {
+          res.json(false)
+          // res.status(403)
+          // .json({ err: 'Incorrect password' });
+        }
+      });
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
+
 
 // DATA BASE STUFF 
 
 
-let StateID = '5902e27baca2984a1299180a';
+
 
 app.post('/isGrouped', function (req, res) {//add new hero
   console.log(req.body)
@@ -90,7 +145,7 @@ app.post('/NewHero', function (req, res) {//add new hero
     .then(scifare => {
       scifare.heroObjects.push(thisHero);
       console.log(scifare);
-      res.send(scifare);
+      res.send('new hero saved!');
       return scifare.save();
     })
     .catch(err => {

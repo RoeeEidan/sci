@@ -7,9 +7,23 @@ textarea:focus , input:focus {
     outline: none;
 }
 
+
+.myTransition{
+    -webkit-transition: .6s ease-in;
+	transition: .6s ease-in;
+    -webkit-transition: .3s ease-out;
+	transition: .3s ease-out;
+}
+
+
 body{
-    padding: 7%;
+    background-color: #eff0f6;
+    padding: 2% 7%;
     font-family: sans-serif;
+    -webkit-transition: 1s ease-in;
+	transition: 1s ease-in;
+    -webkit-transition: 0.5s ease-out;
+	transition: 0.5s ease-out;
 }
 
 li{
@@ -25,15 +39,20 @@ ul{
 }
 
 h1{
+    margin-bottom: 50px;
+    color: #172e7c;
     text-align: center;
 }
-
+ 
 .singleFileBox{
+    padding:0;
     width:100%;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: row;
     flex-direction: row;
+    align-items: center;    
+    justify-content: center;
     .flex-item{
         flex-grow: 1;
     }
@@ -62,38 +81,49 @@ h1{
     margin: 2% 0 ;
 }
 
-.uploadFiles{
+.uploadFiles2{
+    // transition: 0;
     float: left;
     text-align: center;
     -webkit-align-self: center;
     align-self: center;
     height: 100%;
+    min-height: 81px;   
 }
 
+
 .listOfHeros{
+    padding: 0 2%;
+    // max-height: 490px;
+    // overflow-y: scroll;
+    // overflow-x: hidden;
     display: inline-block;
-    width:73%;
-    border-left: $line;
+    width:100%;
 }
 
 .uploadFilesTitleInput{
+    margin: auto;
     display: block;
-    width: 90%;
+    width: 70%;
     height: 10%;
 }
 
 .uploadFilesCreditInput{
+    margin: auto;
     display: block;
-    width: 90%;
+    width: 50%;
 }
 
 .heroFilesWrapper{
+    // max-height: 485px;
+    // padding-top: 5%;
     display: -webkit-flex;
     display: flex;
-    -webkit-flex-direction: row;
-    flex-direction: row;
-    border-bottom: $line;
-}
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    }
 
 .uploadFilesForm{
     
@@ -117,7 +147,6 @@ h1{
 
 .newCategoryButtonDiv{
     text-align: center;
-    border-bottom: $line;
     padding: 20px 0;
 }
 
@@ -185,7 +214,8 @@ h1{
 }
 
 .homeArticlesDiv{
-    border-bottom: $line;
+    max-height: 440px;
+    overflow-y: visible;
 }
 
 .newArticleButton{
@@ -388,4 +418,143 @@ h1{
     border: 1px solid #F1F1F1;
     border-radius: 2px;
     padding:5px;
+}
+
+
+
+///    SECOND ROUND OF STYLING
+
+.logInBody{
+    padding: 15%;
+    text-align: center;
+}
+
+.homePageSingleImage{
+    height: 85px;
+    width: auto;
+    background: blue;
+	opacity: 1;
+	-webkit-transition: .3s ease-in-out;
+	transition: .3s ease-in-out;
+    display: table-row;
+
+    &:hover {
+        opacity: 0.5;
+    }
+}
+
+figure {
+    display: table;
+    background-color: blue;
+}
+
+// Styling the homepage window
+
+.homePageWindowWrapper{
+    @extend .myTransition;
+    padding-top: 3%;
+    height: 400px;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row; 
+    align-items: center;    
+    justify-content: center;
+    .windowBox{
+        @extend .myTransition; 
+        box-shadow: 0 0 10px white;
+        overflow-y: scroll;
+        border-radius: 2%;
+        padding: 2%;
+        height: 350px;
+        overflow-y: scroll;
+        margin-top: 7%;
+        background-color: white;
+        -webkit-flex: 7;
+        flex: 7;  
+    }
+    .homePageArrow{
+        @extend .myTransition;        
+        padding-top: 7%;
+        -webkit-flex: 1;
+        flex: 1;  
+        align-items: center;    
+        justify-content: center;
+        &:hover{
+            font-size: 70px;
+        }
+    }
+}
+
+.homePageWindow{
+    @extend .myTransition;
+    background-color: #4A4A4A;
+    border-radius: 2%;
+    box-shadow: 0px 10px 20px #888888;
+    height: 526px;
+}
+
+
+.homePageNavBarUL{
+    @extend .myTransition;
+    padding: 0 2%;
+    color: #C6C6C6;
+    font-size: larger;
+    min-height: 40px;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row; 
+    .flex-item{
+        -webkit-flex: 1;
+        flex: 1;
+        text-align: center;  
+    }
+}
+
+
+.loginButton{
+    @extend .myTransition;
+    font-size: 50px;
+    width: 70px;
+    margin: auto;
+    &:hover{
+        font-size: 70px; 
+    }
+}
+
+.✢{
+    @extend .myTransition;
+    text-align: center;
+    font-size: 60px;
+    color: white;
+    &:hover{
+        font-size: 70px;
+    }
+}
+
+.homePageAddButton{
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row; 
+    justify-content: center;
+    align-items: center;
+    padding: 3%;
+}
+
+.svg{
+    padding-top: inherit;
+}
+
+.uploadFiles{
+    text-align: center;
+    -webkit-align-self: center;
+    align-self: center;
+    position: absolute;
+    top: 38%;
+    background-color: black;
+    opacity: 0.9;
+    width: 84.5%;
+    color: white;
 }

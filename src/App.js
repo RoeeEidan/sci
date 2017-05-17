@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Redirect , Link } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 
 //COMPONENTS
 
@@ -9,10 +9,24 @@ import SingleFile from './Singlefile';
 
 class App extends Component {
 
+  componentWillUnmount() {
+    this.props.setLocation(false);
+  }
+
   componentDidMount() {
-    if (this.props.path !== '/') {
+    console.log(this.props.category)
+    this.props.setLocation(true);
+    // category and sub categorys
+    if (this.props.path !== '/' && this.props.showAtHomePage) {
       document.getElementById("homePageCheckbox").checked = true
     }
+  }
+
+
+
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log(this.props)
   }
 
   // componentWillUpdate(nextProps, nextState){
@@ -29,49 +43,49 @@ class App extends Component {
       this.props.pathTo();
       return (<Redirect to='/' />)
     }
-    
+
     let subCategorysRender1 = [];
-    let subCategorysRender2= [];
+    let subCategorysRender2 = [];
     let subCategorysRender3 = [];
     let ourSubCategorys = this.props.subCategorys || [];
     for (let i = 0; i < ourSubCategorys.length; i++) {
-      if( i < (ourSubCategorys.length/3)){
+      if (i < (ourSubCategorys.length / 3)) {
         subCategorysRender1.push(
           <div className="singleSubCategoryDiv flex-item">
             {ourSubCategorys[i]}
-            <input type="checkbox" onChange={() => { this.props.addSubCategory(i) }} />
+            <input type="checkbox" id={ourSubCategorys[i]} onChange={() => { this.props.addSubCategory(i) }} />
           </div>
-      );
-      }else if( i >= (ourSubCategorys.length/3) && i < ((ourSubCategorys.length/3)*2)){
+        );
+      } else if (i >= (ourSubCategorys.length / 3) && i < ((ourSubCategorys.length / 3) * 2)) {
         subCategorysRender2.push(
           <div className="singleSubCategoryDiv flex-item">
             {ourSubCategorys[i]}
-            <input type="checkbox" onChange={() => { this.props.addSubCategory(i) }} />
+            <input type="checkbox" id={ourSubCategorys[i]}  onChange={() => { this.props.addSubCategory(i) }} />
           </div>
-      );
-      }else if( i >= ((ourSubCategorys.length/3)*2) ){
+        );
+      } else if (i >= ((ourSubCategorys.length / 3) * 2)) {
         subCategorysRender3.push(
           <div className="singleSubCategoryDiv flex-item">
             {ourSubCategorys[i]}
-            <input type="checkbox" onChange={() => { this.props.addSubCategory(i) }} />
+            <input type="checkbox" id={ourSubCategorys[i]} onChange={() => { this.props.addSubCategory(i) }} />
           </div>
-      );
-      }else{
+        );
+      } else {
         alert("Check App.js at line 52")
       }
     }
-    if(ourSubCategorys.length % 3){
+    if (ourSubCategorys.length % 3) {
       let counter = ourSubCategorys.length;
-       subCategorysRender3.push(
-          <div className="singleSubCategoryDiv flex-item">
-          </div>
+      subCategorysRender3.push(
+        <div className="singleSubCategoryDiv flex-item">
+        </div>
       );
-      counter --;
-      if(counter){
+      counter--;
+      if (counter) {
         subCategorysRender2.push(
           <div className="singleSubCategoryDiv flex-item">
           </div>
-      )
+        )
       }
     }
 
@@ -94,34 +108,34 @@ class App extends Component {
     return (
       <div className="App" >
         <Link to="/">
-        <input type="button" value="Back Home" className="backHome"/>
+          <input type="button" value="Back Home" className="backHome" />
         </Link>
         <h1>New Article</h1>
         <div className="heroFilesWrapper flex-container">
-            <div className="uploadFiles flex-item">
-              <p>Upliad Files</p>
-                <form id='uploadFilesForm' className="uploadFilesForm flex-container">
-                  <input
-                    className="flex-item uploadInput"
-                    id='uploadFilesFile'
-                    type="file"
-                    accept="image/video"
-                  />
-                  <p>
-                    Title: <textarea  rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />
-                  </p>
-                  <p>
-                    Credit: <textarea rows="2" type='text' id='uploadFilesCredit' className="uploadFilesCreditInput flex-item"/>
-                  </p>
-                  <p>
-                    <input type="button" value="Submit" className="flex-item" onClick={this.props.onUploadFilesFormSubmit} />
-                  </p>
+          <div className="uploadFiles flex-item">
+            <p>Upliad Files</p>
+            <form id='uploadFilesForm' className="uploadFilesForm flex-container">
+              <input
+                className="flex-item uploadInput"
+                id='uploadFilesFile'
+                type="file"
+                accept="image/video"
+              />
+              <p>
+                Title: <textarea rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />
+              </p>
+              <p>
+                Credit: <textarea rows="2" type='text' id='uploadFilesCredit' className="uploadFilesCreditInput flex-item" />
+              </p>
+              <p>
+                <input type="button" value="Submit" className="flex-item" onClick={this.props.onUploadFilesFormSubmit} />
+              </p>
             </form>
           </div>
           <div className="listOfHeros">
             <ul className='singleFileBox flex-container'>
               <li className="singleFileName flex-item">
-                 Name
+                Name
               </li>
               <li className="singleFileTitle flex-item">
                 Title
@@ -130,8 +144,8 @@ class App extends Component {
                 Credit
               </li>
               <div className="removeSingleFile flex-item">
-            </div>
-           </ul>
+              </div>
+            </ul>
             {filesList}
           </div>
         </div>
@@ -158,7 +172,7 @@ class App extends Component {
           </div>
           <div className="allCategorysDiv flex-item flex-container">
             <div className="filler flex-item">
-            
+
             </div>
             <div className="homaPageAndCategory flex-item flex-container">
               <div className="showAtHomePageBox flex-item">

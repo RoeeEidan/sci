@@ -16,32 +16,27 @@ import NewGroup from './NewGroup';
 import GroupHomeArticle from './GroupHomeArticle';
 import EditArticle from './EditArticle';
 import EditGroup from './EditGroup';
-
+import LogIn from './LogIn';
 
 //Functions
 
 import { getHomePageState } from './frontEndFunctions';
 
-/*const NavBar = () => (
-    <div>
-        <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/newarticle">New Article</Link></li>
-            <li><Link to="/newgroup">New Group</Link></li>
-            <li><Link to="/editArticle/0">Edit Article </Link></li>
-            <li><Link to="/DditGroup/0">Edit Group </Link></li>
-        </ul>
 
-        <hr />
-    </div>
-)*/
+
+
 
 
 
 export class AdminRouter extends React.Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
+            logInStatus: {
+                incorrectCounter: 0,
+                message: "Welcome Lee 👋 "
+            },
+            isLogedIn: false,
             homePageState: {},
             newSubCategory: false,
             subCategorys: [],
@@ -57,12 +52,13 @@ export class AdminRouter extends React.Component {
                 name: undefined,
                 articleBody: undefined,
                 articleGroups: [], // group name
-                category: undefined,
+                category: "Chose a Category",
                 subCategorys: [],
                 date: undefined,
                 showAtHomePage: true,
                 summery: undefined,
                 isHidden: true,
+                editorState: undefined,
             },
             newGroup: {
                 heroObjects: [],// {type:'' , url: '' , title:'' , credit ''}
@@ -76,6 +72,7 @@ export class AdminRouter extends React.Component {
                 summery: undefined,
                 isInProccese: false,
                 isHidden: true,
+                editorState: undefined,
             },
         }
 
@@ -120,6 +117,12 @@ export class AdminRouter extends React.Component {
         this.newGroupBody = '';
 
         this.myPath = undefined;
+
+        this.isLocationAtNewArticle = false; // used for shouldComponentUpdat
+        this.newArticleHeroObjectTracker = [];
+
+
+        this.isLocationAtNewGroup = false; // used for shouldComponentUpdat
 
         //Home
 
@@ -187,16 +190,33 @@ export class AdminRouter extends React.Component {
         this.saveHiddenGroup = this.saveHiddenGroup.bind(this);
 
 
+        // Log In 
+        this.onLogInClick = this.onLogInClick.bind(this);
+
+
         this.myPathTo = this.myPathTo.bind(this);
         this.updateDbState = this.updateDbState.bind(this);
         this.deleteTo = this.deleteTo.bind(this);
         this.getArticleByID = this.getArticleByID.bind(this);
+        this.setNewArticleLocation = this.setNewArticleLocation.bind(this);
+        this.setNewGrouopLocation = this.setNewGrouopLocation.bind(this);
+
+        // this.shouldComponentUpdate = this.shouldComponentUpdate.bind(this);
     }
 
 
-    saveHiddenGroup(article , articleIndex) {
+    setNewGrouopLocation(bool) {
+        this.isLocationAtNewGroup = bool;
+    }
+
+
+    setNewArticleLocation(bool) {
+        this.isLocationAtNewArticle = bool
+    }
+
+    saveHiddenGroup(article, articleIndex) {
         if ((article && articleIndex) || (article && (articleIndex === 0))) {
-            article.isHidden = true;      
+            article.isHidden = true;
             let homePageState = { ...this.state.homePageState };
             homePageState.groups[articleIndex].name = article.name;
             homePageState.groups[articleIndex].isHidden = true;
@@ -335,6 +355,32 @@ export class AdminRouter extends React.Component {
             this.myPath = path
         } else {
             this.myPath = undefined
+        }
+    }
+
+
+    // Log In 
+
+
+    async onLogInClick() {
+        let pass = document.getElementById('logInPasswordInput').value;
+        let res = await axios.post(`http://localhost:8080/login`, { username: 'RoeeEidan', password: `${pass}` });
+        if (res.data) {
+            this.setState({
+                isLogedIn: true,
+            })
+        } else {
+            let massageStatus = { ...this.state.logInStatus };
+            if (massageStatus.incorrectCounter) {
+                console.log(massageStatus.incorrectCounter)
+                massageStatus.message += "!"
+            } else {
+                massageStatus.message = "Incorrect Password 😬 ";
+            }
+            massageStatus.incorrectCounter++;
+            this.setState({
+                logInStatus: massageStatus
+            })
         }
     }
 
@@ -498,12 +544,12 @@ export class AdminRouter extends React.Component {
 
     onNewGroupEditorStateChange(editorContent) { // ON EDITOR CHANGE 
         const articleBodyString = this.editorContentToHtml(editorContent);
-        // const newState = { ...this.state };
-        // newState.newGroup.articleBody = articleBodyString;
         this.newGroupBody = articleBodyString
-        // this.setState({
-        //     newGroup: newState.newGroup
-        // })
+        const newGroup = { ...this.state.newGroup };
+        newGroup.editorState = editorContent;
+        this.setState({
+            newGroup: newGroup
+        })
     };
 
 
@@ -682,7 +728,7 @@ export class AdminRouter extends React.Component {
 
     arrayToRender(articles) {
         let listToRender = [];
-        let listToRender2 = [];
+        // let listToRender2 = [];
         let hiddenListToRender = [];
         for (let i = 0; i < articles.length; i++) {
             let _id = articles[i]._id;
@@ -701,7 +747,7 @@ export class AdminRouter extends React.Component {
                     />
                 )
             }
-            else if (i < (articles.length / 2)) {
+            else{
                 listToRender.push(
                     <SingleHomeArticle
                         editSingleArticle={this.editSingleArticle}
@@ -715,7 +761,8 @@ export class AdminRouter extends React.Component {
                         index={i}
                     />
                 )
-            } else if (i >= (articles.length / 2)) {
+
+            /*} else if (i >= (articles.length / 2)) {
                 listToRender2.push(
                     <SingleHomeArticle
                         editSingleArticle={this.editSingleArticle}
@@ -728,9 +775,9 @@ export class AdminRouter extends React.Component {
                         }}
                         index={i}
                     />
-                )
-            } else {
-                alert("Check file AdminRouter line 287")
+                )*/
+            // } else {
+            //     alert("Check file AdminRouter line 287")
             }
         }
         return ({
@@ -738,9 +785,9 @@ export class AdminRouter extends React.Component {
                 <div className="articleListToRender flex-item flex-container">
                     {listToRender}
                 </div>
-                <div className="articleListToRender articleListToRender2 flex-item flex-container">
+                {/*<div className="articleListToRender articleListToRender2 flex-item flex-container">
                     {listToRender2}
-                </div>
+                </div>*/}
             </div>,
             hiddenList: <div className="articleListBoxToRender flex-container">
                 <div className="articleListToRender flex-item flex-container">
@@ -806,7 +853,7 @@ export class AdminRouter extends React.Component {
     }
 
 
-    onHomeUploadFilesFormSubmit() {
+    async  onHomeUploadFilesFormSubmit() {
         let file = document.getElementById("uploadFilesFile").files[0];
         let title = document.getElementById("uploadFilesTitle").value;
         let credit = document.getElementById("uploadFilesCredit").value;
@@ -819,13 +866,13 @@ export class AdminRouter extends React.Component {
                 url: `https://s3.amazonaws.com/roeetestbucket123/${file.name}`,
                 name: `${file.name}`
             };
+            let res = await this.uploadFile(file);
             this.postTo('NewHero', heroObject);
             let newHomePageState = { ...this.state.homePageState };
             newHomePageState.heroObjects.push(heroObject);
             this.setState({
                 homePageState: newHomePageState
             })
-            // this.uploadFile(file)
         } else {
             alert('you forgot somthing')
         }
@@ -834,10 +881,11 @@ export class AdminRouter extends React.Component {
 
 
 
-    uploadFile(file) {
+    async uploadFile(file) {
         let form = new FormData();
         form.append(`image`, file);
-        this.postTo('uploads', form)
+        let res = await axios.post('http://localhost:8080/uploads', form);
+        return res.data
     }
 
 
@@ -1063,12 +1111,14 @@ export class AdminRouter extends React.Component {
 
 
     onEditorStateChange(editorContent) { // ON EDITOR CHANGE 
-        console.log(editorContent)
         const articleBodyString = this.editorContentToHtml(editorContent);
         const newState = { ...this.state };
         newState.newArticle.articleBody = articleBodyString;
         this.newArticleBody = newState.newArticle.articleBody;
-        console.log(this.newArticleBody)
+        newState.newArticle.editorState = editorContent;
+        this.setState({
+            newArticle: newState.newArticle,
+        })
 
     };
 
@@ -1083,34 +1133,96 @@ export class AdminRouter extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (document.getElementById("homePageCheckbox")) {
-            if (this.myPath !== '/' &&
-                (this.state.newArticle.showAtHomePage !== document.getElementById("homePageCheckbox").checked ||
-                    this.state.newGroup.showAtHomePage !== document.getElementById("homePageCheckbox").checked)) {
-                return false
+        // find out how not to update when its the editor state,
+
+
+
+        // console.log("LOCATIONNN NEW ARTICLE", this.isLocationAtNewArticle)
+        // if (this.isLocationAtNewArticle) {
+        //     if (this.newArticleHeroObjectTracker !== this.state.newArticle.heroObjects) {
+        //         this.newArticleHeroObjectTracker = this.state.newArticle.heroObjects
+        //         return true
+        //     } else {
+        //         return false
+        //     }
+        // }
+        return true;
+        // this.state.newArticle.category !== document.getElementById("categoryOptions").value
+        // console.log("this ", this)
+        // console.log("nextState ", nextState)
+        // console.log("nextProps ", nextProps)
+
+        //  CASES WHICH I NEED TO RETURN FALSE 
+        //  evry change at new article or group exept the heroObjects
+
+
+
+
+
+
+        // if (document.getElementById("homePageCheckbox")) {
+        //     if (this.myPath !== '/' &&
+        //         (this.state.newArticle.showAtHomePage !== document.getElementById("homePageCheckbox").checked ||
+        //             this.state.newGroup.showAtHomePage !== document.getElementById("homePageCheckbox").checked                   
+        //             )) {
+        //         console.log("returned FALSEE")
+        //         return false
+        //     }
+        // }
+        // if (this.props.titleValue !== nextState.newArticle.name ||
+        //     this.props.summeryValue !== nextState.newArticle.summery ||
+        //     this.props.groupTitleValue !== nextState.newGroup.title ||
+        //     this.props.groupSummeryValue !== nextState.newGroup.summery ||
+        //     this.props.showAtHomePage !== nextProps.showAtHomePage
+        // ) {
+        //     console.log("returned FALSEE")
+        //     return false
+
+        // } else {
+        //     console.log("returned TRUEE")
+        //     return true
+        // }
+    }
+
+    componentDidUpdate() {  
+        if (this.isLocationAtNewArticle) {
+            document.getElementById("homePageCheckbox").value = this.state.newArticle.showAtHomePage;
+            document.getElementById("categoryOptions").value = this.state.newArticle.category;
+            for (let i = 0; i < this.newArticleSubCategorys.length; i++) {
+                let ID = this.newArticleSubCategorys[i];
+                document.getElementById(ID).checked = true;
             }
         }
-        if (this.props.titleValue !== nextState.newArticle.name ||
-            this.props.summeryValue !== nextState.newArticle.summery ||
-            this.props.groupTitleValue !== nextState.newGroup.title ||
-            this.props.groupSummeryValue !== nextState.newGroup.summery ||
-            this.props.showAtHomePage !== nextProps.showAtHomePage
-
-        ) {
-            return false
-        } else {
-            return true
+        if (this.isLocationAtNewGroup) {
+            document.getElementById("homePageCheckbox").checked = this.state.newGroup.showAtHomePage;
+            for (let i = 0; i < this.newGroupSubCategorys.length; i++) {
+                let ID = this.newGroupSubCategorys[i];
+                document.getElementById(ID).checked = true;
+            }
         }
     }
 
     render() {
+        console.log(this.state)
+        /*if (!this.state.isLogedIn) {
+            return (
+                <LogIn
+                    onLogInClick={this.onLogInClick}
+                    logInMassage={this.state.logInStatus.message}
+                    counter={this.state.logInStatus.incorrectCounter}
+                />
+            )
+        }*/
+
         return (
             <Router>
                 <div>
                     {/*<NavBar />*/}
+
                     <Route exact path="/" render={(props) => {
                         return (
                             <HomeAdmin
+                                match={props.match}
                                 stopNewCategory={this.stopNewCategory}
                                 stopGroupProccese={this.stopGroupProccese}
                                 homePageState={this.state.homePageState}
@@ -1132,10 +1244,16 @@ export class AdminRouter extends React.Component {
                                 removeGroup={this.deepRemoveGroup}
                             />
                         )
-                    }} />
+                    }} >
+                    </Route>
                     <Route path="/newarticle" component={(props) => (
                         <App
                             /*showAtHomePage={this.state.newArticle.showAtHomePage} // might be removed??? */
+                            /*titleValue = {this.state.newArticle.name} // this is here for the shouldComponentUpdate*/
+                            category={this.state.newArticle.category}
+                            subCategorys={this.state.newArticle.subCategorys}
+                            showAtHomePage={this.state.newArticle.showAtHomePage}
+                            setLocation={this.setNewArticleLocation}
                             saveToInProcess={this.saveToInProcess}
                             addSubCategory={this.addSubCategory}
                             subCategorys={this.state.homePageState.subCategorys}
@@ -1155,6 +1273,7 @@ export class AdminRouter extends React.Component {
                                 toolbarClassName="home-toolbar"
                                 wrapperClassName="home-wrapper"
                                 editorClassName="home-editor"
+                                editorState={this.state.newArticle.editorState}
                                 onEditorStateChange={this.onEditorStateChange}
                                 toolbar={{ image: { uploadCallback: this.uploadImage } }}
                             />}
@@ -1162,6 +1281,7 @@ export class AdminRouter extends React.Component {
 
                     <Route path="/newgroup" component={() => (
                         <NewGroup
+                            setLocation={this.setNewGrouopLocation}
                             saveGroupToInProcess={this.saveGroupToInProcess}
                             showAtHomePage={this.state.newGroup.showAtHomePage}
                             groupAddSubCategory={this.groupAddSubCategory}
@@ -1185,6 +1305,7 @@ export class AdminRouter extends React.Component {
                                 toolbarClassName="home-toolbar"
                                 wrapperClassName="home-wrapper"
                                 editorClassName="home-editor"
+                                editorState={this.state.newGroup.editorState}
                                 onEditorStateChange={this.onNewGroupEditorStateChange}
                                 toolbar={{ image: { uploadCallback: this.uploadImage } }}
                             />}

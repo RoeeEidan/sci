@@ -2,11 +2,16 @@ import React, { Component } from 'react';
 
 
 class SingleFile extends Component {
+
     render() {
         return (
             <ul className='singleFileBox flex-container'>
                 <li className="singleFileName flex-item">
-                    {this.props.singleFileName}
+                    <figure>
+                        <img
+                            src={this.props.singleFileName}
+                            className='homePageSingleImage' />
+                    </figure>
                 </li>
                 <li className="singleFileTitle flex-item">
                     {this.props.singleFileTitle}
@@ -15,12 +20,14 @@ class SingleFile extends Component {
                     {this.props.singleFileCredit}
                 </li>
                 <li className="removeSingleFile flex-item">
+
                     <img
                         src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
                         height="25px"
                         width="25px"
                         onClick={this.props.onClick}
                     />
+
                 </li>
             </ul>
         )
