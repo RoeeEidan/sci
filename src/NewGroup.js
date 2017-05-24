@@ -103,7 +103,7 @@ class NewGroup extends Component {
                    {articlesList}
                 </div>
                 <div className="heroFilesWrapper flex-container">
-                    <div className="uploadFiles flex-item">
+                    <div className="uploadFiles2 flex-item">
                         <p>Upliad Files</p>
                         <form id='uploadFilesForm' className="uploadFilesForm flex-container">
                             <input
@@ -146,13 +146,9 @@ class NewGroup extends Component {
                         className="newArticleTitleInput flex-item"
                         id='titleInput'
                         type='text'
-                        value={this.props.titleValue}
                         onChange={this.props.onTitleChange}
                     />
                 </div>
-
-
-
                 <div className="summeryAndCategorysDiv flex-container">
                     <div className="summerybox flex-item flex-container">
                         <h2 className="flex-item">Summery</h2>

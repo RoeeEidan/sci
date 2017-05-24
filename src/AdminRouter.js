@@ -119,10 +119,16 @@ export class AdminRouter extends React.Component {
         this.myPath = undefined;
 
         this.isLocationAtNewArticle = false; // used for shouldComponentUpdat
-        this.newArticleHeroObjectTracker = [];
+        this.newArticleHeroObjectTracker = {
+            oldLength: 0,
+            currntLength: 0 
+        };
 
-
-        this.isLocationAtNewGroup = false; // used for shouldComponentUpdat
+        this.isLocationAtNewGroup = false; // used for shouldComponentUpdat\
+        this.newGroupHeroObjectTracker = {
+            oldLength: 0,
+            currntLength: 0 
+        };
 
         //Home
 
@@ -273,7 +279,8 @@ export class AdminRouter extends React.Component {
         }, () => { console.log(this.state) })
 
         this.myPath = '/';
-        this.resetNewGroupState()
+        this.resetNewGroupState();
+        this.forceUpdate();
     }
 
 
@@ -298,6 +305,7 @@ export class AdminRouter extends React.Component {
         })
         this.myPath = '/';
         this.resetNewArticleState()
+        this.forceUpdate();
     }
 
 
@@ -539,6 +547,7 @@ export class AdminRouter extends React.Component {
         }, () => { console.log(this.state) })
         this.myPath = '/';
         this.resetNewGroupState();
+        this.forceUpdate();
     }
 
 
@@ -566,7 +575,7 @@ export class AdminRouter extends React.Component {
     onNewGroupTitleChange() {// LISTINING ON CHANGE OF TITLE INPUT
         const text = document.getElementById("titleInput").value;
         let newState = { ...this.state };
-        newState.newGroup.title = `<h1>${text}</h1>`;
+        newState.newGroup.title = `${text}`;
         this.setState({
             newGroup: newState.newGroup
         })
@@ -577,6 +586,7 @@ export class AdminRouter extends React.Component {
         let newState = { ...this.state };
         newState.newGroup.heroObjects = [...this.state.newGroup.heroObjects];
         newState.newGroup.heroObjects.splice(heroIndex, 1)
+        this.newGroupHeroObjectTracker.currntLength--
         this.setState({
             newGroup: newState.newGroup
         })
@@ -598,6 +608,7 @@ export class AdminRouter extends React.Component {
             };
             let newState = { ...this.state };
             newState.newGroup.heroObjects.push(heroObject);
+            this.newGroupHeroObjectTracker.currntLength++
             this.setState({
                 newGroup: newState.newGroup
             }, () => { console.log("STATTEEEE", this.state) })
@@ -728,7 +739,7 @@ export class AdminRouter extends React.Component {
 
     arrayToRender(articles) {
         let listToRender = [];
-        // let listToRender2 = [];
+        // 
         let hiddenListToRender = [];
         for (let i = 0; i < articles.length; i++) {
             let _id = articles[i]._id;
@@ -747,7 +758,7 @@ export class AdminRouter extends React.Component {
                     />
                 )
             }
-            else{
+            else {
                 listToRender.push(
                     <SingleHomeArticle
                         editSingleArticle={this.editSingleArticle}
@@ -761,33 +772,11 @@ export class AdminRouter extends React.Component {
                         index={i}
                     />
                 )
-
-            /*} else if (i >= (articles.length / 2)) {
-                listToRender2.push(
-                    <SingleHomeArticle
-                        editSingleArticle={this.editSingleArticle}
-                        name={articles[i].name}
-                        removeSingleArticle={() => {
-                            if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
-                                this.removeHomeSingleArticle(i);
-                                this.postTo(`DeleteArticle/${_id}`)
-                            }
-                        }}
-                        index={i}
-                    />
-                )*/
-            // } else {
-            //     alert("Check file AdminRouter line 287")
             }
         }
         return ({
-            showenList: <div className="articleListBoxToRender flex-container">
-                <div className="articleListToRender flex-item flex-container">
-                    {listToRender}
-                </div>
-                {/*<div className="articleListToRender articleListToRender2 flex-item flex-container">
-                    {listToRender2}
-                </div>*/}
+            showenList: <div className="articleListBoxToRender articleListToRender flex-container flex-item">
+                {listToRender}
             </div>,
             hiddenList: <div className="articleListBoxToRender flex-container">
                 <div className="articleListToRender flex-item flex-container">
@@ -801,22 +790,6 @@ export class AdminRouter extends React.Component {
 
 
     // might be removed
-
-    // deepCatagoryGroupRemove(name, newHomePageState) {
-    //     let newArray = [...newHomePageState.articles];
-    //     for (let i = 0; i < newArray.length; i++) {// loops through array of articales
-    //         for (let z = 0; z < newArray[i].articleGroups.length; z++) { // loops throu each article realated groups
-    //             if (newArray[i].articleGroups[z] === name) { // looks for match
-    //                 newArray[i].articleGroups = [...this.state.allArticles[i].articleGroups]
-    //                 newArray[i].articleGroups.splice(z, 1);
-    //             }
-    //         }
-    //     }
-    //     this.setState({
-    //         groups: newState.groups,
-    //         allArticles: newArray
-    //     }, () => { console.log(this.state) })
-    // }
 
 
     deepRemoveGroup(i) {
@@ -866,13 +839,14 @@ export class AdminRouter extends React.Component {
                 url: `https://s3.amazonaws.com/roeetestbucket123/${file.name}`,
                 name: `${file.name}`
             };
-            let res = await this.uploadFile(file);
+            await this.uploadFile(file);
             this.postTo('NewHero', heroObject);
             let newHomePageState = { ...this.state.homePageState };
             newHomePageState.heroObjects.push(heroObject);
             this.setState({
                 homePageState: newHomePageState
             })
+            document.getElementById('root').click();
         } else {
             alert('you forgot somthing')
         }
@@ -974,6 +948,7 @@ export class AdminRouter extends React.Component {
         let newState = { ...this.state };
         newState.newArticle.heroObjects = [...this.state.newArticle.heroObjects]
         newState.newArticle.heroObjects.splice(heroIndex, 1)
+        this.newArticleHeroObjectTracker.currntLength--
         this.setState({
             newArticle: newState.newArticle
         })
@@ -996,6 +971,7 @@ export class AdminRouter extends React.Component {
             let newState = { ...this.state };
             newState.newArticle.heroObjects = [...this.state.newArticle.heroObjects]
             newState.newArticle.heroObjects.push(heroObject);
+            this.newArticleHeroObjectTracker.currntLength++;
             this.setState({
                 newArticle: newState.newArticle
             })
@@ -1055,22 +1031,31 @@ export class AdminRouter extends React.Component {
         newState.newArticle.articleBody = this.newArticleBody;
         newState.newArticle.subCategorys = [...this.newArticleSubCategorys];
 
-        // might be moved
-        newState.allArticles.push(newState.newArticle);
-        newState.allArticles = [...this.state.allArticles]
-        console.log("new state", newState)
+        // // might be moved
+        // newState.allArticles.push(newState.newArticle);
+        // newState.allArticles = [...this.state.allArticles]
+
+
+        console.log("newState.homePageState.articles", newState.homePageState.articles)
         this.postTo('NewArticle', newState.newArticle);
         newState.homePageState.articles.push(
-            {
+            {   
+                category: newState.newArticle.category,
                 name: newState.newArticle.name,
+                isHidden: newState.newArticle.isHidden,
+                showAtHomePage: newState.newArticle.showAtHomePage,
+                articleGroups: newState.newArticle.articleGroups,
                 index: newState.homePageState.articles.length // needs to be removed
             }
         )
+        console.log('Router',{Router})
         this.setState({
             homePageState: newState.homePageState,
             // allArticles: newState.allArticles,
         }, () => { this.resetNewArticleState() })
-
+        this.myPath = "/";
+        this.forceUpdate();
+        
     }
 
 
@@ -1078,7 +1063,7 @@ export class AdminRouter extends React.Component {
         const text = document.getElementById("titleInput").value;
         let newState = { ...this.state };
         newState.newArticle.name = `${text}`;
-        newState.newArticle.title = `<h1>${text}</h1>`;
+        newState.newArticle.title = `${text}`;
         this.setState({
             newArticle: newState.newArticle
         }, () => { console.log(this.state) })
@@ -1128,72 +1113,45 @@ export class AdminRouter extends React.Component {
             const homePageState = await getHomePageState();
             this.setState({
                 homePageState: homePageState,
-            }, () => { console.log(this.state.homePageState) })
+            })
         }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        // find out how not to update when its the editor state,
-
-
-
-        // console.log("LOCATIONNN NEW ARTICLE", this.isLocationAtNewArticle)
-        // if (this.isLocationAtNewArticle) {
-        //     if (this.newArticleHeroObjectTracker !== this.state.newArticle.heroObjects) {
-        //         this.newArticleHeroObjectTracker = this.state.newArticle.heroObjects
-        //         return true
-        //     } else {
-        //         return false
-        //     }
-        // }
-        return true;
-        // this.state.newArticle.category !== document.getElementById("categoryOptions").value
-        // console.log("this ", this)
-        // console.log("nextState ", nextState)
-        // console.log("nextProps ", nextProps)
-
-        //  CASES WHICH I NEED TO RETURN FALSE 
-        //  evry change at new article or group exept the heroObjects
-
-
-
-
-
-
-        // if (document.getElementById("homePageCheckbox")) {
-        //     if (this.myPath !== '/' &&
-        //         (this.state.newArticle.showAtHomePage !== document.getElementById("homePageCheckbox").checked ||
-        //             this.state.newGroup.showAtHomePage !== document.getElementById("homePageCheckbox").checked                   
-        //             )) {
-        //         console.log("returned FALSEE")
-        //         return false
-        //     }
-        // }
-        // if (this.props.titleValue !== nextState.newArticle.name ||
-        //     this.props.summeryValue !== nextState.newArticle.summery ||
-        //     this.props.groupTitleValue !== nextState.newGroup.title ||
-        //     this.props.groupSummeryValue !== nextState.newGroup.summery ||
-        //     this.props.showAtHomePage !== nextProps.showAtHomePage
-        // ) {
-        //     console.log("returned FALSEE")
-        //     return false
-
-        // } else {
-        //     console.log("returned TRUEE")
-        //     return true
-        // }
+        if(this.isLocationAtNewArticle){ 
+            if(this.newArticleHeroObjectTracker.currntLength !== this.newArticleHeroObjectTracker.oldLength){
+                return true 
+            }else{
+                return false
+            }
+            
+        }else if(this.isLocationAtNewGroup){
+            if(this.newGroupHeroObjectTracker.currntLength !== this.newGroupHeroObjectTracker.oldLength){ 
+                return true
+            }else{
+                return false
+            }
+        }else{
+            return true
+        }  
     }
 
-    componentDidUpdate() {  
-        if (this.isLocationAtNewArticle) {
+    componentDidUpdate() {
+        if (this.isLocationAtNewArticle && (this.newArticleHeroObjectTracker.currntLength !== this.newArticleHeroObjectTracker.oldLength) ) {
+            this.newArticleHeroObjectTracker.oldLength = this.newArticleHeroObjectTracker.currntLength;
+            document.getElementById("titleInput").value = this.state.newArticle.title;
+            document.getElementById("summeryInput").value = this.state.newArticle.summery;
             document.getElementById("homePageCheckbox").value = this.state.newArticle.showAtHomePage;
             document.getElementById("categoryOptions").value = this.state.newArticle.category;
-            for (let i = 0; i < this.newArticleSubCategorys.length; i++) {
+            for (let i = 0; i < this.newArticleSubCategorys.length; i++){
                 let ID = this.newArticleSubCategorys[i];
                 document.getElementById(ID).checked = true;
             }
         }
-        if (this.isLocationAtNewGroup) {
+        if (this.isLocationAtNewGroup && (this.newGroupHeroObjectTracker.currntLength !== this.newGroupHeroObjectTracker.oldLength)) {
+            this.newGroupHeroObjectTracker.oldLength = this.newGroupHeroObjectTracker.currntLength;
+            document.getElementById("titleInput").value = this.state.newGroup.title;
+            document.getElementById("summeryInput").value = this.state.newGroup.summery;
             document.getElementById("homePageCheckbox").checked = this.state.newGroup.showAtHomePage;
             for (let i = 0; i < this.newGroupSubCategorys.length; i++) {
                 let ID = this.newGroupSubCategorys[i];
@@ -1203,7 +1161,6 @@ export class AdminRouter extends React.Component {
     }
 
     render() {
-        console.log(this.state)
         /*if (!this.state.isLogedIn) {
             return (
                 <LogIn
@@ -1222,6 +1179,9 @@ export class AdminRouter extends React.Component {
                     <Route exact path="/" render={(props) => {
                         return (
                             <HomeAdmin
+                                editSingleArticle={this.editSingleArticle}
+                                removeHomeSingleArticle={this.removeHomeSingleArticle}
+                                postTo={this.postTo}
                                 match={props.match}
                                 stopNewCategory={this.stopNewCategory}
                                 stopGroupProccese={this.stopGroupProccese}
@@ -1251,7 +1211,7 @@ export class AdminRouter extends React.Component {
                             /*showAtHomePage={this.state.newArticle.showAtHomePage} // might be removed??? */
                             /*titleValue = {this.state.newArticle.name} // this is here for the shouldComponentUpdate*/
                             category={this.state.newArticle.category}
-                            subCategorys={this.state.newArticle.subCategorys}
+                            /*subCategorys={this.state.newArticle.subCategorys}*/
                             showAtHomePage={this.state.newArticle.showAtHomePage}
                             setLocation={this.setNewArticleLocation}
                             saveToInProcess={this.saveToInProcess}

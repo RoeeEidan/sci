@@ -1,57 +1,29 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Redirect, Link, Route } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 
 
 //COMPONENTS
 
 import SingleFile from './Singlefile';
+import MyButton from './MyButton';
+// import FileInput from './FileInput';
+import SingleHomeArticle from './SingleHomeArticle'
 
 
+// Animation package 
 
-const Topics = (that) => (
-    <div>
-        <ul>
-            <li
-                onClick={(that) => {
-                    that.setState({
-                        renderInt: 0
-                    })
-                }}
-            >Hero Image's
-            </li>
-            <li
-                onClick={(that) => {
-                    that.setState({
-                        renderInt: 1
-                    }, () => { console.log(that.state) })
-                }}
-            >
-                Article's
-            </li>
-            <li
-                onClick={() => {
-                    that.setState({
-                        renderInt: 2
-                    })
-                }}
-            >
-                Group's
-            </li>
-            <li
-                onClick={() => {
-                    that.setState({
-                        renderInt: 3
-                    })
-                }}
-            >
-                Sub Categories
-            </li>
-        </ul>
-        <hr />
+import { Motion,/* TransitionMotion, */spring } from 'react-motion';
+import { Button, /*Card, CardText,*/ Textfield } from 'react-mdl';
+import ReactCSSTransitionReplace from 'react-css-transition-replace';
 
-    </div>
-)
+// import { Button as Button2 } from 'react-bootstrap';
 
+// Radium lets you write react style
+import Radium from 'radium';
+
+
+import 'react-mdl/extra/material.js';
+import 'react-mdl/extra/material.css';
 
 class HomeAdmin extends Component {
     constructor() {
@@ -59,18 +31,300 @@ class HomeAdmin extends Component {
         this.state = {
             renderInt: 0,
             addHero: false,
+            fileName: "No File Chosen",
         }
-        this.myFunc = this.myFunc.bind(this);
+
+        this.addButtonSvg;
+
+        this.isMobile;
+
+        this.uniqueNumber = 0;
+
+        this.addOutSideEventListener = this.addOutSideEventListener.bind(this);
+
+        this.toShownAtHomeOrNot = this.toShownAtHomeOrNot.bind(this);
+
+        this.arrayToRender = this.arrayToRender.bind(this);
+
+        this.onKeyDown = this.onKeyDown.bind(this);
+
+        this.unikeId = this.unikeId.bind(this);
+
     }
 
-    myFunc(event) {
+
+    unikeId() {
+
+        let date = new Date().valueOf();
+
+        if (date === this.uniqueNumber) {
+
+            date = (this.uniqueNumber++)
+
+        } else {
+
+            this.uniqueNumber = date;
+
+        }
+        return date;
+    }
+
+
+    onKeyDown(e) {
+        let thisRendetInt = this.state.renderInt
+        switch (e.keyCode) {
+            case 39:
+                if (thisRendetInt >= 3) {
+                    thisRendetInt = 0
+                } else {
+                    thisRendetInt++
+                }
+                break;
+            case 37:
+                if (thisRendetInt <= 0) {
+                    thisRendetInt = 3
+                } else {
+                    thisRendetInt--
+                }
+                break;
+            default:
+                break;
+        }
+        this.setState({
+            renderInt: thisRendetInt
+        })
+    }
+
+
+    arrayToRender(articles) {
+
+        let hiddenListToRender = [];
+        let atHomePageScience = [];
+        let atHomePageHealth = [];
+        let atHomePageTechnology = [];
+        let notAtHomePageScience = [];
+        let notAtHomePageHealth = [];
+        let notAtHomePageTechnology = [];
+
+        for (let i = 0; i < articles.length; i++) {
+            // Loops through all the articles
+
+
+            let style = { backgroundColor: '#FEBC64', ':hover': { backgroundColor: 'rgba(254, 188, 100, 0.6)' } }
+
+            let _id = articles[i]._id;
+
+            if (articles[i].isHidden) { // checks if its hidden and if it is it pushs it
+                if (hiddenListToRender.length % 2 === 0) {
+                    style = {
+                        backgroundColor: '#FFD180',
+                        ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' }
+                    }
+                }
+                hiddenListToRender.push(
+                    <SingleHomeArticle
+                        style={style}
+                        editSingleArticle={this.props.editSingleArticle}
+                        name={articles[i].name}
+                        removeSingleArticle={() => {
+                            if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                this.props.removeHomeSingleArticle(i);
+                                this.props.postTo(`DeleteArticle/${_id}`)
+                            }
+                        }}
+                        index={i}
+                    />
+                )
+            } else {
+                // Sepered in to categories
+                if (articles[i].showAtHomePage) {
+                    switch (articles[i].category) {
+                        case 'Science':
+                            if (atHomePageScience.length % 2 === 0) {
+                                style = {
+                                    backgroundColor: '#FFD180',
+                                    ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' }
+                                }
+                            }
+                            atHomePageScience.push(
+                                <SingleHomeArticle
+                                    style={style}
+                                    editSingleArticle={this.props.editSingleArticle}
+                                    name={articles[i].name}
+                                    removeSingleArticle={() => {
+                                        if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                            this.props.removeHomeSingleArticle(i);
+                                            this.props.postTo(`DeleteArticle/${_id}`)
+                                        }
+                                    }}
+                                    index={i}
+                                />
+                            );
+                            break;
+                        case 'Health':
+                            if (atHomePageHealth.length % 2 === 0) {
+                                style = {
+                                    backgroundColor: '#FFD180',
+                                    ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' }
+                                }
+                            }
+                            atHomePageHealth.push(
+                                <SingleHomeArticle
+                                    style={style}
+                                    editSingleArticle={this.props.editSingleArticle}
+                                    name={articles[i].name}
+                                    removeSingleArticle={() => {
+                                        if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                            this.props.removeHomeSingleArticle(i);
+                                            this.props.postTo(`DeleteArticle/${_id}`)
+                                        }
+                                    }}
+                                    index={i}
+                                />
+                            );
+                            break;
+                        case 'Technology':
+                            if (atHomePageTechnology.length % 2 === 0) {
+                                style = {
+                                    backgroundColor: '#FFD180',
+                                    ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' }
+                                }
+                            }
+                            atHomePageTechnology.push(
+                                <SingleHomeArticle
+                                    style={style}
+                                    editSingleArticle={this.props.editSingleArticle}
+                                    name={articles[i].name}
+                                    removeSingleArticle={() => {
+                                        if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                            this.props.removeHomeSingleArticle(i);
+                                            this.props.postTo(`DeleteArticle/${_id}`)
+                                        }
+                                    }}
+                                    index={i}
+                                />
+                            );
+                            break;
+                        default: console.log("Shouldnt happen")
+                            break;
+                    }
+                } else {
+                    switch (articles[i].category) {
+                        case 'Science':
+                            if (notAtHomePageScience.length % 2 === 0) {
+                                style = {
+                                    backgroundColor: '#FFD180',
+                                    ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' }
+                                }
+                            }
+                            notAtHomePageScience.push(
+                                <SingleHomeArticle
+                                    style={style}
+                                    editSingleArticle={this.props.editSingleArticle}
+                                    name={articles[i].name}
+                                    removeSingleArticle={() => {
+                                        if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                            this.props.removeHomeSingleArticle(i);
+                                            this.props.postTo(`DeleteArticle/${_id}`)
+                                        }
+                                    }}
+                                    index={i}
+                                />
+                            );
+                            break;
+                        case 'Health':
+                            if (notAtHomePageHealth.length % 2 === 0) {
+                                style = {
+                                    backgroundColor: '#FFD180',
+                                    ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' }
+                                }
+                            }
+                            notAtHomePageHealth.push(
+                                <SingleHomeArticle
+                                    style={style}
+                                    editSingleArticle={this.props.editSingleArticle}
+                                    name={articles[i].name}
+                                    removeSingleArticle={() => {
+                                        if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                            this.props.removeHomeSingleArticle(i);
+                                            this.props.postTo(`DeleteArticle/${_id}`)
+                                        }
+                                    }}
+                                    index={i}
+                                />
+                            );
+                            break;
+                        case 'Technology':
+                            if (notAtHomePageTechnology.length % 2 === 0) {
+                                style = {
+                                    backgroundColor: '#FFD180',
+                                    ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' }
+                                }
+                            }
+                            notAtHomePageTechnology.push(
+                                <SingleHomeArticle
+                                    style={style}
+                                    editSingleArticle={this.props.editSingleArticle}
+                                    name={articles[i].name}
+                                    removeSingleArticle={() => {
+                                        if (confirm(`Are you sure you want to remove ${articles[i].name}???`) === true) {
+                                            this.props.removeHomeSingleArticle(i);
+                                            this.props.postTo(`DeleteArticle/${_id}`)
+                                        }
+                                    }}
+                                    index={i}
+                                />
+                            );
+                            break;
+                        default: console.log("Shouldnt happen")
+                            break;
+                    }
+                }
+            }
+        }
+        return ({
+            hiddenList: <div className="articleListBoxToRender flex-container">
+                <div className="articleListToRender flex-item flex-container">
+                    {hiddenListToRender}
+                </div>
+            </div>,
+            showenList: <div className="articleListBoxToRender articleListToRender flex-container flex-item">
+                <p className="atHomePage">AT HOME PAGE</p>
+                <p className="atHomePageCategory">SCIENCE</p>
+                {atHomePageScience}
+                <p className="atHomePageCategory">HEALTH</p>
+                {atHomePageHealth}
+                <p className="atHomePageCategory">TECHNOLOGY</p>
+                {atHomePageTechnology}
+                <p className="atHomePage">NOT AT HOME PAGE</p>
+                <p className="atHomePageCategory">SCIENCE</p>
+                {notAtHomePageScience}
+                <p className="atHomePageCategory">HEALTH</p>
+                {notAtHomePageHealth}
+                <p className="atHomePageCategory">TECHNOLOGY</p>
+                {notAtHomePageTechnology}
+            </div>
+
+        })
+    }
+
+
+
+
+    toShownAtHomeOrNot(allArticlesList) {
+
+    }
+
+
+
+    addOutSideEventListener(event) {
         console.log("RUNING!!")
         var specifiedElement = document.getElementById('uploadFilesForm');
         var isClickInside = specifiedElement.contains(event.target);
         if (!isClickInside) {
             if (this.state.addHero) {
                 console.log("removing event listner")
-                document.removeEventListener('click', this.myFunc);
+                document.removeEventListener('click', this.addOutSideEventListener);
                 console.log("Setting to false")
                 this.setState({
                     addHero: false,
@@ -79,8 +333,22 @@ class HomeAdmin extends Component {
         }
     }
 
+    componentWillMount() {
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        this.isMobile = isMobile;
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('keydown', this.onKeyDown, true);
+    }
+
+    componentDidMount() {
+        window.addEventListener('keydown', this.onKeyDown, true);
+    }
+
+
     componentDidUpdate() {
-        let that = this;
+        // let that = this;
         if (document.getElementById("groupNameInput")) {
             document.getElementById("groupNameInput").focus()
         }
@@ -89,25 +357,37 @@ class HomeAdmin extends Component {
         }
         if (document.getElementById("uploadFilesForm")) {
             console.log("adding event listner")
-            document.addEventListener('click', this.myFunc);
+            document.addEventListener('click', this.addOutSideEventListener);
         }
     }
 
     render() {
+
+
+
         if (this.props.path) {
             this.props.pathTo();
             return (<Redirect to={this.props.path} />)
         }
 
+        // Styles 
+        let arrowStyle = {};
+        let windowStyle = { width: '100%' }
 
+        if (this.isMobile) {
+            windowStyle = { width: '100%', padding: '7px' }
+            arrowStyle = { display: 'none' }
+        }
 
-        let newSubCategoryButton = (<div className="newCategoryButtonDiv"> <button className="newGroupButton" onClick={this.props.newSubCategoryButton}>New Sub Category</button></div>);
+        // End Styles
+
+        let newSubCategoryButton = (<div className="newCategoryButtonDiv"> <Button raised ripple className="newGroupButton" onClick={this.props.newSubCategoryButton}>Add</Button></div>);
         if (this.props.newSubCategory) {
             newSubCategoryButton = (
                 <div className="newCategoryButtonDiv">
                     <form id="newSubCategoryForm">
                         Sub Category: <input type="text" id="newCategoryInput" className="newCategoryInput" onBlur={this.props.stopNewCategory} />
-                        <input type="button" value="Create" onClick={this.props.addCategory} />
+                        <Button raised ripple onClick={this.props.addCategory}> Creat! </Button>
                     </form>
                 </div>
             )
@@ -117,21 +397,29 @@ class HomeAdmin extends Component {
         let subCategorysRender = [];
         let subCategorys = this.props.homePageState.subCategorys || [];
         for (let i = 0; i < subCategorys.length; i++) {
+            let thisSubCategoryStyle = { backgroundColor: '#FEBC64', ':hover': { backgroundColor: 'rgba(254, 188, 100, 0.6)' } }
+            if (subCategorysRender.length % 2 === 0) {
+                thisSubCategoryStyle = {
+                    backgroundColor: '#FFD180',
+                    ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' }
+                }
+            }
             subCategorysRender.push(
-                <li className="flex-item">
+                <li className="flex-item" style={thisSubCategoryStyle} key={`${subCategorys[i]}`} key={`${i}`}>
                     <span className="subCategorysText">
                         {subCategorys[i]}
                     </span>
-                    <img
-                        height="30%"
-                        src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
+                    <Button
+                        accent
                         onClick={() => {
-                            if (confirm(`Are you sure you want to remove ${subCategorys[i]}`) == true) {
+                            if (confirm(`Are you sure you want to remove ${subCategorys[i]}`) === true) {
                                 this.props.removeSubCategory(i)
                             } else {
                                 console.log('ok')
                             }
-                        }} />
+                        }} >
+                        Remove
+                        </Button>
                 </li>
             )
         }
@@ -139,127 +427,78 @@ class HomeAdmin extends Component {
 
         let groupsArray = this.props.homePageState.groups || [];// creating the list of groups
         let groupList1 = [];
-        let groupList2 = [];
-        let groupList3 = [];
         let hiddenGroupList = [];
         for (let i = 0; i < groupsArray.length; i++) {
+            // var _id = this.unikeId();
+            let thisGrouoStyle = { backgroundColor: '#FEBC64', ':hover': { backgroundColor: 'rgba(254, 188, 100, 0.6)' } }
             if (groupsArray[i].isHidden) {
+                if (hiddenGroupList.length % 2 === 0) {
+                    thisGrouoStyle = { backgroundColor: '#FFD180', ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' } };
+                }
                 hiddenGroupList.push(
-                    <div className="singleGroupList flex-item flex-container">
-                        <div className="singleGroupButtons">
-                            <img
-                                height="25px"
-                                width="25px"
-                                src="https://s3.amazonaws.com/roeetestbucket123/edit-flat.png"
-                                onClick={() => { this.props.editGroup(i) }}
-                            />
-                        </div>
+                    <div className="singleGroupList flex-item flex-container" style={thisGrouoStyle} key={`${i}`}>
                         <div className="singleGroupName">
                             {groupsArray[i].name}
                         </div>
                         <div className="singleGroupButtons">
-                            <img
-                                height="30%"
-                                src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
+                            <Button
+                                primary
+                                onClick={() => { this.props.editGroup(i) }}
+                            >
+                                Edit
+                            </Button>
+                            <Button
+                                accent
                                 onClick={() => {
                                     if (confirm(`Are you sure you want to delete ${groupsArray[i].name}??`)) {
                                         this.props.removeGroup(i)
                                     }
-                                }} />
+                                }} >
+                                Remove
+                                </Button>
                         </div>
                     </div>
                 )
             }
-            else if (i < (groupsArray.length / 3)) {
+            else {
+                if (groupList1.length % 2 === 0) {
+                    thisGrouoStyle = { backgroundColor: '#FFD180', ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' } };
+                }
+                var _id = this.unikeId();
                 groupList1.push(
-                    <div className="singleGroupList flex-item flex-container">
-                        <div className="singleGroupButtons">
-                            <img
-                                height="25px"
-                                width="25px"
-                                src="https://s3.amazonaws.com/roeetestbucket123/edit-flat.png"
-                                onClick={() => { this.props.editGroup(i) }}
-                            />
-                        </div>
+                    <div className="singleGroupList flex-item flex-container" style={thisGrouoStyle} key={`${i}`}>
                         <div className="singleGroupName">
                             {groupsArray[i].name}
                         </div>
                         <div className="singleGroupButtons">
-                            <img
-                                height="30%"
-                                src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
-                                onClick={() => {
-                                    if (confirm(`Are you sure you want to delete ${groupsArray[i].name}??`)) {
-                                        this.props.removeGroup(i)
-                                    }
-                                }} />
-                        </div>
-                    </div>
-                )
-            } else if ((groupsArray.length / 3) <= i && i < ((groupsArray.length / 3) * 2)) {
-                groupList2.push(
-                    <div className="singleGroupList flex-item flex-container singleGroupList2">
-                        <div className="singleGroupButtons">
-                            <img
-                                height="25px"
-                                width="25px"
-                                src="https://s3.amazonaws.com/roeetestbucket123/edit-flat.png"
+                            <Button
+                                primary
                                 onClick={() => { this.props.editGroup(i) }}
-                            />
-                        </div>
-                        <div className="singleGroupName">
-                            {groupsArray[i].name}
-                        </div>
-                        <div className="singleGroupButtons">
-                            <img
-                                height="30%"
-                                src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
+                            >
+                                Edit
+                            </Button>
+                            <Button
+                                accent
                                 onClick={() => {
                                     if (confirm(`Are you sure you want to delete ${groupsArray[i].name}??`)) {
                                         this.props.removeGroup(i)
                                     }
-                                }} />
+                                }}>
+                                Remove
+                                </Button>
                         </div>
                     </div>
                 )
-            } else if (((groupsArray.length / 3) * 2) <= i) {
-                groupList3.push(
-                    <div className="singleGroupList flex-item flex-container">
-                        <div className="singleGroupButtons">
-                            <img
-                                height="25px"
-                                width="25px"
-                                src="https://s3.amazonaws.com/roeetestbucket123/edit-flat.png"
-                                onClick={() => { this.props.editGroup(i) }}
-                            />
-                        </div>
-                        <div className="singleGroupName">
-                            {groupsArray[i].name}
-                        </div>
-                        <div className="singleGroupButtons">
-                            <img
-                                height="30%"
-                                src="https://s3.amazonaws.com/roeetestbucket123/redXbutton.jpg"
-                                onClick={() => {
-                                    if (confirm(`Are you sure you want to delete ${groupsArray[i].name}??`)) {
-                                        this.props.removeGroup(i)
-                                    }
-                                }} />
-                        </div>
-                    </div>
-                )
-            } else {
-                alert("check HomeAdmin at line 60")
             }
         }
 
 
-        let groupVar = (<button className="newGroupButton" onClick={this.props.creatNewGroup}>New Group</button>);// diplaying the new group form
+        let groupVar = (<Button raised ripple className="newGroupButton" onClick={this.props.creatNewGroup}>Add</Button>);// diplaying the new group form
         if (this.props.isInProccese) {
             groupVar = (
                 <form id="newGroupForm">
                     Group Name: <input type="text" id="groupNameInput" className="groupNameInput" onBlur={this.props.stopGroupProccese} />
-                    <input type="button" value="Create" onClick={this.props.startNewGroup} />
+                    <Button raised ripple onClick={this.props.startNewGroup} >Craet !</Button>
                 </form>
             )
         }
@@ -268,13 +507,20 @@ class HomeAdmin extends Component {
         let heroList = this.props.homePageState.heroObjects || []; // HOME HERO LIST
         let filesList = [];
         for (let i = 0; i < heroList.length; i++) {
+            let style = {};
+            if (i % 2 === 0) {
+                style = { backgroundColor: "#febc64", ':hover': { backgroundColor: 'rgba(254, 188, 100, 0.6)' } }
+            } else {
+                style = { backgroundColor: "#FFD180", ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' } }
+            }
             filesList.push(
                 <SingleFile
+                    style={style}
                     singleFileTitle={heroList[i].title}
                     singleFileCredit={heroList[i].credit}
                     singleFileName={heroList[i].url}
                     onClick={() => {
-                        if (confirm(`Are you sure you want to delete ${heroList[i].name} ?`) == true) {
+                        if (confirm(`Are you sure you want to delete ${heroList[i].name} ?`) === true) {
                             this.props.removeSingleHero(i)
                         } else {
                             console.log('ok')
@@ -284,51 +530,74 @@ class HomeAdmin extends Component {
             )
         }
 
-        let allArticlesList = this.props.arrayToRender(this.props.homePageState.articles || []);
+        let allArticlesList = this.arrayToRender(this.props.homePageState.articles || []);
 
+        //  1. Need to seperaid to shown at home and not
 
-        // let plusStyle = {
-        //     fontSize: 60,
-        //     transition: 0,
-        //     '&:hover': {
-        //         fontSize: 90,
-        //     }
-        // };
+        //  2. Need to seperaid in to categorys arrays
+
 
         let addHeroButton = (
             <div
-                /*style = {plusStyle}*/
+                /*style = {transition}*/
+                /*onMouseOver={this.onAddMouseOver}
+                onMouseOut={this.onAddMouseOut}*/
                 className="uploadFilesPlus flex-item ✢"
-                onClick={() => {
-                    this.setState({
-                        addHero: true,
-                    }, () => { console.log(this.state); this.forceUpdate() })
-                }}
+
             >
-                ✢
+                <Button raised ripple
+                    onClick={() => {
+                        this.setState({
+                            addHero: true,
+                        }, () => { console.log(this.state); this.forceUpdate() })
+                    }}
+                >Add
+                </Button>
             </div>
         )
-        console.log("befor the if")
-        if (this.state.addHero) {
-            console.log("after the if")
+        if (this.state.addHero && (this.state.renderInt === 0)) {
             addHeroButton = (
                 <div className="uploadFiles flex-item">
-                    <p>Upliad Files</p>
                     <form id='uploadFilesForm' className="uploadFilesForm flex-container">
                         <input
-                            className="flex-item"
+                            className="flex-item custom-file-input"
+                            name="files[]"
                             id='uploadFilesFile'
                             type="file"
                             accept="image/video"
+                            onChange={() => {
+                                let file = document.getElementById("uploadFilesFile").files[0]
+                                this.setState({
+                                    fileName: file.name
+                                })
+                            }}
                         />
+                        {this.state.fileName}
                         <p>
-                            Title: <textarea rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />
+                            Title: {/* <textarea rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />*/}
+                            <Textfield
+                                id='uploadFilesTitle'
+                                className="uploadFilesTitleInput flex-item"
+                                label="  Title..."
+                                rows={1}
+                                style={{ borderBottomColor: 'black' }}
+                            />
                         </p>
                         <p>
-                            Credit: <textarea rows="2" type='text' id='uploadFilesCredit' className="uploadFilesCreditInput flex-item" />
+                            Credit:
+                             <Textfield
+                                id='uploadFilesCredit'
+                                className="uploadFilesCreditInput flex-item"
+                                label="  Credit..."
+                                rows={1}
+                                style={{ borderBottomColor: 'black' }}
+                            />
                         </p>
-                        <p>
-                            <input type="button" value="Submit" className="flex-item" onClick={this.props.onUploadFilesFormSubmit} />
+                        <p className="flex-item">
+                            <MyButton
+                                miliSeconds='2000'
+                                onClick={this.props.onUploadFilesFormSubmit}
+                            />
                         </p>
                     </form>
                 </div>
@@ -344,7 +613,14 @@ class HomeAdmin extends Component {
         let foucsStyle = {
             borderBottom: '2px solid #fc852e',
             fontSize: 'x-large',
-            color: "#172e7c"
+            color: "#172e7c",
+            transition: "0.3s ease-in-out",
+        }
+        let mobileFoucsStyle = {
+            borderBottom: '2px solid #fc852e',
+            fontSize: '20px',
+            color: "#172e7c",
+            transition: "0.3s ease-in-out",
         }
 
 
@@ -352,59 +628,67 @@ class HomeAdmin extends Component {
         let homaPageAddButtonVar;
         switch (this.state.renderInt) {
             case 0:
-                heroImageStyle = foucsStyle;
+                if (this.isMobile) {
+                    heroImageStyle = mobileFoucsStyle;
+                } else {
+                    heroImageStyle = foucsStyle;
+                }
                 homaPageAddButtonVar = addHeroButton;
                 myWindow = (
-                    <div className="heroFilesWrapper flex-container">
+                    <div className="heroFilesWrapper flex-container" key="heroBox">
                         <div className="listOfHeros">
-                            {filesList}
+                            <ReactCSSTransitionReplace transitionName="roll-up"
+                                transitionEnterTimeout={1000} transitionLeaveTimeout={1000}>
+                                <div key="filesListDiv">
+                                    {filesList}
+                                </div>
+                            </ReactCSSTransitionReplace>
                         </div>
                     </div>)
                 break;
             case 1:
-                articleStyle = foucsStyle;
-                homaPageAddButtonVar = (<div className="newArticleButton">
-                    <Link to="newarticle"><button>New Article</button></Link>
+                if (this.isMobile) {
+                    articleStyle = mobileFoucsStyle;
+                } else {
+                    articleStyle = foucsStyle;
+                }
+                homaPageAddButtonVar = (<div className="newArticleButton" >
+                    <Link to="newarticle"><Button raised ripple>Add</Button></Link>
                 </div>);
                 myWindow = (
-                    <div>
-                        {/*<div className="homeArticlesDiv">
-
-                        </div>*/}
-                        <div className="homeArticlesDiv">
-                            <p className="articlesTitle">
-                                ARTICLES
+                    <div key="articleBox" className="homeArticlesDiv">
+                        <p className="articlesTitle">
+                            In Prossec
                             </p>
-                            {allArticlesList.showenList}
-                            <p className="articlesTitle">
-                                ARTICLES IN PROSSEC
-                            </p>
-                            {allArticlesList.hiddenList}
-                        </div>
+                        <ReactCSSTransitionReplace transitionName="roll-up"
+                            transitionEnterTimeout={1000} transitionLeaveTimeout={1000}>
+                            <div key="articalsListKsy">
+                                {allArticlesList.hiddenList}
+                            </div>
+                        </ReactCSSTransitionReplace>
+                        {/*<p className="articlesTitle">
+                            ARTICLES
+                            </p>*/}
+                        <ReactCSSTransitionReplace transitionName="cross-fade"
+                            transitionEnterTimeout={1000} transitionLeaveTimeout={1000}>
+                            <div key="articalsListKey">
+                                {allArticlesList.showenList}
+                            </div>
+                        </ReactCSSTransitionReplace>
                     </div>
                 )
                 break;
             case 2:
-                groupStyle = foucsStyle;
+                if (this.isMobile) {
+                    groupStyle = mobileFoucsStyle;
+                } else {
+                    groupStyle = foucsStyle;
+                }
                 homaPageAddButtonVar = (<div className="newGroupButton">
                     {groupVar}
                 </div>)
                 myWindow = (
-                    <div>
-                        <p className="groupsTitle">
-                            GROUPS
-                        </p>
-                        <div className="groupListDiv flex-container">
-                            <div className="groupList flex-item flex-container">
-                                {groupList1}
-                            </div>
-                            <div className="groupList flex-item flex-container">
-                                {groupList2}
-                            </div>
-                            <div className="groupList flex-item flex-container">
-                                {groupList3}
-                            </div>
-                        </div>
+                    <div key="groupBox">
                         <p className="groupsTitle">
                             GROUPS IN PROSSEC
                         </p>
@@ -413,14 +697,26 @@ class HomeAdmin extends Component {
                                 {hiddenGroupList}
                             </div>
                         </div>
+                        <p className="groupsTitle">
+                            GROUPS
+                        </p>
+                        <div className="groupListDiv flex-container">
+                            <div className="groupList flex-item flex-container">
+                                {groupList1}
+                            </div>
+                        </div>
                     </div>
                 )
                 break;
             case 3:
-                subCategoryStyle = foucsStyle;
+                if (this.isMobile) {
+                    subCategoryStyle = mobileFoucsStyle;
+                } else {
+                    subCategoryStyle = foucsStyle;
+                }
                 homaPageAddButtonVar = newSubCategoryButton;
                 myWindow = (
-                    <div>
+                    <div key="categoryBox">
                         <p className="subCategorysTitle">
                             Sub Categories
                         </p>
@@ -436,14 +732,17 @@ class HomeAdmin extends Component {
                     renderInt: 0
                 })
         }
-
+        let navBarStyle = {};
+        if (this.isMobile) {
+            navBarStyle.fontSize = '14px'
+        }
 
 
         return (
             <div className="App" >
                 <h1>Sci-Fare.com</h1>
                 <div>
-                    <ul className="homePageNavBarUL flex-container">
+                    <ul className="homePageNavBarUL flex-container" style={navBarStyle} key="forthKey">
                         <li
                             style={heroImageStyle}
                             className="flex-item"
@@ -490,9 +789,10 @@ class HomeAdmin extends Component {
                     </ul>
 
                     <div className="flex-container homePageWindow">
-                        <div className="flex-container homePageWindowWrapper">
+                        <div className="flex-container homePageWindowWrapper" style={windowStyle}>
                             <div
-                                className="flex-item homePageArrow "
+                                style={arrowStyle}
+                                className="flex-item homePageArrow"
                                 onClick={() => {
                                     let renderInt = this.state.renderInt;
                                     if (renderInt <= 0) {
@@ -505,20 +805,31 @@ class HomeAdmin extends Component {
                                     })
                                 }}
                             >
-                                <svg width="100" height="280" xmlns="http://www.w3.org/2000/svg" className="svg">
+                                <svg width="100" height="280" xmlns="http://www.w3.org/2000/svg" >
                                     <g>
                                         <title>Layer 1</title>
                                         <g stroke="null" id="svg_3">
-                                            <rect stroke="null" id="svg_2" height="279.71037" width="100.663093" y="0.059024" x="0.000014" stroke-opacity="null" stroke-width="1.5" fill="none" />
-                                            <path stroke="null" id="svg_1" d="m45.389625,139.476985l31.653553,-132.080087l-52.499917,132.080087l52.499917,132.079983l-31.653553,-132.079983z" stroke-width="1.5" fill="#fc852e" />
+                                            <rect stroke="null" id="svg_2" height="279.71037" width="100.663093" y="0.059024" x="0.000014" strokeOpacity="null" strokeWidth="1.5" fill="none" />
+                                            <path stroke="null" id="svg_1" d="m45.389625,139.476985l31.653553,-132.080087l-52.499917,132.080087l52.499917,132.079983l-31.653553,-132.079983z" strokeWidth="1.5" fill="#fc852e" />
                                         </g>
                                     </g>
                                 </svg>
                             </div>
+                            {/*<TransitionMotion
+                            defaultValue={ ()=> {return  {val:{scale:1 , width: '100%' , oacity:1}}} }
+                            endValue={ ()=> {return {val: {scale:1, width: '100%' , oacity:1}}} }
+                            willEnter={ ()=> {return  {val: {scale:1 , width: '100%' , oacity:1}}} }
+                            willLeave={ ()=> {return  {val: {scale:0 , width: 0, opacity: 0}}} }
+                            >*/}
                             <div className="flex-item windowBox ">
-                                {myWindow}
+                                <ReactCSSTransitionReplace transitionName="carousel-swap"
+                                    transitionEnterTimeout={300} transitionLeaveTimeout={300} style={{ width: '100%' }} >
+                                    {myWindow}
+                                </ReactCSSTransitionReplace>
                             </div>
+                            {/*</TransitionMotion>*/}
                             <div
+                                style={arrowStyle}
                                 className="flex-item homePageArrow "
                                 onClick={() => {
                                     let renderInt = this.state.renderInt;
@@ -536,32 +847,25 @@ class HomeAdmin extends Component {
                                     <g>
                                         <title>Layer 1</title>
                                         <g id="svg_3">
-                                            <rect stroke="null" id="svg_2" height="279.71037" width="100.312502" y="0.059024" x="-0.312502" stroke-opacity="null" stroke-width="1.5" fill="none" />
-                                            <path stroke="null" id="svg_1" d="m54.768473,139.476985l-31.54331,-132.080087l52.31707,132.080087l-52.31707,132.079983l31.54331,-132.079983z" stroke-width="1.5" fill="#fc852e" />
+                                            <rect stroke="null" id="svg_2" height="279.71037" width="100.312502" y="0.059024" x="-0.312502" strokeOpacity="null" strokeWidth="1.5" fill="none" />
+                                            <path stroke="null" id="svg_1" d="m54.768473,139.476985l-31.54331,-132.080087l52.31707,132.080087l-52.31707,132.079983l31.54331,-132.079983z" strokeWidth="1.5" fill="#fc852e" />
                                         </g>
                                     </g>
                                 </svg>
                             </div>
                         </div>
-                        <div className="flex-item homePageAddButton flex-container">
-                            {homaPageAddButtonVar}
-                        </div>
+                        <Motion defaultStyle={{ x: 0 }} style={{ x: spring(10) }}>
+                            {() => {
+                                return <div className="flex-item homePageAddButton flex-container">
+                                    {homaPageAddButtonVar}
+                                </div>
+                            }}
+                        </Motion>
                     </div>
-
                 </div>
-
-
-
-
-
-
-
-                {/*<div>
-                    <button onClick={this.props.updateDbState}>Update The Web</button>      // CHECK ON REMOVING THE ON CLICK FUNC
-                </div>*/}
             </div>
         )
     }
 }
-
-export default HomeAdmin;
+// HomeAdmin = Radium(HomeAdmin);
+export default Radium(HomeAdmin);

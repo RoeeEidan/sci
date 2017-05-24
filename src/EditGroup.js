@@ -191,7 +191,7 @@ class EditGroup extends Component {
         const text = document.getElementById("titleInput").value;
         let newState = { ...this.state };
         newState.group.name = `${text}`;
-        newState.group.title = `<h1>${text}</h1>`;
+        newState.group.title = `${text}`;
         this.setState({
             group: newState.group
         }, () => { console.log(this.state) })
@@ -364,7 +364,7 @@ class EditGroup extends Component {
 
 
                 <div className="heroFilesWrapper flex-container">
-                    <div className="uploadFiles flex-item">
+                    <div className="uploadFiles2 flex-item">
                         <p>Upliad Files</p>
                         <form id='uploadFilesForm' className="uploadFilesForm flex-container">
                             <input
@@ -407,7 +407,7 @@ class EditGroup extends Component {
                         className="newArticleTitleInput flex-item"
                         id='titleInput'
                         type='text'
-                        onChange={this.onTitleChange}
+                        onBlur={this.onTitleChange}
                     />
                 </div>
 
@@ -420,7 +420,7 @@ class EditGroup extends Component {
                             className="newArticleSummeryTextArea flex-item"
                             id='summeryInput'
                             type='text'
-                            onChange={this.onSummeryChange}
+                            onBlur={this.onSummeryChange}
                         />
                     </div>
                     <div className="allCategorysDiv flex-item flex-container">

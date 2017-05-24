@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
-
+import { Textfield } from 'react-mdl';
 
 
 
 class LogIn extends Component {
     render() {
         //counter
-        console.log(this.props.counter)
         let loginVarButton = "🤗";
         if (this.props.counter > 0) {
             loginVarButton = "🙂"
         }
         if (this.props.counter > 1) {
-           loginVarButton = "😶"
+            loginVarButton = "😶"
         }
         if (this.props.counter > 2) {
             loginVarButton = "😐"
@@ -29,7 +28,10 @@ class LogIn extends Component {
             <div className="logInBody">
                 {this.props.logInMassage}
                 <div>
-                    <input
+                    <Textfield
+                        label="Password.."
+                        floatingLabel
+                        style={{ width: '200px'}}
                         type="password"
                         id="logInPasswordInput"
                     />

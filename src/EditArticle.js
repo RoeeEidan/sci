@@ -135,7 +135,7 @@ class EditArticle extends Component {
         const text = document.getElementById("titleInput").value;
         let newState = { ...this.state };
         newState.article.name = `${text}`;
-        newState.article.title = `<h1>${text}</h1>`;
+        newState.article.title = `${text}`;
         this.setState({
             article: newState.article
         }, () => { console.log(this.state) })
@@ -200,6 +200,9 @@ class EditArticle extends Component {
             .catch(function (error) {
                 console.log(error);
             });
+    }
+    componentDidMount(){
+        
     }
 
 
@@ -294,7 +297,7 @@ class EditArticle extends Component {
                 </Link>
                 <h1>{this.state.article.name}</h1>
                 <div className="heroFilesWrapper flex-container">
-                    <div className="uploadFiles flex-item">
+                    <div className="uploadFiles2 flex-item">
                         <p>Upliad Files</p>
                         <form id='uploadFilesForm' className="uploadFilesForm flex-container">
                             <input
@@ -337,8 +340,8 @@ class EditArticle extends Component {
                         className="newArticleTitleInput flex-item"
                         id='titleInput'
                         type='text'
-                        value={this.state.article.name}
-                        onChange={this.onTitleChange}
+                        /*value={this.state.article.name}*/
+                        onBlur={this.onTitleChange}
                     />
                 </div>
 
@@ -353,7 +356,7 @@ class EditArticle extends Component {
                             id='summeryInput'
                             type='text'
                             /*value={this.props.summeryValue}*/
-                            onChange={this.onSummeryChange}
+                            onBlur={this.onSummeryChange}
                         />
                     </div>
                     <div className="allCategorysDiv flex-item flex-container">

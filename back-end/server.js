@@ -193,6 +193,27 @@ app.post('/RemoveCategory', function (req, res) {//remove a  Category
     .then(scifare => {
       scifare.subCategorys.splice(index, 1);
       console.log(scifare);
+      res.send("Sub Category Removed");
+      return scifare.save();
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
+
+
+app.post('/RemoveNoCategoryArticles', function (req, res) {  //remove a articles with no category USED TO HELP ME, NO USEAGE FROM USER
+  console.log(req.body.index)
+  let index = req.body.index;
+  SciFare.findById(StateID)
+    .then(scifare => {
+      console.log(scifare);
+      for(let i = 0; i < scifare.allArticles.length; i++){
+        if(!scifare.allArticles[i].category || (scifare.allArticles[i].category === 'Chose a Category') || (scifare.allArticles[i].category === '') ){
+          scifare.allArticles.splice(i , 1)
+        }
+      }
       res.send(scifare);
       return scifare.save();
     })
@@ -235,9 +256,11 @@ app.get('/GetHomePageContent', (req, res) => { // get the home page state
         let article = {
           index: i,
           name: scifare.allArticles[i].name,
+          category: scifare.allArticles[i].category,
           articleGroups: scifare.allArticles[i].articleGroups,
           _id: scifare.allArticles[i]._id,
           isHidden: scifare.allArticles[i].isHidden,
+          showAtHomePage: scifare.allArticles[i].showAtHomePage
         }
         homePageObject.articles.push(article);
       }

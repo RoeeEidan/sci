@@ -7,6 +7,9 @@ textarea:focus , input:focus {
     outline: none;
 }
 
+textarea{
+    background-color: white;
+}
 
 .myTransition{
     -webkit-transition: .6s ease-in;
@@ -18,12 +21,15 @@ textarea:focus , input:focus {
 
 body{
     background-color: #eff0f6;
-    padding: 2% 7%;
+    padding: 2% 2%;
     font-family: sans-serif;
     -webkit-transition: 1s ease-in;
 	transition: 1s ease-in;
     -webkit-transition: 0.5s ease-out;
 	transition: 0.5s ease-out;
+    max-width: 100%;
+    max-height: 96%;
+    min-height: 0px;
 }
 
 li{
@@ -34,17 +40,24 @@ li{
 }
 
 ul{
+    // background-color: #365EE5;
     margin: 0;
     padding-left: 25px;
 }
 
 h1{
-    margin-bottom: 50px;
+    margin: 0px;
     color: #172e7c;
     text-align: center;
+    font-size: 40px;
 }
  
+ a{
+    color: black;
+ }
+
 .singleFileBox{
+    position: relative;
     padding:0;
     width:100%;
     display: -webkit-flex;
@@ -53,6 +66,28 @@ h1{
     flex-direction: row;
     align-items: center;    
     justify-content: center;
+	opacity: 1;
+	-webkit-transition: .3s ease-in-out;
+	transition: .3s ease-in-out;
+    &:hover {
+        .mdl-button--accent.mdl-button--accent {
+            color: rgba(252, 151, 76, 1);
+        }
+        .removeSingleFile{
+            @extend .myTransition;
+            transition: 1s ease-in;
+            transition: 0.5s ease-out;
+            // position: absolute;
+            margin: 0;
+            color: white;
+            font-size: 80px;
+            opacity: 1;
+            overflow:auto;
+            height: inherit;
+            line-height: 100%;
+            display: inherit;
+        }
+    }
     .flex-item{
         flex-grow: 1;
     }
@@ -73,12 +108,14 @@ h1{
 }
 
 .singleFileName{
+    margin-top: auto;
+    text-align: letf;
     width: 25%;
 }
 
 .removeSingleFile{
-    float: right;
-    margin: 2% 0 ;
+   transition: 1s ease-in;
+    transition: 0.5s ease-out;
 }
 
 .uploadFiles2{
@@ -89,16 +126,18 @@ h1{
     align-self: center;
     height: 100%;
     min-height: 81px;   
+    width: 100%;
 }
 
 
 .listOfHeros{
-    padding: 0 2%;
+    padding:0;
     // max-height: 490px;
     // overflow-y: scroll;
     // overflow-x: hidden;
     display: inline-block;
     width:100%;
+    height: 100%;
 }
 
 .uploadFilesTitleInput{
@@ -143,6 +182,10 @@ h1{
 
 .subCategorysTitle{
     text-align: center;
+    background-color: #FC974C;
+    height: 50px;
+    padding: 2%;
+    margin: 0;
 }
 
 .newCategoryButtonDiv{
@@ -151,22 +194,38 @@ h1{
 }
 
 .subCategorysUl{
+    background-color: white;
+    padding: 0;
+    text-align: center;
     display: -webkit-flex;
     display: flex;
-    -webkit-flex-direction: row;
-    flex-direction: row;
+    -webkit-flex-direction: column;
+    flex-direction: column;
     .flex-item{
+        &:hover {
+        .mdl-button--accent.mdl-button--accent {
+            color: rgba(252, 151, 76, 1);
+        }
+        }
         flex-grow: 1;
+    }
+    button{
+        float: right;
     }
 }
 
 .subCategorysText{
-    padding: 0 5px;
-    border-left: $line;
+    // padding: 5px;
+    
 }
 
 .articlesTitle{
+    font-size: 18px;
     text-align: center;
+    margin: 0;
+    background-color: #FC974C;
+    height: 50px;
+    padding: 2%;
 }
 
 
@@ -182,18 +241,27 @@ h1{
 }
 
 .articleListToRender{
+    background-color: white;
+    text-align: center;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: column;
     flex-direction: column;
     .flex-item{
+        @extend .myTransition;
         -webkit-flex: 1;
         flex: 1;
+        opacity: 1;
+        // &:hover{
+        //     @extend .myTransition;
+        //     opacity: 0.6;
+        // }
     }
 }
 
 .SingleHomeArticle{
-    padding: 0 5% 0 0 ;
+    font-size: 17px;
+    padding: 0;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: row;
@@ -204,6 +272,8 @@ h1{
         text-align: center;
     }
     .singleFileName{
+        text-align: left;
+        padding: 0 0 0 3%;
         -webkit-flex: 4;
         flex: 4; 
     }
@@ -244,6 +314,7 @@ h1{
 }
 
 .groupList{
+    background-color: white;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: column;
@@ -255,6 +326,7 @@ h1{
 }
 
 .singleGroupList{
+    text-align: center;
     padding: 8px;
     display: -webkit-flex;
     display: flex;
@@ -264,9 +336,22 @@ h1{
         -webkit-flex: 1;
         flex: 1;
     }
-    .singleGroupName{
+    .singleGroupName{ 
+        text-align: left;
+        padding: 0 0 0 5%;
         -webkit-flex: 3;
         flex: 3;
+    }
+    .mdl-button--primary.mdl-button--primary {
+                 color: rgba(47, 57, 95 , 0);
+            }
+    &:hover {
+            .mdl-button--accent.mdl-button--accent {
+                color: rgba(252, 151, 76, 1);
+            }
+            .mdl-button--primary.mdl-button--primary {
+                 color: rgba(47, 57, 95 , 1);
+            }
     }
 }
 
@@ -313,6 +398,7 @@ h1{
         flex: 1;
     }
     .allCategorysDiv{
+        text-align: center;
         -webkit-flex: 1.5;
         flex: 1.5;
     }
@@ -352,10 +438,10 @@ h1{
         .flex-item{
             -webkit-flex: 1;
             flex: 1;  
-            text-align: center;
         }
     }
     .newArticleSubCategorysDiv{
+        padding: 0 9%;
         text-align: center;
         -webkit-flex: 3;
         flex: 3;
@@ -371,10 +457,14 @@ h1{
 }
 
 .singleSubCategoryDiv{
+    align-self: auto;
     display: inline-block;
 }
 
 .showAtHomePageBox{
+    margin: auto;
+    position: relative;
+    left : 1px;
     display: inline-block;
 }
 
@@ -384,6 +474,8 @@ h1{
 
 .newArticleSubCategorysTitle{
     text-align: center;
+    margin: 0;
+
 }
 
 .subCategorysToRender{
@@ -414,10 +506,12 @@ h1{
 }
 
 .rdw-editor-main{
+    background-color: white;
     min-height: 400px;
     border: 1px solid #F1F1F1;
     border-radius: 2px;
     padding:5px;
+    width: inherit;
 }
 
 
@@ -430,30 +524,32 @@ h1{
 }
 
 .homePageSingleImage{
-    height: 85px;
+    max-height: 85px;
     width: auto;
-    background: blue;
+    background: white;;
 	opacity: 1;
 	-webkit-transition: .3s ease-in-out;
 	transition: .3s ease-in-out;
     display: table-row;
-
+    max-width: 100%;
     &:hover {
-        opacity: 0.5;
+        opacity: 0.7;
     }
 }
 
 figure {
     display: table;
-    background-color: blue;
+    background-color: #0A1538;
 }
 
 // Styling the homepage window
 
 .homePageWindowWrapper{
     @extend .myTransition;
-    padding-top: 3%;
+    padding-top: 0%;
     height: 400px;
+    -webkit-flex: 13;
+    flex: 13; 
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: row;
@@ -462,16 +558,17 @@ figure {
     justify-content: center;
     .windowBox{
         @extend .myTransition; 
+        // background-color: #fff3e0;
         box-shadow: 0 0 10px white;
         overflow-y: scroll;
         border-radius: 2%;
-        padding: 2%;
-        height: 350px;
+        height: 97%;
         overflow-y: scroll;
-        margin-top: 7%;
-        background-color: white;
-        -webkit-flex: 7;
-        flex: 7;  
+        margin-top: 2%;
+        background-color: #FFD180;
+        -webkit-flex: 13;
+        flex: 13;  
+        align-self: flex-start;
     }
     .homePageArrow{
         @extend .myTransition;        
@@ -488,10 +585,14 @@ figure {
 
 .homePageWindow{
     @extend .myTransition;
-    background-color: #4A4A4A;
+    background-color: #2f395f;
     border-radius: 2%;
     box-shadow: 0px 10px 20px #888888;
-    height: 526px;
+    height: 613px;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column; 
 }
 
 
@@ -506,6 +607,7 @@ figure {
     -webkit-flex-direction: row;
     flex-direction: row; 
     .flex-item{
+        margin-top: auto;
         -webkit-flex: 1;
         flex: 1;
         text-align: center;  
@@ -515,6 +617,7 @@ figure {
 
 .loginButton{
     @extend .myTransition;
+    padding: 3% 0 ;
     font-size: 50px;
     width: 70px;
     margin: auto;
@@ -523,24 +626,26 @@ figure {
     }
 }
 
-.✢{
-    @extend .myTransition;
-    text-align: center;
-    font-size: 60px;
-    color: white;
-    &:hover{
-        font-size: 70px;
-    }
-}
+// .✢{
+    // @extend .myTransition;
+    // text-align: center;
+    // font-size: 60px;
+    // color: white;
+    // &:hover{
+    //     font-size: 70px;
+    // }
+// }
 
 .homePageAddButton{
+    -webkit-flex: 1;
+    flex: 1; 
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: row;
     flex-direction: row; 
     justify-content: center;
     align-items: center;
-    padding: 3%;
+    padding: 1%;
 }
 
 .svg{
@@ -552,9 +657,300 @@ figure {
     -webkit-align-self: center;
     align-self: center;
     position: absolute;
-    top: 38%;
-    background-color: black;
-    opacity: 0.9;
-    width: 84.5%;
+    top: 26.5%;
+    background-color: #2f395f;
+    opacity: 0.8;
+    width: 96%;
     color: white;
 }
+
+.ladda-button{
+    background: "#172E7C";
+    &:hover{
+    background: "#172E7C";
+    }
+}
+
+.uploadFilesForm{
+    overflow: hidden;
+    position: relative;
+    justify-content: center;
+    .flex-item{
+        align-self: center;
+    }
+    // align-items: center;
+}
+
+.uploadFilesForm [type=file]{
+    margin: 30px 0 15px 0 ;
+    color:white;
+    width: 200px;
+    height: 50px;
+}
+
+.myFileInputLable{
+    // height: 50px;
+    // width: 50px;
+    background-color: white;
+}
+
+
+.atHomePageCategory{
+    font-size: 18px;
+    margin: 0;
+    background-color: #FC974C;
+    height: 50px;
+    padding: 2%;
+}
+
+.atHomePage{
+    font-size: 18px;
+    margin: 0;
+    background-color: #FC974C;
+    height: 50px;
+    padding: 2%;
+}
+
+
+
+
+// CODE FROM SOMEWHERE 
+
+.custom-file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+.custom-file-input::before {
+  content: 'Chose a File';
+  display: inline-block;
+  background: -webkit-linear-gradient(top, #365EE5 , #172E7C);
+  padding: 6% 20%;;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 20px;
+  width: 100%;
+  height: 100%;
+  }
+.custom-file-input:hover::before {
+//   border-color: #999;
+background: -webkit-linear-gradient(top, #365EE5 , #365EE5  );
+}
+.custom-file-input:active::before {
+//   background: -webkit-linear-gradient(top, #172E7C, #172E7C);
+}
+
+.mdl-button--raised{
+    color: white;
+    background-color: #fc852e;
+    border-radius: 5px;
+    &:hover{
+       background-color: #FFAB40; 
+    }
+}
+
+
+// TRANSITIONS
+
+.carousel-swap-leave {
+  transition: transform .3s ease-in-out;
+  transform: translate(0, 0);
+}
+.carousel-swap-leave-active {
+  transform: translate(-100%, 0);
+}
+
+.carousel-swap-enter {
+  transition: transform .3s ease-in-out;
+  transform: translate(100%, 0);
+}
+.carousel-swap-enter-active {
+  transform: translate(0, 0);
+}
+
+.carousel-swap-height {
+  transition: height .3s ease-in-out;
+}
+
+
+
+
+.roll-up-leave {
+  transform: translate(0, 0);
+  opacity: 1;
+}
+.roll-up-leave.roll-up-leave-active {
+  transform: translate(-100%, 0);
+  opacity: 0;
+  transition: opacity .8s ease-in-out, transform .8s ease-in-out;
+}
+
+.roll-up-enter {
+  transform: translate(-100%, 0);
+  opacity: 0;
+}
+.roll-up-enter.roll-up-enter-active {
+  transform: translate(0, 0);
+  opacity: 1;
+  transition: opacity .8s ease-in-out, transform .8s ease-in-out;
+}
+
+.roll-up-height {
+  transition: height .8s ease-in-out;
+}
+
+
+.cross-fade-leave {
+  opacity: 1;
+}
+.cross-fade-leave.cross-fade-leave-active {
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+
+.cross-fade-enter {
+  opacity: 0;
+}
+.cross-fade-enter.cross-fade-enter-active {
+  opacity: 1;
+  transition: opacity 1s ease-in;
+}
+
+.cross-fade-height {
+  transition: height .5s ease-in-out;
+}
+
+
+#uploadFilesTitle{
+    padding:0;
+    margin-bottom: 4px;
+    height: 35px;
+    background-color: white;
+    color: black;
+}
+
+#uploadFilesCredit{
+    padding:0;
+    margin-bottom: 4px;
+    height: 35px;
+    background-color: white;
+    color: black;
+}
+
+.singleFileWrapper{
+    background-color: white;
+}
+
+.groupsTitle{
+    text-align: center;
+    margin: 0;
+    background-color: #FC974C;
+    height: 50px;
+    padding: 2%;
+}
+
+
+    // .mdl-textfield__input{
+    //     &:focus{
+    //             border-bottom-color: #FC852E;
+    //             }
+    // }
+    
+
+
+
+
+
+
+    /// --------------------------------New Article Begining Style-------------------------------------
+
+    .removeNewArticleSingleFile{
+        display: inherit;
+    }
+
+    .NewArticlePage{
+        width: 87%;
+        margin: auto;
+        box-shadow: 0px -2px 1026px 24px;
+    
+    }
+
+
+
+    /// --------------------------------New Article End Style-------------------------------------
+
+
+#logInPasswordInput{
+    padding: 0;
+    margin-bottom: 5px;
+}
+
+
+  #homeArticleEditButtonID{
+    color: rgba(11, 12, 17, 0)
+  }
+
+  .SingleHomeArticle{
+      &:hover{
+         #homeArticleEditButtonID{
+             color: #2f395f;
+         } 
+          .mdl-button--accent.mdl-button--accent {
+            color: rgba(252, 151, 76, 1);
+        }
+      }
+  }
+
+
+.mdl-button--file {
+  input {
+    cursor: pointer;
+    height: 100%;
+    right: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    width: 300px;
+    z-index: 4;
+  }
+}
+ .mdl-button--file {
+    right: 0;
+  }
+
+  #titleInput{
+    padding:0;
+    margin-bottom: 4px;
+    height: 35px;
+    background-color: white;
+  }
+  #summeryInput{
+    padding:0;
+    margin-bottom: 16px;
+    background-color: white;
+  }
+
+  .saveButton{
+      margin: 0 5px;
+  }
+  .publishButton{
+      margin: 0 5px;
+  }
+  .mdl-checkbox{
+      width: inherit;
+  }
+
+  .mdl-checkbox__box-outline{
+      position: absolute;
+      top:0px;
+      left: 0px;
+  }
+
+
+// ----------Remove button--------------
+  .mdl-button--accent.mdl-button--accent {
+    color: rgba(252, 151, 76, 0);
+}
+// ----------End Remove button--------------
+
