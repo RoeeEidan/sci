@@ -47,7 +47,7 @@ class SingleFile extends Component {
                     <li className={`removeSingleFile  ${itemVsCol2}`} onClick={this.props.onClick}>
                         <Button
                             accent>
-                            Remove
+                            <i className="material-icons">clear</i>
                         </Button>
                     </li>
                 </ul>

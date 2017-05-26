@@ -23,13 +23,13 @@ class SingleHomeArticle extends Component {
                         style={style}
                         onClick={() => { this.props.editSingleArticle(this.props.index) }}
                     >
-                        Edit
+                        <i className="material-icons">edit</i>
                     </Button>
                     <Button
                         accent
 
                         onClick={() => { this.props.removeSingleArticle(this.props.index); }}
-                    >Remove</Button>
+                    ><i className="material-icons">clear</i></Button>
                 </li>
             </ul>
         )

@@ -50,6 +50,10 @@ h1{
     color: #172e7c;
     text-align: center;
     font-size: 40px;
+    text-shadow: 0px 0px 3px #fc852e;
+}
+h2{
+    text-shadow: 0px 0px 2px #fc852e;
 }
  
  a{
@@ -57,7 +61,6 @@ h1{
  }
 
 .singleFileBox{
-    position: relative;
     padding:0;
     width:100%;
     display: -webkit-flex;
@@ -72,19 +75,17 @@ h1{
     &:hover {
         .mdl-button--accent.mdl-button--accent {
             color: rgba(252, 151, 76, 1);
+            
         }
         .removeSingleFile{
             @extend .myTransition;
             transition: 1s ease-in;
             transition: 0.5s ease-out;
-            // position: absolute;
             margin: 0;
             color: white;
             font-size: 80px;
             opacity: 1;
             overflow:auto;
-            height: inherit;
-            line-height: 100%;
             display: inherit;
         }
     }
@@ -94,7 +95,7 @@ h1{
 }
 
 .newGroupArticlesList{
-    border-bottom: $line;
+    // border-bottom: $line;
 }
 
 
@@ -156,6 +157,7 @@ h1{
 .heroFilesWrapper{
     // max-height: 485px;
     // padding-top: 5%;
+    background-color: white;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: column;
@@ -429,6 +431,7 @@ h1{
         flex: 1;
     }
     .homaPageAndCategory{
+        background-color: white;
         -webkit-flex: 2;
         flex: 2;
         display: -webkit-flex;
@@ -441,7 +444,7 @@ h1{
         }
     }
     .newArticleSubCategorysDiv{
-        padding: 0 9%;
+        padding: 9% 9% 0 9%;
         text-align: center;
         -webkit-flex: 3;
         flex: 3;
@@ -459,9 +462,11 @@ h1{
 .singleSubCategoryDiv{
     align-self: auto;
     display: inline-block;
+    text-align: left;
 }
 
 .showAtHomePageBox{
+    padding-top: 5%;
     margin: auto;
     position: relative;
     left : 1px;
@@ -577,12 +582,13 @@ figure {
         flex: 1;  
         align-items: center;    
         justify-content: center;
-        &:hover{
-            font-size: 70px;
-        }
+        color: white;
+        text-align: center;
     }
 }
-
+.home-wrapper{
+    box-shadow: 0px 0px 15px #777;
+}
 .homePageWindow{
     @extend .myTransition;
     background-color: #2f395f;
@@ -682,7 +688,6 @@ figure {
 }
 
 .uploadFilesForm [type=file]{
-    margin: 30px 0 15px 0 ;
     color:white;
     width: 200px;
     height: 50px;
@@ -823,22 +828,25 @@ background: -webkit-linear-gradient(top, #365EE5 , #365EE5  );
 
 
 #uploadFilesTitle{
+    box-shadow: 0px 0px 15px #777;
     padding:0;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
     height: 35px;
-    background-color: white;
+    background-color: #eff0f6;
     color: black;
 }
 
 #uploadFilesCredit{
+    box-shadow: 0px 0px 15px #777;
     padding:0;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
     height: 35px;
-    background-color: white;
+    background-color: #eff0f6;
     color: black;
 }
 
 .singleFileWrapper{
+    transition: 0s;
     background-color: white;
 }
 
@@ -872,8 +880,7 @@ background: -webkit-linear-gradient(top, #365EE5 , #365EE5  );
     .NewArticlePage{
         width: 87%;
         margin: auto;
-        box-shadow: 0px -2px 1026px 24px;
-    
+        box-shadow: 0px 0px 1500px #777;    
     }
 
 
@@ -920,12 +927,14 @@ background: -webkit-linear-gradient(top, #365EE5 , #365EE5  );
   }
 
   #titleInput{
+    box-shadow: 0px 0px 15px #777;
     padding:0;
     margin-bottom: 4px;
     height: 35px;
     background-color: white;
   }
   #summeryInput{
+    box-shadow: 0px 0px 15px #777;
     padding:0;
     margin-bottom: 16px;
     background-color: white;
@@ -947,6 +956,15 @@ background: -webkit-linear-gradient(top, #365EE5 , #365EE5  );
       left: 0px;
   }
 
+.orangeArrows{
+    min-width: 80px;
+    font-size: 70px;
+    transform: 0.3s ease-in-out;
+    &:hover{
+        font-size: 80px;
+        text-shadow: 0px 0px 25px;
+    }
+}
 
 // ----------Remove button--------------
   .mdl-button--accent.mdl-button--accent {
@@ -954,3 +972,19 @@ background: -webkit-linear-gradient(top, #365EE5 , #365EE5  );
 }
 // ----------End Remove button--------------
 
+
+.mdl-radio{
+    font-size: 20px;
+}
+
+//<--------------------------- New Group Style  Start -------------------------->>
+
+.uploader{
+    margin: auto;
+}
+
+
+
+
+
+//<--------------------------- New Group Style   End -------------------------->>

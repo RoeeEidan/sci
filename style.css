@@ -38,13 +38,16 @@ h1 {
   margin: 0px;
   color: #172e7c;
   text-align: center;
-  font-size: 40px; }
+  font-size: 40px;
+  text-shadow: 0px 0px 3px #fc852e; }
+
+h2 {
+  text-shadow: 0px 0px 2px #fc852e; }
 
 a {
   color: black; }
 
 .singleFileBox {
-  position: relative;
   padding: 0;
   width: 100%;
   display: -webkit-flex;
@@ -66,14 +69,9 @@ a {
     font-size: 80px;
     opacity: 1;
     overflow: auto;
-    height: inherit;
-    line-height: 100%;
     display: inherit; }
   .singleFileBox .flex-item {
     flex-grow: 1; }
-
-.newGroupArticlesList {
-  border-bottom: 2px solid #c2c2c2; }
 
 .singleFileCredit {
   width: 25%; }
@@ -117,6 +115,7 @@ a {
   width: 50%; }
 
 .heroFilesWrapper {
+  background-color: white;
   display: -webkit-flex;
   display: flex;
   -webkit-flex-direction: column;
@@ -328,6 +327,7 @@ a {
     -webkit-flex: 1;
     flex: 1; }
   .allCategorysDiv .homaPageAndCategory {
+    background-color: white;
     -webkit-flex: 2;
     flex: 2;
     display: -webkit-flex;
@@ -338,7 +338,7 @@ a {
       -webkit-flex: 1;
       flex: 1; }
   .allCategorysDiv .newArticleSubCategorysDiv {
-    padding: 0 9%;
+    padding: 9% 9% 0 9%;
     text-align: center;
     -webkit-flex: 3;
     flex: 3;
@@ -352,9 +352,11 @@ a {
 
 .singleSubCategoryDiv {
   align-self: auto;
-  display: inline-block; }
+  display: inline-block;
+  text-align: left; }
 
 .showAtHomePageBox {
+  padding-top: 5%;
   margin: auto;
   position: relative;
   left: 1px;
@@ -444,9 +446,12 @@ figure {
     -webkit-flex: 1;
     flex: 1;
     align-items: center;
-    justify-content: center; }
-    .homePageWindowWrapper .homePageArrow:hover {
-      font-size: 70px; }
+    justify-content: center;
+    color: white;
+    text-align: center; }
+
+.home-wrapper {
+  box-shadow: 0px 0px 15px #777; }
 
 .homePageWindow {
   background-color: #2f395f;
@@ -519,7 +524,6 @@ figure {
     align-self: center; }
 
 .uploadFilesForm [type=file] {
-  margin: 30px 0 15px 0;
   color: white;
   width: 200px;
   height: 50px; }
@@ -624,20 +628,23 @@ figure {
   transition: height .5s ease-in-out; }
 
 #uploadFilesTitle {
+  box-shadow: 0px 0px 15px #777;
   padding: 0;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   height: 35px;
-  background-color: white;
+  background-color: #eff0f6;
   color: black; }
 
 #uploadFilesCredit {
+  box-shadow: 0px 0px 15px #777;
   padding: 0;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   height: 35px;
-  background-color: white;
+  background-color: #eff0f6;
   color: black; }
 
 .singleFileWrapper {
+  transition: 0s;
   background-color: white; }
 
 .groupsTitle {
@@ -653,7 +660,7 @@ figure {
 .NewArticlePage {
   width: 87%;
   margin: auto;
-  box-shadow: 0px -2px 1026px 24px; }
+  box-shadow: 0px 0px 1500px #777; }
 
 #logInPasswordInput {
   padding: 0;
@@ -681,12 +688,14 @@ figure {
   right: 0; }
 
 #titleInput {
+  box-shadow: 0px 0px 15px #777;
   padding: 0;
   margin-bottom: 4px;
   height: 35px;
   background-color: white; }
 
 #summeryInput {
+  box-shadow: 0px 0px 15px #777;
   padding: 0;
   margin-bottom: 16px;
   background-color: white; }
@@ -705,7 +714,21 @@ figure {
   top: 0px;
   left: 0px; }
 
+.orangeArrows {
+  min-width: 80px;
+  font-size: 70px;
+  transform: 0.3s ease-in-out; }
+  .orangeArrows:hover {
+    font-size: 80px;
+    text-shadow: 0px 0px 25px; }
+
 .mdl-button--accent.mdl-button--accent {
   color: rgba(252, 151, 76, 0); }
+
+.mdl-radio {
+  font-size: 20px; }
+
+.uploader {
+  margin: auto; }
 
 /*# sourceMappingURL=style.css.map */

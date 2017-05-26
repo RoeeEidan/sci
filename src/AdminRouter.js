@@ -110,24 +110,35 @@ export class AdminRouter extends React.Component {
 
         this.newArticleSubCategorys = [];
 
+        this.oldNewArticleChosenCategory = "Chose a Category";
+
+        this.oldNewArticleShowAtHomePage = true;
+
+        this.oldNewArticleSummery = '';
+
+
+
+
         this.newGroupSubCategorys = [];
 
         this.newArticleBody = '';
+        this.oldNewArticleBody = '';
 
         this.newGroupBody = '';
+        this.oldNewGroupBody = '';
 
         this.myPath = undefined;
 
         this.isLocationAtNewArticle = false; // used for shouldComponentUpdat
         this.newArticleHeroObjectTracker = {
             oldLength: 0,
-            currntLength: 0 
+            currntLength: 0
         };
 
         this.isLocationAtNewGroup = false; // used for shouldComponentUpdat\
         this.newGroupHeroObjectTracker = {
             oldLength: 0,
-            currntLength: 0 
+            currntLength: 0
         };
 
         //Home
@@ -151,6 +162,7 @@ export class AdminRouter extends React.Component {
 
 
         //New Article
+
         this.addSubCategory = this.addSubCategory.bind(this);
         this.uploadImage = this.uploadImage.bind(this);
         this.onEditorStateChange = this.onEditorStateChange.bind(this);
@@ -261,8 +273,10 @@ export class AdminRouter extends React.Component {
             _id = this.postTo("NewGroup", articleObject);
         } else {
             let newGroup = { ...this.state.newGroup }
-            console.log(newGroup)
+            newGroup.subCategorys = [...this.newGroupSubCategorys];
+            newGroup.articleBody = this.newGroupBody;
             newGroup.isHidden = true;
+            console.log(newGroup);
             _id = this.postTo("NewGroup", newGroup);
         }
         newHomePageState.groups.push(
@@ -274,7 +288,7 @@ export class AdminRouter extends React.Component {
             }
         )
         this.setState({
-            homePageState: newState.homePageState,
+            homePageState: newHomePageState,
             groups: newState.groups,
         }, () => { console.log(this.state) })
 
@@ -429,6 +443,7 @@ export class AdminRouter extends React.Component {
 
 
     groupAddSubCategory(index) {
+        
         let thisSubCategory = this.state.homePageState.subCategorys[index];
         // let newGroup = {...this.state.newGroup};
         let newGroupSubCategorys = [...this.newGroupSubCategorys];
@@ -456,10 +471,18 @@ export class AdminRouter extends React.Component {
 
 
     newGroupArrayToRender(articles) {
+        console.log('NewGroupToRender', articles)
         let listToRender = [];
         for (let i = 0; i < articles.length; i++) {
+            let isChecked = false;
+            for (let z = 0; z < articles[i].articleGroups.length; z++) {
+                if ( articles[i].articleGroups[z] === this.state.newGroup.name) {
+                    isChecked = true;
+                }
+            }
             listToRender.push(
                 <GroupHomeArticle
+                    isChecked={isChecked}
                     name={articles[i].name}
                     isGrouped={this.isGrouped}
                     index={i}
@@ -509,6 +532,7 @@ export class AdminRouter extends React.Component {
             newGroup: newState.newGroup
         }, () => { console.log(this.state) })
         this.newGroupBody = '';
+        this.oldNewGroupBody = '';
         this.newGroupSubCategorys = [];
     }
 
@@ -551,10 +575,12 @@ export class AdminRouter extends React.Component {
     }
 
 
-    onNewGroupEditorStateChange(editorContent) { // ON EDITOR CHANGE 
+    onNewGroupEditorStateChange(editorContent) { // ON EDITOR CHANGE
         const articleBodyString = this.editorContentToHtml(editorContent);
-        this.newGroupBody = articleBodyString
-        const newGroup = { ...this.state.newGroup };
+        console.log('articleBodyString', articleBodyString)
+        this.oldNewGroupBody = this.newGroupBody;
+        this.newGroupBody = articleBodyString;
+        let newGroup = { ...this.state.newGroup };
         newGroup.editorState = editorContent;
         this.setState({
             newGroup: newGroup
@@ -651,27 +677,41 @@ export class AdminRouter extends React.Component {
     }
 
     groupSingleArticle(articleIndex) {
+        let isFound = false;
         let newState = { ...this.state };
+        let newHomePageState = { ...this.state.homePageState };
         let articleName = this.state.homePageState.articles[articleIndex].name
         let groupName = this.state.newGroup.name;
         for (let i = 0; i < newState.newGroup.relatedArticles.length; i++) {//this is the way to the articles  
-            if (newState.newGroup.relatedArticles[i].name === articleName) {// removers the article from the group
+            if (newState.newGroup.relatedArticles[i].name === articleName) {// removers the article from the group and the homePageState
+                let isFound = true;
                 // ungroup evrything
+                for(let z = 0; z < newState.homePageState.articles[articleIndex].articleGroups.length; z++){
+                    if(newState.homePageState.articles[articleIndex].articleGroups[z] === groupName){
+                        newState.homePageState.articles[articleIndex].articleGroups.splice(z, 1);
+                    }
+                }
+                 // ungroup fromHomePageState 
                 newState.newGroup.relatedArticles.splice(i, 1); // moves the article from the group ( no need to do is in the back end )
                 this.setState({
                     newGroup: newState.newGroup,
+                    homePageState: newState.homePageState
                 })
 
-                return false
+                return 'article removed'
             }
         }
-        // Group it all!!
-        let newHomePageState = { ...this.state.homePageState };
-        newHomePageState.articles[articleIndex].articleGroups.push(groupName); // pushs the group in to the article (only at the front end)
-        newState.newGroup.relatedArticles.push(newHomePageState.articles[articleIndex]) // pushs the article to the group (will be sent to the backend when the group is published)
-        this.setState({
-            newGroup: newState.newGroup,
-        })
+        if (!isFound) {
+            // Group it all!!
+            let newHomePageState = { ...this.state.homePageState };
+            newHomePageState.articles[articleIndex].articleGroups.push(groupName); // pushs the group in to the article (only at the front end)
+            newState.newGroup.relatedArticles.push(newHomePageState.articles[articleIndex]) // pushs the article to the group (will be sent to the backend when the group is published)
+            this.setState({
+                newGroup: newState.newGroup,
+                homePageState: newState.homePageState
+            })
+            return " Article added"
+        }
     }
 
 
@@ -920,6 +960,7 @@ export class AdminRouter extends React.Component {
         // document.getElementById("homePageCheckbox").checked = true;
         // document.getElementById("categoryOptions").value = "Chose a Catagory";
         this.newArticleBody = '';
+        this.oldNewArticleBody = '';
         this.newArticleSubCategorys = [];
         let newState = { ...this.state }
         newState.newArticle = { ...this.defaultNewArticleState };
@@ -933,9 +974,12 @@ export class AdminRouter extends React.Component {
     }
 
 
-    onSummeryChange() {
+    onSummeryChange(e) {
+        console.log(e)
         const text = document.getElementById("summeryInput").value;
+        console.log(text);
         let newState = { ...this.state };
+        this.oldNewArticleSummery = newState.newArticle.summery;
         newState.newArticle.summery = `${text}`;
         this.setState({
             newArticle: newState.newArticle
@@ -989,9 +1033,11 @@ export class AdminRouter extends React.Component {
     }
 
 
-    onHomePageChange() {
-        const val = document.getElementById("homePageCheckbox").checked;
+    onHomePageChange(event) {
+        const val = event.currentTarget.checked;
+        console.log(val);
         let newState = { ...this.state };
+        this.oldNewArticleShowAtHomePage = this.state.newArticle.showAtHomePage;
         switch (val) {
             case false:
                 newState.newArticle.showAtHomePage = false;
@@ -1010,9 +1056,12 @@ export class AdminRouter extends React.Component {
     }
 
 
-    onCategoryChange() {
-        const category = document.getElementById("categoryOptions").value;
+    onCategoryChange(event) {
+
+        const category = event.currentTarget.value;
+        console.log(category)
         let newState = { ...this.state };
+        this.oldNewArticleChosenCategory = newState.newArticle.category;
         newState.newArticle.category = category;
         this.setState({
             newArticle: newState.newArticle
@@ -1039,7 +1088,7 @@ export class AdminRouter extends React.Component {
         console.log("newState.homePageState.articles", newState.homePageState.articles)
         this.postTo('NewArticle', newState.newArticle);
         newState.homePageState.articles.push(
-            {   
+            {
                 category: newState.newArticle.category,
                 name: newState.newArticle.name,
                 isHidden: newState.newArticle.isHidden,
@@ -1048,14 +1097,14 @@ export class AdminRouter extends React.Component {
                 index: newState.homePageState.articles.length // needs to be removed
             }
         )
-        console.log('Router',{Router})
+        console.log('Router', { Router })
         this.setState({
             homePageState: newState.homePageState,
             // allArticles: newState.allArticles,
         }, () => { this.resetNewArticleState() })
         this.myPath = "/";
         this.forceUpdate();
-        
+
     }
 
 
@@ -1097,9 +1146,9 @@ export class AdminRouter extends React.Component {
 
     onEditorStateChange(editorContent) { // ON EDITOR CHANGE 
         const articleBodyString = this.editorContentToHtml(editorContent);
-        const newState = { ...this.state };
-        newState.newArticle.articleBody = articleBodyString;
-        this.newArticleBody = newState.newArticle.articleBody;
+        let newState = { ...this.state };
+        this.oldNewArticleBody = this.newArticleBody;
+        this.newArticleBody = articleBodyString;
         newState.newArticle.editorState = editorContent;
         this.setState({
             newArticle: newState.newArticle,
@@ -1118,45 +1167,54 @@ export class AdminRouter extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if(this.isLocationAtNewArticle){ 
-            if(this.newArticleHeroObjectTracker.currntLength !== this.newArticleHeroObjectTracker.oldLength){
-                return true 
-            }else{
-                return false
-            }
-            
-        }else if(this.isLocationAtNewGroup){
-            if(this.newGroupHeroObjectTracker.currntLength !== this.newGroupHeroObjectTracker.oldLength){ 
+        if (this.isLocationAtNewArticle) {
+            if (this.newArticleHeroObjectTracker.currntLength !== this.newArticleHeroObjectTracker.oldLength ||
+                this.newArticleBody !== this.oldNewArticleBody ||
+                this.oldNewArticleChosenCategory !== this.state.newArticle.category ||
+                this.oldNewArticleShowAtHomePage !== this.state.newArticle.showAtHomePage
+            ) {
                 return true
-            }else{
+            } else {
                 return false
             }
-        }else{
+
+        } else if (this.isLocationAtNewGroup) {
+            if (this.newGroupHeroObjectTracker.currntLength !== this.newGroupHeroObjectTracker.oldLength ||
+                this.newGroupBody.length !== this.oldNewGroupBody.length
+            ) {
+                return true
+            } else {
+                return false
+            }
+        } else {
             return true
-        }  
+        }
     }
 
     componentDidUpdate() {
-        if (this.isLocationAtNewArticle && (this.newArticleHeroObjectTracker.currntLength !== this.newArticleHeroObjectTracker.oldLength) ) {
-            this.newArticleHeroObjectTracker.oldLength = this.newArticleHeroObjectTracker.currntLength;
-            document.getElementById("titleInput").value = this.state.newArticle.title;
-            document.getElementById("summeryInput").value = this.state.newArticle.summery;
-            document.getElementById("homePageCheckbox").value = this.state.newArticle.showAtHomePage;
-            document.getElementById("categoryOptions").value = this.state.newArticle.category;
-            for (let i = 0; i < this.newArticleSubCategorys.length; i++){
-                let ID = this.newArticleSubCategorys[i];
-                document.getElementById(ID).checked = true;
+        if (this.isLocationAtNewArticle) {
+            if (this.newArticleHeroObjectTracker.currntLength !== this.newArticleHeroObjectTracker.oldLength) {
+                this.newArticleHeroObjectTracker.oldLength = this.newArticleHeroObjectTracker.currntLength;
             }
+            // document.getElementById("titleInput").value = this.state.newArticle.title;
+            // document.getElementById("summeryInput").value = this.state.newArticle.summery;
+            // document.getElementById("homePageCheckbox").value = this.state.newArticle.showAtHomePage;
+            // document.getElementById("categoryOptions").value = this.state.newArticle.category;
+            // for (let i = 0; i < this.newArticleSubCategorys.length; i++) {
+            //     let ID = this.newArticleSubCategorys[i];
+            //     console.log(document.getElementById(ID).checked)
+            //     document.getElementById(ID).checked = true;
+            // }
         }
         if (this.isLocationAtNewGroup && (this.newGroupHeroObjectTracker.currntLength !== this.newGroupHeroObjectTracker.oldLength)) {
             this.newGroupHeroObjectTracker.oldLength = this.newGroupHeroObjectTracker.currntLength;
-            document.getElementById("titleInput").value = this.state.newGroup.title;
-            document.getElementById("summeryInput").value = this.state.newGroup.summery;
-            document.getElementById("homePageCheckbox").checked = this.state.newGroup.showAtHomePage;
-            for (let i = 0; i < this.newGroupSubCategorys.length; i++) {
-                let ID = this.newGroupSubCategorys[i];
-                document.getElementById(ID).checked = true;
-            }
+            // document.getElementById("titleInput").value = this.state.newGroup.title;
+            // document.getElementById("summeryInput").value = this.state.newGroup.summery;
+            // document.getElementById("homePageCheckbox").checked = this.state.newGroup.showAtHomePage;
+            // for (let i = 0; i < this.newGroupSubCategorys.length; i++) {
+            //     let ID = this.newGroupSubCategorys[i];
+            //     document.getElementById(ID).checked = true;
+            // }
         }
     }
 
@@ -1212,6 +1270,7 @@ export class AdminRouter extends React.Component {
                             /*titleValue = {this.state.newArticle.name} // this is here for the shouldComponentUpdate*/
                             category={this.state.newArticle.category}
                             /*subCategorys={this.state.newArticle.subCategorys}*/
+                            ourSubCategorys={this.newArticleSubCategorys}
                             showAtHomePage={this.state.newArticle.showAtHomePage}
                             setLocation={this.setNewArticleLocation}
                             saveToInProcess={this.saveToInProcess}
@@ -1241,6 +1300,7 @@ export class AdminRouter extends React.Component {
 
                     <Route path="/newgroup" component={() => (
                         <NewGroup
+                            checkedSubCategorys={this.newGroupSubCategorys}
                             setLocation={this.setNewGrouopLocation}
                             saveGroupToInProcess={this.saveGroupToInProcess}
                             showAtHomePage={this.state.newGroup.showAtHomePage}
@@ -1266,6 +1326,7 @@ export class AdminRouter extends React.Component {
                                 wrapperClassName="home-wrapper"
                                 editorClassName="home-editor"
                                 editorState={this.state.newGroup.editorState}
+                                onBlur={(e) => { console.log(e) }}
                                 onEditorStateChange={this.onNewGroupEditorStateChange}
                                 toolbar={{ image: { uploadCallback: this.uploadImage } }}
                             />}

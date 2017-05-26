@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Checkbox } from 'react-mdl';
 
 
 class SingleHomeArticle extends Component {
@@ -11,25 +12,34 @@ class SingleHomeArticle extends Component {
             style = { backgroundColor: 'green' }
         }
 
-        let button = (<button style={style} className="groupSingleHomeArticle" onClick={() => {
-            this.props.groupSingleArticle(this.props.index, this.props.name)
+        let button = (
+            <Checkbox
+                className="groupSingleHomeArticle"
+                onChange={() => {
+                    console.log(this.props.groupSingleArticle(this.props.index))
+                }}
+                label={this.props.name}
+            />
+        );
+        if (this.props.isChecked) {
+            button = (
+                <Checkbox
+                    defaultChecked
+                    className="groupSingleHomeArticle"
+                    onChange={() => {
+                        console.log(this.props.groupSingleArticle(this.props.index))
+                    }}
+                    label={this.props.name}
+                />
+            );
         }
-        }>
-            group
-                </button>);
 
 
 
         return (
-            <ul className='SingleHomeArticle'>
-                <li>
-                    {button}
-                </li>
-                <li className="singleFileName">
-                    {this.props.name}
-                </li>
-
-            </ul>
+            <div className='SingleHomeArticle'>
+                {button}
+            </div>
         )
     }
 }

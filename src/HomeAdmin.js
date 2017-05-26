@@ -418,7 +418,7 @@ class HomeAdmin extends Component {
                                 console.log('ok')
                             }
                         }} >
-                        Remove
+                        <i className="material-icons">clear</i>
                         </Button>
                 </li>
             )
@@ -445,7 +445,7 @@ class HomeAdmin extends Component {
                                 primary
                                 onClick={() => { this.props.editGroup(i) }}
                             >
-                                Edit
+                            <i className="material-icons">edit</i>
                             </Button>
                             <Button
                                 accent
@@ -454,7 +454,7 @@ class HomeAdmin extends Component {
                                         this.props.removeGroup(i)
                                     }
                                 }} >
-                                Remove
+                                <i className="material-icons">clear</i>
                                 </Button>
                         </div>
                     </div>
@@ -475,7 +475,7 @@ class HomeAdmin extends Component {
                                 primary
                                 onClick={() => { this.props.editGroup(i) }}
                             >
-                                Edit
+                                <i className="material-icons">edit</i>
                             </Button>
                             <Button
                                 accent
@@ -484,7 +484,7 @@ class HomeAdmin extends Component {
                                         this.props.removeGroup(i)
                                     }
                                 }}>
-                                Remove
+                                <i className="material-icons">clear</i>
                                 </Button>
                         </div>
                     </div>
@@ -740,6 +740,7 @@ class HomeAdmin extends Component {
 
         return (
             <div className="App" >
+
                 <h1>Sci-Fare.com</h1>
                 <div>
                     <ul className="homePageNavBarUL flex-container" style={navBarStyle} key="forthKey">
@@ -805,7 +806,7 @@ class HomeAdmin extends Component {
                                     })
                                 }}
                             >
-                                <svg width="100" height="280" xmlns="http://www.w3.org/2000/svg" >
+                                {/*<svg width="100" height="280" xmlns="http://www.w3.org/2000/svg" >
                                     <g>
                                         <title>Layer 1</title>
                                         <g stroke="null" id="svg_3">
@@ -813,17 +814,13 @@ class HomeAdmin extends Component {
                                             <path stroke="null" id="svg_1" d="m45.389625,139.476985l31.653553,-132.080087l-52.499917,132.080087l52.499917,132.079983l-31.653553,-132.079983z" strokeWidth="1.5" fill="#fc852e" />
                                         </g>
                                     </g>
-                                </svg>
+                                </svg>*/}
+                                
+                                <i className="material-icons orangeArrows">keyboard_arrow_left</i>                            
                             </div>
-                            {/*<TransitionMotion
-                            defaultValue={ ()=> {return  {val:{scale:1 , width: '100%' , oacity:1}}} }
-                            endValue={ ()=> {return {val: {scale:1, width: '100%' , oacity:1}}} }
-                            willEnter={ ()=> {return  {val: {scale:1 , width: '100%' , oacity:1}}} }
-                            willLeave={ ()=> {return  {val: {scale:0 , width: 0, opacity: 0}}} }
-                            >*/}
                             <div className="flex-item windowBox ">
                                 <ReactCSSTransitionReplace transitionName="carousel-swap"
-                                    transitionEnterTimeout={300} transitionLeaveTimeout={300} style={{ width: '100%' }} >
+                                    transitionEnterTimeout={300} transitionLeaveTimeout={300} style={{ width: '100%', borderRadius: '2%' }} >
                                     {myWindow}
                                 </ReactCSSTransitionReplace>
                             </div>
@@ -843,7 +840,8 @@ class HomeAdmin extends Component {
                                     })
                                 }}
                             >
-                                <svg width="100" height="280" xmlns="http://www.w3.org/2000/svg">
+                                <i className="material-icons orangeArrows">keyboard_arrow_right</i>
+                                {/*<svg width="100" height="280" xmlns="http://www.w3.org/2000/svg">
                                     <g>
                                         <title>Layer 1</title>
                                         <g id="svg_3">
@@ -851,7 +849,7 @@ class HomeAdmin extends Component {
                                             <path stroke="null" id="svg_1" d="m54.768473,139.476985l-31.54331,-132.080087l52.31707,132.080087l-52.31707,132.079983l31.54331,-132.079983z" strokeWidth="1.5" fill="#fc852e" />
                                         </g>
                                     </g>
-                                </svg>
+                                </svg>*/}
                             </div>
                         </div>
                         <Motion defaultStyle={{ x: 0 }} style={{ x: spring(10) }}>
