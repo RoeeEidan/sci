@@ -1,41 +1,41 @@
 import React, { Component } from 'react';
-
-// Props
-// GroupName is group name
-// relatedArticles
-// Index - its own index
-// article
+import { Checkbox } from 'react-mdl';
 
 
 class SingleGroupArticle extends Component {
-
     render() {
-        // takes care of the button color
-        let style = { backgroundColor: 'red' };
+        let didFind = false;
         for (let i = 0; i < this.props.relatedArticles.length; i++) {
             if (this.props.relatedArticles[i].name === this.props.articleName) {
-                style = { backgroundColor: 'green' }
+                didFind = true;
+                break;
             }
         }
-        console.log(this);
-        let that =this;
-
-        return (
-            <ul className='SingleHomeArticle'>
-                <li>
-                    <button style={style} className="groupSingleHomeArticle" onClick={() => {
-                        that.props.groupSingleArticle(that.props.Index, that.props.articleName)
-                    }
-                    }>
-                        group
-                </button>
-                </li>
-                <li className="singleFileName">
-                    {this.props.articleName}
-                </li>
-
-            </ul>
-        )
+        if (!didFind) {
+            return (
+                <div className='SingleHomeArticle' key={`${this.props.articleName}`}>
+                    <Checkbox
+                        onClick={() => {
+                            this.props.groupSingleArticle(this.props.Index, this.props.articleName)
+                        }}
+                        label={`${this.props.articleName}`}
+                        
+                    />
+                </div>
+            )
+        } else {
+            return (
+                <div className='SingleHomeArticle' key={`${this.props.articleName}`}>
+                    <Checkbox
+                        onClick={() => {
+                            this.props.groupSingleArticle(this.props.Index, this.props.articleName)
+                        }}
+                        label={`${this.props.articleName}`}
+                        checked={true}
+                    />
+                </div>
+            )
+        }    
     }
 }
 

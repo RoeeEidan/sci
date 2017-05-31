@@ -15,6 +15,8 @@ import { convertToRaw } from 'draft-js';
 import SingleFile from './Singlefile';
 import SingleGroupArticle from './EditGroupHomeArticle'
 
+//React mdl
+import { Button, Textfield, Checkbox, Switch } from 'react-mdl';
 
 
 class EditGroup extends Component {
@@ -29,7 +31,7 @@ class EditGroup extends Component {
                 name: undefined,
                 articleBody: undefined,
                 date: undefined,
-                showAtHomePage: true,
+                showAtHomePage: undefined,
                 summery: undefined,
                 subCategorys: [],
                 isInProccese: false
@@ -73,7 +75,7 @@ class EditGroup extends Component {
                 newState.group.relatedArticles.splice(i, 1) // removes the article from the group
             }
         }
-        this.props.postTo('RemoveGroupFromArticle', { groupIndex: this.props.id, articleIndex: index })
+        // this.props.postTo('RemoveGroupFromArticle', { groupIndex: this.props.id, articleIndex: index })
         this.setState({
             group: newState.group
         })
@@ -93,7 +95,7 @@ class EditGroup extends Component {
             }
         } else {
             let thisArticle = this.props.articles[index];
-            this.props.postTo('AddGroupToArticle', { groupIndex: this.props.id, articleIndex: index })
+            // this.props.postTo('AddGroupToArticle', { groupIndex: this.props.id, articleIndex: index })
             newState.group.relatedArticles.push(thisArticle); // pushs the article to the group related array
         }
         this.setState({
@@ -146,8 +148,8 @@ class EditGroup extends Component {
     }
 
 
-    onHomePageChange() {
-        const val = document.getElementById("homePageCheckbox").checked;
+    onHomePageChange(event) {
+        const val = event.currentTarget.checked;
         let newGroup = { ...this.state.group };
         switch (val) {
             case false:
@@ -234,15 +236,10 @@ class EditGroup extends Component {
                 that.setState({
                     group: response.data
                 }, () => {
-                    let title = '';
-                    if (that.state.group.title) {
-                        title = that.state.group.title.slice(4, (that.state.group.title.length - 5));
-                    }
                     document.getElementById("homePageCheckbox").checked = that.state.group.showAtHomePage;
-                    document.getElementById("titleInput").value = title;
+                    document.getElementById("titleInput").value = that.state.group.title;
                     document.getElementById("summeryInput").value = that.state.group.summery;
                     // document.getElementById("categoryOptions").value = that.state.group.category;
-
                     let ourSubCategorys = that.state.group.subCategorys;
                     for (let i = 0; i < ourSubCategorys.length; i++) {
                         if (document.getElementById(`${ourSubCategorys[i]}`)) {
@@ -288,34 +285,36 @@ class EditGroup extends Component {
             )
         }
 
-
-
         let subCategorysRender1 = [];
         let subCategorysRender2 = [];
         let subCategorysRender3 = [];
         let ourSubCategorys = this.props.subCategorys || [];
+        let groupSubCategorys = this.state.group.subCategorys;
         for (let i = 0; i < ourSubCategorys.length; i++) {
+            // let myCheckboxDiv;
+            let didFind = false;
+            for (let y = 0; y < groupSubCategorys.length; y++) {
+                if (ourSubCategorys[i] === groupSubCategorys[y]) {
+                    didFind = true;
+                    break;
+                }
+            }
+            let myCheckboxDiv = (
+                <div className="singleSubCategoryDiv flex-item" key={`${i}`}>
+                    <Checkbox
+                        id={`${ourSubCategorys[i]}`}
+                        onChange={() => { this.addSubCategory(i) }}
+                        label={`${ourSubCategorys[i]}`}
+                        checked={didFind}
+                    />
+                </div>
+            )
             if (i < (ourSubCategorys.length / 3)) {
-                subCategorysRender1.push(
-                    <div className="singleSubCategoryDiv flex-item">
-                        {ourSubCategorys[i]}
-                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
-                    </div>
-                );
+                subCategorysRender1.push(myCheckboxDiv);
             } else if (i >= (ourSubCategorys.length / 3) && i < ((ourSubCategorys.length / 3) * 2)) {
-                subCategorysRender2.push(
-                    <div className="singleSubCategoryDiv flex-item">
-                        {ourSubCategorys[i]}
-                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
-                    </div>
-                );
+                subCategorysRender2.push(myCheckboxDiv);
             } else if (i >= ((ourSubCategorys.length / 3) * 2)) {
-                subCategorysRender3.push(
-                    <div className="singleSubCategoryDiv flex-item">
-                        {ourSubCategorys[i]}
-                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
-                    </div>
-                );
+                subCategorysRender3.push(myCheckboxDiv);
             } else {
                 alert("Check App.js at line 52")
             }
@@ -340,11 +339,16 @@ class EditGroup extends Component {
         let heroList = this.state.group.heroObjects;
         let filesList = []
         for (let i = 0; i < heroList.length; i++) {
+            let thisStyle = {};
+            if (i % 2 === 0) {
+                thisStyle.backgroundColor = 'rgba(239, 240 , 246 , 0.5)';
+            }
             filesList.push(
                 <SingleFile
+                    style={thisStyle}
                     singleFileTitle={heroList[i].title}
                     singleFileCredit={heroList[i].credit}
-                    singleFileName={heroList[i].name}
+                    singleFileName={heroList[i].url}
                     onClick={() => {
                         this.removeSingleHero(i);
                     }}
@@ -352,9 +356,9 @@ class EditGroup extends Component {
             )
         }
         return (
-            <div className="EditGroup" >
+            <div className="EditGroup NewArticlePage" >
                 <Link to="/">
-                    <input type="button" value="Back Home" className="backHome" />
+                    <Button primary className="backHome">Back Home</Button>
                 </Link>
                 <h1>{this.state.group.name}</h1>
                 <div>
@@ -367,46 +371,75 @@ class EditGroup extends Component {
                     <div className="uploadFiles2 flex-item">
                         <p>Upliad Files</p>
                         <form id='uploadFilesForm' className="uploadFilesForm flex-container">
-                            <input
-                                className="flex-item uploadInput"
-                                id='uploadFilesFile'
-                                type="file"
-                                accept="image/video"
-                            />
-                            <p>
-                                Title: <textarea rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />
-                            </p>
-                            <p>
-                                Credit: <textarea rows="2" type='text' id='uploadFilesCredit' className="uploadFilesCreditInput flex-item" />
-                            </p>
-                            <p>
-                                <input type="button" value="Submit" className="flex-item" onClick={this.onUploadHeroForm} />
-                            </p>
+                            <div className="mdl-button mdl-button--primary mdl-button--icon mdl-button--file uploader">
+                                <i className="material-icons">attach_file</i>
+                                <input
+                                    className="flex-item uploadInput "
+                                    id='uploadFilesFile'
+                                    type="file"
+                                    accept="image/video"
+                                    onChange={() => {
+                                        let text = document.getElementById('uploadFilesFile').files[0].name;
+                                        document.getElementById('fileLabeID').innerHTML = text
+                                    }}
+                                />
+                            </div>
+                            <p id="fileLabeID">No File Chosen</p>
+                            <div>
+                                Title:
+                                <Textfield
+                                    label='Title..'
+                                    rows={1}
+                                    id='uploadFilesTitle'
+                                    className="uploadFilesTitleInput flex-item"
+                                    floatingLabel
+                                    style={{ width: '70%' }}
+                                />
+                            </div>
+                            <div>
+                                Credit:
+                                <Textfield
+                                    rows={1}
+                                    id='uploadFilesCredit'
+                                    className="uploadFilesCreditInput flex-item"
+                                    label='Credit..'
+                                    floatingLabel
+                                    style={{ width: '50%' }}
+                                />
+                            </div>
                         </form>
+                        <Button
+                            raised colored ripple
+                            className="flex-item"
+                            onClick={this.onUploadHeroForm}
+                        >Submit
+                        </Button>
                     </div>
                     <div className="listOfHeros">
                         <ul className='singleFileBox flex-container'>
                             <li className="singleFileName flex-item">
                                 Name
-              </li>
+                            </li>
                             <li className="singleFileTitle flex-item">
                                 Title
-              </li>
+                            </li>
                             <li className="singleFileCredit flex-item">
                                 Credit
-              </li>
+                            </li>
                             <div className="removeSingleFile flex-item">
                             </div>
                         </ul>
                         {filesList}
                     </div>
                 </div>
+
+
                 <h2 className="newArticleTitle">Title</h2>
                 <div className="titlebox flex-container">
-                    <input
+                    <Textfield
+                        rows={1}
                         className="newArticleTitleInput flex-item"
                         id='titleInput'
-                        type='text'
                         onBlur={this.onTitleChange}
                     />
                 </div>
@@ -416,10 +449,10 @@ class EditGroup extends Component {
                 <div className="summeryAndCategorysDiv flex-container">
                     <div className="summerybox flex-item flex-container">
                         <h2 className="flex-item">Summery</h2>
-                        <textarea
+                        <Textfield
+                            rows={10}
                             className="newArticleSummeryTextArea flex-item"
                             id='summeryInput'
-                            type='text'
                             onBlur={this.onSummeryChange}
                         />
                     </div>
@@ -429,13 +462,14 @@ class EditGroup extends Component {
                         </div>
                         <div className="homaPageAndCategory flex-item flex-container">
                             <div className="showAtHomePageBox flex-item">
-                                <span>show at home page:</span>
-                                <input
+                                <Switch
                                     id='homePageCheckbox'
-                                    type="checkbox"
                                     className="homePageCheckbox"
                                     onChange={this.onHomePageChange}
-                                />
+                                    checked={this.state.group.showAtHomePage}
+                                >
+                                    Show At Home Page
+                                </Switch>
                             </div>
                         </div>
                         <h4 className="newArticleSubCategorysTitle">Sub Categorys</h4>
@@ -460,17 +494,26 @@ class EditGroup extends Component {
                     />
                 </div>
                 <div className="publish">
-                    <button onClick={() => { this.props.onPublishClick(this.props.id, this.state.group) }}>
+                    <Button
+                        onClick={() => { this.props.onPublishClick(this.props.id, this.state.group) }}
+                        className="publishButton"
+                        raised ripple
+                    >
                         publish
-                    </button>
+                    </Button>
+                    <Button 
+                    onClick={() => {
+                        let newState = { ...this.state }
+                        newState.group.isHidden = true;
+                        this.props.saveHiddenGroup(newState.group, this.props.id)
+                    }}
+                    className="saveButton saveToInProcess" 
+                    raised colored ripple 
+                    >
+                        Save
+                </Button>
                 </div>
-                <button onClick={() => {
-                    let newState = { ...this.state }
-                    newState.group.isHidden = true;
-                    this.props.saveHiddenGroup(newState.group, this.props.id)
-                }}>
-                    Save
-                </button>
+
             </div>
         );
     }

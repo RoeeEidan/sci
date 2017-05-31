@@ -36,8 +36,8 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 // app.use(express.static(__dirname + 'build/')); // for build
 
 app.use(multipartyMiddleware);
@@ -92,7 +92,7 @@ app.post('/login', (req, res) => {
       bcrypt.compare(pass, user.hash).then((resault) => {
         if (resault === true) {
           res.json(true)
-        }else {
+        } else {
           res.json(false)
           // res.status(403)
           // .json({ err: 'Incorrect password' });
@@ -209,9 +209,9 @@ app.post('/RemoveNoCategoryArticles', function (req, res) {  //remove a articles
   SciFare.findById(StateID)
     .then(scifare => {
       console.log(scifare);
-      for(let i = 0; i < scifare.allArticles.length; i++){
-        if(!scifare.allArticles[i].category || (scifare.allArticles[i].category === 'Chose a Category') || (scifare.allArticles[i].category === '') ){
-          scifare.allArticles.splice(i , 1)
+      for (let i = 0; i < scifare.allArticles.length; i++) {
+        if (!scifare.allArticles[i].category || (scifare.allArticles[i].category === 'Chose a Category') || (scifare.allArticles[i].category === '')) {
+          scifare.allArticles.splice(i, 1)
         }
       }
       res.send(scifare);
@@ -489,12 +489,18 @@ app.post('/EditArticle/:x', (req, res) => { //edit a article object by id
 });
 
 
+
 app.post('/EditGroup/:x', (req, res) => { //edit a group object by id
   SciFare.findById(StateID)
     .then(scifare => {
-      console.log(req.body);
-      let article = req.body.article;
-      scifare.groups[req.body.index] = article;
+      let thisGroup = req.body.article;
+      let oldRelatedArticles = scifare.groups[req.body.index].relatedArticles;
+      let newRelatedArticles = thisGroup.relatedArticles;
+      let groupName = thisGroup.name;
+      let instruntionsObject = comparingRelaitedArticlesArrays(oldRelatedArticles, newRelatedArticles);
+      let updatedArticlesObject = addAndRemove(scifare.allArticles, instruntionsObject, groupName);
+      scifare.allArticles = updatedArticlesObject.allArticles;
+      scifare.groups[req.body.index] = thisGroup;
       scifare.save();
       res.send('yess');
     })
@@ -504,6 +510,126 @@ app.post('/EditGroup/:x', (req, res) => { //edit a group object by id
         .json({ err });
     })
 });
+
+
+
+// FUNCTION THAT TAKES IN OLD ARRAY OF REALATED ARTICLES AND NEW ONE AND RETUNRS AN OBJECT WHITH ADD AND REMOVES ARRAYS ON DATA
+
+function comparingRelaitedArticlesArrays(oldRelatedArticles, newRelatedArticles) {
+  const onlyAtTheOldArray = [];
+  const onlyAtTheNewArray = [];
+  // console.log(oldRelatedArticles, newRelatedArticles)
+  for (let i = 0; i < oldRelatedArticles.length; i++) {
+    let didFind = false;
+    console.log("starting the loop to remove")
+    for (let z = 0; z < newRelatedArticles.length; z++) {
+      console.log(oldRelatedArticles[i].name, newRelatedArticles[z].name)
+      if (oldRelatedArticles[i].name === newRelatedArticles[z].name) {
+        console.log('found')
+        didFind = true;
+      }
+    }
+    if (!didFind || newRelatedArticles.length === 0) {
+      console.log('pushing in to remove')
+      onlyAtTheOldArray.push({ name: oldRelatedArticles[i].name, id: oldRelatedArticles[i]._id });
+    }
+  }
+
+
+  for (let i = 0; i < newRelatedArticles.length; i++) {
+    let didFind = false;
+    console.log("starting loop for add")
+    for (let z = 0; z < oldRelatedArticles.length; z++) {
+      console.log(oldRelatedArticles[i], newRelatedArticles[z])
+      if (oldRelatedArticles[i].name === newRelatedArticles[z].name) {
+        console.log('found')
+        didFind = true;
+      }
+    }
+    if (!didFind) {
+      console.log("pushing to the add")
+      onlyAtTheNewArray.push({ name: newRelatedArticles[i].name, id: newRelatedArticles[i]._id });
+    }
+  }
+
+  return {
+    add: onlyAtTheNewArray,
+    remove: onlyAtTheOldArray
+  }
+}
+
+
+function addAndRemove(allArticles, instruntionsObject, groupName) {// instruntionsObject is what the function obove returns {add: onlyAtTheNewArray, remove: onlyAtTheOldArray}
+  console.log("instruntionsObjectinstruntionsObjectinstruntionsObject", instruntionsObject)
+  let error = [];
+  for (let i = 0; i < allArticles.length; i++) {
+    ///this Chunk deals with adding the group names to the articles arrays
+
+    for (let y = 0; y < (instruntionsObject.add.length || 0); y++) {
+      let allreadyThere = false;
+      if (instruntionsObject.add[y].name === allArticles[i].name || instruntionsObject.add[y].id === allArticles[i]._id) {
+        console.log('we found the article we should add adding to')
+        // 1. make sure that it the group name isnt allready there and then add it
+        for (let z = 0; z < allArticles[i].articleGroups.length; z++) {
+          // checking that it isnt allready there 
+          if (allArticles[i].articleGroups[z] === groupName) {
+            allreadyThere = true;
+            let errorInfo = {
+              articleIndex: i,
+              description: 'Error: has been asked to add a group in to an article and the group is allready there',
+              groupIndexInTheArticle: z,
+              groupName: groupName,
+              method: "add"
+            }
+            error.push(errorInfo)
+          }
+        }
+        if (!allreadyThere) {
+          allArticles[i].articleGroups.push(groupName);
+        }
+      }
+    }
+    for (let y = 0; y < (instruntionsObject.remove.length || 0); y++) {
+      let thisErr = true;
+      if ((instruntionsObject.remove[y].name === allArticles[i].name) || (instruntionsObject.remove[y].id === allArticles[i]._id)) {
+        // This is the article we need
+        console.log('we found the article we want to remove from')
+        for (let q = 0; q < allArticles[i].articleGroups.length; q++) {
+          // checking that it isnt allready there 
+          if (allArticles[i].articleGroups[q] === groupName) {
+            console.log('we found the index in the article')
+            allArticles[i].articleGroups.splice(q, 1);
+            thisErr = false;
+          }
+        }
+        if (thisErr) {
+          let errorInfo = {
+            articleIndex: i,
+            description: 'Error: group that has been asked to remove wasnt there',
+            groupName: groupName,
+            method: "remove"
+          }
+          error.push(errorInfo);
+        }
+      }
+    }
+  }
+  if (error.length > 0) {
+    console.error('ERORRRRRRRRRRRRRRRRRRRRRR')
+    console.log(error)
+  }
+
+  return { allArticles: allArticles, errors: error }
+}
+
+
+
+
+
+
+
+
+
 
 
 app.post('/RemoveGroupFromArticle', (req, res) => { //remove a group from article
@@ -528,6 +654,8 @@ app.post('/RemoveGroupFromArticle', (req, res) => { //remove a group from articl
 });
 
 
+/// GONAAA CHANGE THIS MADAFAKAA TO DO THIS ON PUBLISH!!!!!
+
 app.post('/AddGroupToArticle', (req, res) => { //add a group to article 
   SciFare.findById(StateID)
     .then(scifare => {
@@ -543,6 +671,12 @@ app.post('/AddGroupToArticle', (req, res) => { //add a group to article
         .json({ err });
     })
 });
+
+/// GONAAA CHANGE THIS MADAFAKAA TO DO THIS ON PUBLISH!!!!!
+
+
+
+
 
 //AddGroupToArticle'
 

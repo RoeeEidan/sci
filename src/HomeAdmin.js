@@ -596,7 +596,7 @@ class HomeAdmin extends Component {
                         <p className="flex-item">
                             <MyButton
                                 miliSeconds='2000'
-                                onClick={this.props.onUploadFilesFormSubmit}
+                                onClick={()=>{this.props.onUploadFilesFormSubmit(); this.setState({fileName:"No File Chosen"})}}
                             />
                         </p>
                     </form>
@@ -806,15 +806,6 @@ class HomeAdmin extends Component {
                                     })
                                 }}
                             >
-                                {/*<svg width="100" height="280" xmlns="http://www.w3.org/2000/svg" >
-                                    <g>
-                                        <title>Layer 1</title>
-                                        <g stroke="null" id="svg_3">
-                                            <rect stroke="null" id="svg_2" height="279.71037" width="100.663093" y="0.059024" x="0.000014" strokeOpacity="null" strokeWidth="1.5" fill="none" />
-                                            <path stroke="null" id="svg_1" d="m45.389625,139.476985l31.653553,-132.080087l-52.499917,132.080087l52.499917,132.079983l-31.653553,-132.079983z" strokeWidth="1.5" fill="#fc852e" />
-                                        </g>
-                                    </g>
-                                </svg>*/}
                                 
                                 <i className="material-icons orangeArrows">keyboard_arrow_left</i>                            
                             </div>
@@ -841,15 +832,6 @@ class HomeAdmin extends Component {
                                 }}
                             >
                                 <i className="material-icons orangeArrows">keyboard_arrow_right</i>
-                                {/*<svg width="100" height="280" xmlns="http://www.w3.org/2000/svg">
-                                    <g>
-                                        <title>Layer 1</title>
-                                        <g id="svg_3">
-                                            <rect stroke="null" id="svg_2" height="279.71037" width="100.312502" y="0.059024" x="-0.312502" strokeOpacity="null" strokeWidth="1.5" fill="none" />
-                                            <path stroke="null" id="svg_1" d="m54.768473,139.476985l-31.54331,-132.080087l52.31707,132.080087l-52.31707,132.079983l31.54331,-132.079983z" strokeWidth="1.5" fill="#fc852e" />
-                                        </g>
-                                    </g>
-                                </svg>*/}
                             </div>
                         </div>
                         <Motion defaultStyle={{ x: 0 }} style={{ x: spring(10) }}>

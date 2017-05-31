@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Redirect, Link } from 'react-router-dom';
 import SingleFile from './Singlefile';
 
-import { Button, Textfield, Checkbox, Switch, RadioGroup, Radio } from 'react-mdl';
+import { Button, Textfield, Checkbox, Switch} from 'react-mdl';
 
 
 
@@ -100,11 +100,17 @@ class NewGroup extends Component {
         let heroList = this.props.newGroupleHeros;
         let filesList = []
         for (let i = 0; i < heroList.length; i++) {
+            let thisStyle = {}
+            if (i % 2 === 0) {
+                thisStyle = { backgroundColor: 'rgba(239, 240 , 246 , 0.5)' }
+            }
             filesList.push(
                 <SingleFile
+                    style={thisStyle}
+                    singleFileName={heroList[i].url}
                     singleFileTitle={heroList[i].title}
                     singleFileCredit={heroList[i].credit}
-                    singleFileName={heroList[i].name}
+                    /*singleFileName={heroList[i].name}*/
                     onClick={() => {
                         this.props.removeSingleHero(i);
                     }}
@@ -113,9 +119,9 @@ class NewGroup extends Component {
         }
 
         return (
-            <div>
+            <div className="NewArticlePage">
                 <Link to="/">
-                    <input type="button" value="Back Home" className="backHome" />
+                    <Button primary className="backHome">Back Home</Button>
                 </Link>
                 <h1> New Group </h1>
                 <div className="newGroupArticlesList">
@@ -140,7 +146,7 @@ class NewGroup extends Component {
                                 />
                             </div>
                             <p id="fileLabeID">No File Chosen</p>
-                            <p>
+                            <div>
                                 Title:
                                 <Textfield
                                     label='Title..'
@@ -150,8 +156,8 @@ class NewGroup extends Component {
                                     floatingLabel
                                     style={{ width: '70%' }}
                                 />
-                            </p>
-                            <p>
+                            </div>
+                            <div>
                                 Credit:
                                 <Textfield
                                     rows={1}
@@ -161,16 +167,16 @@ class NewGroup extends Component {
                                     floatingLabel
                                     style={{ width: '50%' }}
                                 />
-                            </p>
-                            <p>
-                                <Button
-                                    raised colored ripple
-                                    className="flex-item"
-                                    onClick={this.props.onUploadFilesFormSubmit}
-                                >Submit
-                                </Button>
-                            </p>
+                            </div>
                         </form>
+                        <div>
+                            <Button
+                                raised colored ripple
+                                className="flex-item"
+                                onClick={this.props.onUploadFilesFormSubmit}
+                            >Submit
+                                </Button>
+                        </div>
                     </div>
                     <div className="listOfHeros">
                         <ul className='singleFileBox flex-container'>
@@ -250,13 +256,22 @@ class NewGroup extends Component {
                     {this.props.editor}
                 </div>
                 <div className="publish">
-                    <button onClick={this.props.onPublishClick}>
+                    <Button
+                        className="publishButton"
+                        onClick={this.props.onPublishClick}
+                        raised
+                        ripple
+                    >
                         publish
-                    </button>
+                    </Button>
+                    <Button
+                        onClick={this.props.saveGroupToInProcess}
+                        className="saveButton saveToInProcess"
+                        raised colored ripple
+                    >
+                        Save
+                    </Button>
                 </div>
-                <button onClick={this.props.saveGroupToInProcess}>
-                    Save
-                </button>
             </div >
 
         )

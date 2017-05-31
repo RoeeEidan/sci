@@ -6,12 +6,6 @@ class SingleHomeArticle extends Component {
 
     render() {
         // takes care of the button color
-        let style = { backgroundColor: 'red' }
-        let isGrouped = this.props.isGrouped(this.props.index);
-        if (typeof (isGrouped) === 'object') {
-            style = { backgroundColor: 'green' }
-        }
-
         let button = (
             <Checkbox
                 className="groupSingleHomeArticle"

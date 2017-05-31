@@ -61,8 +61,8 @@ class App extends Component {
                 id={ourSubCategorys[i]}
                 onChange={() => { this.props.addSubCategory(i) }}
                 defaultChecked
+                label={ourSubCategorys[i]}
               />
-              {ourSubCategorys[i]}
             </div>
           )
         }
@@ -98,12 +98,12 @@ class App extends Component {
     let filesList = []
     for (let i = 0; i < heroList.length; i++) {
       let thisStyle = {}
-      if(i % 2 === 0 ){
-        thisStyle = {backgroundColor: 'rgba(239, 240 , 246 , 0.5)'}
+      if (i % 2 === 0) {
+        thisStyle = { backgroundColor: 'rgba(239, 240 , 246 , 0.5)' }
       }
       filesList.push(
         <SingleFile
-          style = {thisStyle}
+          style={thisStyle}
           singleFileTitle={heroList[i].title}
           singleFileCredit={heroList[i].credit}
           singleFileName={heroList[i].url}
@@ -138,7 +138,7 @@ class App extends Component {
                 />
               </div>
               <p id="fileLabeID">No File Chosen</p>
-              <p>
+              <div>
                 Title:
 
                 <Textfield
@@ -149,8 +149,8 @@ class App extends Component {
                   floatingLabel
                   style={{ width: '70%' }}
                 />
-              </p>
-              <p>
+              </div>
+              <div>
                 Credit:
                 <Textfield
                   rows={1}
@@ -160,17 +160,14 @@ class App extends Component {
                   floatingLabel
                   style={{ width: '50%' }}
                 />
-              </p>
-              <p>
-
-                <Button
-                  raised colored ripple
-                  className="flex-item"
-                  onClick={this.props.onUploadFilesFormSubmit}
-                >Submit
-                </Button>
-              </p>
+              </div>
             </form>
+            <Button
+              raised colored ripple
+              className="flex-item"
+              onClick={this.props.onUploadFilesFormSubmit}
+            >Submit
+            </Button>
           </div>
           <div className="listOfHeros">
             <ul className='singleNewArticleFileBox flex-container'>
@@ -266,11 +263,11 @@ class App extends Component {
           {this.props.editor}
         </div>
         <div className="publish">
-          <Button className="publishButton" raised ripple ripple onClick={this.props.onPublishClick}>
+          <Button className="publishButton" raised ripple onClick={this.props.onPublishClick}>
             publish
           </Button>
 
-          <Button className="saveButton" raised colored ripple className="saveToInProcess" onClick={this.props.saveToInProcess}>
+          <Button className="saveButton saveToInProcess" raised colored ripple onClick={this.props.saveToInProcess}>
             Save
         </Button>
         </div>

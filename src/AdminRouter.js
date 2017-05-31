@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import axios from 'axios';
 import FormData from 'form-data';
 import { Editor } from 'react-draft-wysiwyg';
@@ -141,6 +141,9 @@ export class AdminRouter extends React.Component {
             currntLength: 0
         };
 
+
+        this.isLocationAtEditArticle = false
+
         //Home
 
         this.addCategory = this.addCategory.bind(this);
@@ -201,6 +204,7 @@ export class AdminRouter extends React.Component {
         //Edit Article
         this.onEditPublishClick = this.onEditPublishClick.bind(this);
         this.updateArticlesInProcess = this.updateArticlesInProcess.bind(this);
+        this.setEditArticleLocation = this.setEditArticleLocation.bind(this);
 
 
         // Edit Group
@@ -220,6 +224,11 @@ export class AdminRouter extends React.Component {
         this.setNewGrouopLocation = this.setNewGrouopLocation.bind(this);
 
         // this.shouldComponentUpdate = this.shouldComponentUpdate.bind(this);
+    }
+
+
+    setEditArticleLocation(bool) {
+        this.isLocationAtEditArticle = bool;
     }
 
 
@@ -248,7 +257,7 @@ export class AdminRouter extends React.Component {
 
 
     updateArticlesInProcess(article, index) {
-        if ((article && index) || (article && index === 0)) {
+        if ((article && index) || (article && (index === 0))) {
             let newHomePageState = { ...this.state.homePageState };
             article.isHidden = true;
             newHomePageState.articles[index].name = article.name
@@ -308,6 +317,8 @@ export class AdminRouter extends React.Component {
             )
         } else {
             let newArticle = { ...this.state.newArticle }
+            newArticle.subCategorys = this.newArticleSubCategorys;
+            newArticle.articleBody = this.newArticleBody;
             console.log(newArticle)
             this.postTo("NewArticle", newArticle);
             newHomePageState.articles.push(
@@ -407,9 +418,6 @@ export class AdminRouter extends React.Component {
     }
 
 
-    // EDIT ARTICLE FUNCTIONS
-
-
     onEditPublishClick(articleIndex, article) {
         article.isHidden = false;
         this.postTo(`EditArticle/${article._id}`, { article: article, index: articleIndex })
@@ -422,6 +430,9 @@ export class AdminRouter extends React.Component {
             homePageState: homePageState
         })
     }
+
+
+
 
     // EDIT GROUP FUNCTIONs
 
@@ -439,11 +450,25 @@ export class AdminRouter extends React.Component {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // NEW GROUP FUNCTIONS
 
 
     groupAddSubCategory(index) {
-        
+
         let thisSubCategory = this.state.homePageState.subCategorys[index];
         // let newGroup = {...this.state.newGroup};
         let newGroupSubCategorys = [...this.newGroupSubCategorys];
@@ -476,7 +501,7 @@ export class AdminRouter extends React.Component {
         for (let i = 0; i < articles.length; i++) {
             let isChecked = false;
             for (let z = 0; z < articles[i].articleGroups.length; z++) {
-                if ( articles[i].articleGroups[z] === this.state.newGroup.name) {
+                if (articles[i].articleGroups[z] === this.state.newGroup.name) {
                     isChecked = true;
                 }
             }
@@ -638,7 +663,7 @@ export class AdminRouter extends React.Component {
             this.setState({
                 newGroup: newState.newGroup
             }, () => { console.log("STATTEEEE", this.state) })
-            // this.uploadFile(file)
+            this.uploadFile(file)
         } else {
             alert('you forgot somthing')
         }
@@ -678,20 +703,19 @@ export class AdminRouter extends React.Component {
 
     groupSingleArticle(articleIndex) {
         let isFound = false;
-        let newState = { ...this.state };
-        let newHomePageState = { ...this.state.homePageState };
+        let newState = this.state;
         let articleName = this.state.homePageState.articles[articleIndex].name
         let groupName = this.state.newGroup.name;
         for (let i = 0; i < newState.newGroup.relatedArticles.length; i++) {//this is the way to the articles  
             if (newState.newGroup.relatedArticles[i].name === articleName) {// removers the article from the group and the homePageState
-                let isFound = true;
+                isFound = true;
                 // ungroup evrything
-                for(let z = 0; z < newState.homePageState.articles[articleIndex].articleGroups.length; z++){
-                    if(newState.homePageState.articles[articleIndex].articleGroups[z] === groupName){
+                for (let z = 0; z < newState.homePageState.articles[articleIndex].articleGroups.length; z++) {
+                    if (newState.homePageState.articles[articleIndex].articleGroups[z] === groupName) {
                         newState.homePageState.articles[articleIndex].articleGroups.splice(z, 1);
                     }
                 }
-                 // ungroup fromHomePageState 
+                // ungroup fromHomePageState 
                 newState.newGroup.relatedArticles.splice(i, 1); // moves the article from the group ( no need to do is in the back end )
                 this.setState({
                     newGroup: newState.newGroup,
@@ -703,7 +727,7 @@ export class AdminRouter extends React.Component {
         }
         if (!isFound) {
             // Group it all!!
-            let newHomePageState = { ...this.state.homePageState };
+            let newHomePageState = this.state.homePageState;
             newHomePageState.articles[articleIndex].articleGroups.push(groupName); // pushs the group in to the article (only at the front end)
             newState.newGroup.relatedArticles.push(newHomePageState.articles[articleIndex]) // pushs the article to the group (will be sent to the backend when the group is published)
             this.setState({
@@ -999,7 +1023,7 @@ export class AdminRouter extends React.Component {
     }
 
 
-    onUploadFilesFormSubmit() {
+    async onUploadFilesFormSubmit() {
         let file = document.getElementById("uploadFilesFile").files[0];
         let title = document.getElementById("uploadFilesTitle").value;
         let credit = document.getElementById("uploadFilesCredit").value;
@@ -1016,10 +1040,11 @@ export class AdminRouter extends React.Component {
             newState.newArticle.heroObjects = [...this.state.newArticle.heroObjects]
             newState.newArticle.heroObjects.push(heroObject);
             this.newArticleHeroObjectTracker.currntLength++;
+            await this.uploadFile(file);
             this.setState({
                 newArticle: newState.newArticle
             })
-            // this.uploadFile(file)
+
         } else {
             alert('you forgot somthing')
         }
@@ -1343,6 +1368,7 @@ export class AdminRouter extends React.Component {
                         let id = path.match.params.i;
                         return (
                             <EditArticle
+                                setLocation={this.setEditArticleLocation}
                                 updateArticlesInProcess={this.updateArticlesInProcess}
                                 id={id}
                                 subCategorys={this.state.homePageState.subCategorys}

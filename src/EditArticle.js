@@ -15,6 +15,9 @@ import { convertToRaw } from 'draft-js';
 import SingleFile from './Singlefile';
 
 
+// UI 
+
+import { Button, Textfield, Checkbox, Switch, RadioGroup, Radio } from 'react-mdl';
 
 class EditArticle extends Component {
 
@@ -30,7 +33,7 @@ class EditArticle extends Component {
                 category: undefined,
                 subCategorys: [],
                 date: undefined,
-                showAtHomePage: true,
+                showAtHomePage: undefined,
                 summery: undefined,
                 isHidden: undefined
             },
@@ -53,6 +56,7 @@ class EditArticle extends Component {
         let credit = document.getElementById("uploadFilesCredit").value;
         if (file && title && credit) {
             document.getElementById("uploadFilesForm").reset();
+            document.getElementById('fileLabeID').innerHTML = "No File Chosen";
             let heroObject = {
                 type: file.type,
                 title: title,
@@ -60,16 +64,15 @@ class EditArticle extends Component {
                 url: `https://s3.amazonaws.com/roeetestbucket123/${file.name}`,
                 name: `${file.name}`
             };
-            let article = { ...this.state.article };
+            let article = this.state.article
             article.heroObjects.push(heroObject);
             this.setState({
                 article: article
-            })
+            }, () => { console.log(this.state) })
             // this.props.uploadFile(file)
         } else {
             alert('you forgot somthing')
         }
-
     }
 
 
@@ -80,8 +83,8 @@ class EditArticle extends Component {
     };
 
 
-    onCategoryChange() {
-        const category = document.getElementById("categoryOptions").value;
+    onCategoryChange(event) {
+        const category = event.currentTarget.value;
         let newArticle = { ...this.state.article };
         newArticle.category = category;
         this.setState({
@@ -90,8 +93,8 @@ class EditArticle extends Component {
     }
 
 
-    onHomePageChange() {
-        const val = document.getElementById("homePageCheckbox").checked;
+    onHomePageChange(event) {
+        const val = event.currentTarget.checked;
         let newArticle = { ...this.state.article };
         switch (val) {
             case false:
@@ -122,6 +125,7 @@ class EditArticle extends Component {
 
 
     removeSingleHero(i) {
+        console.log("runing", i)
         let newArticle = { ...this.state.article };
         newArticle.heroObjects = [...this.state.article.heroObjects];
         newArticle.heroObjects.splice(i, 1);
@@ -171,38 +175,45 @@ class EditArticle extends Component {
     }
 
 
-    componentWillMount() {
+    componentDidMount() {
+        console.log("componentDidMount")
         let that = this;
-        axios.get(`http://localhost:8080/GetArticle/${this.props.id}`)
-            .then(function (response) {
-                that.setState({
-                    article: response.data
-                }, () => {
-                    document.getElementById("homePageCheckbox").checked = that.state.article.showAtHomePage;
-                    document.getElementById("titleInput").value = that.state.article.name;
-                    document.getElementById("summeryInput").value = that.state.article.summery;
-                    document.getElementById("categoryOptions").value = that.state.article.category;
-                    let ourSubCategorys = that.state.article.subCategorys;
-                    for (let i = 0; i < ourSubCategorys.length; i++) {
-                        console.log('checkingggg')
-                        if (document.getElementById(`${ourSubCategorys[i]}`)) {
-                            document.getElementById(`${ourSubCategorys[i]}`).checked = true
-                        }
-                    }
+        if (!this.state.article.name && !this.state.article.category) {
+            axios.get(`http://localhost:8080/GetArticle/${this.props.id}`)
+                .then(function (response) {
                     that.setState({
-                        editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.article.articleBody).contentBlocks))
+                        article: response.data
                     }, () => {
-                        console.log('editorState Changedd', that.state)
+                        // document.getElementById("homePageCheckbox").checked = that.state.article.showAtHomePage;
+                        document.getElementById("titleInput").value = that.state.article.name;
+                        document.getElementById("summeryInput").value = that.state.article.summery;
+                        // document.getElementById("categoryOptions").value = that.state.article.category;
+                        // let ourSubCategorys = that.state.article.subCategorys;
+                        // for (let i = 0; i < ourSubCategorys.length; i++) {
+                        //     console.log('checkingggg')
+                        //     if (document.getElementById(`${ourSubCategorys[i]}`)) {
+                        // document.getElementById(`${ourSubCategorys[i]}`).checked = true
+                        // }
+                        // }
+                        that.setState({
+                            editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.article.articleBody).contentBlocks))
+                        }, () => {
+                            console.log('editorState Changedd', that.state)
+                        })
                     })
-                })
 
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
     }
-    componentDidMount(){
-        
+
+    componentWillMount() {
+        this.props.setLocation(true);
+    }
+    componentWillUnmount() {
+        this.props.setLocation(false);
     }
 
 
@@ -214,37 +225,42 @@ class EditArticle extends Component {
         }
 
 
-
         let subCategorysRender1 = [];
         let subCategorysRender2 = [];
         let subCategorysRender3 = [];
         let ourSubCategorys = this.props.subCategorys || [];
-        for (let i = 0; i < ourSubCategorys.length; i++) {
+
+        for (let i = 0; i < ourSubCategorys.length; i++) { // Loops throu all the categorys
+            let didFind = false;
+            for (let z = 0; z < this.state.article.subCategorys.length; z++) { // Loops through the checked ctegorys
+                if (ourSubCategorys[i] === this.state.article.subCategorys[z]) {// checks if each category is checked or not 
+                    didFind = true;
+                    break;
+                }
+            }
+               let myCheckboxDiv = (
+                    <div className="singleSubCategoryDiv flex-item " key={`${i}`}>
+                        <Checkbox
+                            id={ourSubCategorys[i]}
+                            onChange={() => { this.addSubCategory(i) }}
+                            label={`${ourSubCategorys[i]}`}
+                            checked={didFind}
+                        />
+                    </div>
+                )
+
             if (i < (ourSubCategorys.length / 3)) {
-                subCategorysRender1.push(
-                    <div className="singleSubCategoryDiv flex-item">
-                        {ourSubCategorys[i]}
-                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
-                    </div>
-                );
+                subCategorysRender1.push(myCheckboxDiv);
             } else if (i >= (ourSubCategorys.length / 3) && i < ((ourSubCategorys.length / 3) * 2)) {
-                subCategorysRender2.push(
-                    <div className="singleSubCategoryDiv flex-item">
-                        {ourSubCategorys[i]}
-                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
-                    </div>
-                );
+                subCategorysRender2.push(myCheckboxDiv);
             } else if (i >= ((ourSubCategorys.length / 3) * 2)) {
-                subCategorysRender3.push(
-                    <div className="singleSubCategoryDiv flex-item">
-                        {ourSubCategorys[i]}
-                        <input id={`${ourSubCategorys[i]}`} type="checkbox" onChange={() => { this.addSubCategory(i) }} />
-                    </div>
-                );
+                subCategorysRender3.push(myCheckboxDiv);
             } else {
                 alert("Check App.js at line 52")
             }
         }
+
+
         if (ourSubCategorys.length % 3) {
             let counter = ourSubCategorys.length;
             subCategorysRender3.push(
@@ -262,18 +278,17 @@ class EditArticle extends Component {
 
 
 
-
-        /*let subCategorysRender = [];
-        console.log(this.props.subCategorys);
-        let ourSubCategorys = this.props.subCategorys
-        for (let i = 0; i < ourSubCategorys.length; i++) {
-            subCategorysRender.push(
-                <div>
-                    {ourSubCategorys[i]}
-                    <input type="checkbox" id={`${ourSubCategorys[i]}`} onChange={() => { this.addSubCategory(i) }} />
-                </div>
+        //<------ showAtHomePage logic Start ------->
+        let showAtHomePage = (
+                <Switch
+                    onChange={this.onHomePageChange}
+                    className="homePageCheckbox"
+                    id='homePageCheckbox'
+                    checked={this.state.article.showAtHomePage}
+                >Show At Home Page</Switch>
             );
-        }*/
+        //<------ showAtHomePage logic End ------->
+
 
 
         let heroList = this.state.article.heroObjects;
@@ -283,7 +298,7 @@ class EditArticle extends Component {
                 <SingleFile
                     singleFileTitle={heroList[i].title}
                     singleFileCredit={heroList[i].credit}
-                    singleFileName={heroList[i].name}
+                    singleFileName={heroList[i].url}
                     onClick={() => {
                         this.removeSingleHero(i);
                     }}
@@ -291,31 +306,60 @@ class EditArticle extends Component {
             )
         }
         return (
-            <div className="EditArticle" >
+            <div className="EditArticle NewArticlePage" >
                 <Link to="/">
-                    <input type="button" value="Back Home" className="backHome" />
+                    <Button primary className="backHome">Back Home</Button>
                 </Link>
                 <h1>{this.state.article.name}</h1>
                 <div className="heroFilesWrapper flex-container">
                     <div className="uploadFiles2 flex-item">
                         <p>Upliad Files</p>
                         <form id='uploadFilesForm' className="uploadFilesForm flex-container">
-                            <input
-                                className="flex-item uploadInput"
-                                id='uploadFilesFile'
-                                type="file"
-                                accept="image/video"
-                            />
-                            <p>
-                                Title: <textarea rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />
-                            </p>
-                            <p>
-                                Credit: <textarea rows="2" type='text' id='uploadFilesCredit' className="uploadFilesCreditInput flex-item" />
-                            </p>
-                            <p>
-                                <input type="button" value="Submit" className="flex-item" onClick={this.onUploadHeroForm} />
-                            </p>
+                            <div className="mdl-button mdl-button--primary mdl-button--icon mdl-button--file alignCenter">
+                                <i className="material-icons">attach_file</i>
+                                <input
+                                    className="flex-item uploadInput "
+                                    id='uploadFilesFile'
+                                    type="file"
+                                    accept="image/video"
+                                    onChange={() => {
+                                        let text = document.getElementById('uploadFilesFile').files[0].name;
+                                        document.getElementById('fileLabeID').innerHTML = text
+                                    }}
+                                />
+                            </div>
+                            <p id="fileLabeID">No File Chosen</p>
+                            <div>
+                                Title:
+                                <Textfield
+                                    rows={1}
+                                    id='uploadFilesTitle'
+                                    className="uploadFilesTitleInput flex-item MDLTextfield"
+                                    label="Title..."
+                                    floatingLabel
+                                    style={{ width: '70%' }}
+                                />
+                            </div>
+                            <div>
+                                Credit:
+                                <Textfield
+                                    rows={1}
+                                    id='uploadFilesCredit'
+                                    className="uploadFilesCreditInput flex-item"
+                                    label="Credit..."
+                                    floatingLabel
+                                    style={{ width: '50%' }}
+                                />
+                            </div>
                         </form>
+                        <div>
+                            <Button
+                                raised colored ripple
+                                className="flex-item"
+                                onClick={this.onUploadHeroForm}
+                            >Submit
+                            </Button>
+                        </div>
                     </div>
                     <div className="listOfHeros">
                         <ul className='singleFileBox flex-container'>
@@ -336,7 +380,8 @@ class EditArticle extends Component {
                 </div>
                 <h2 className="newArticleTitle">title</h2>
                 <div className="titlebox flex-container">
-                    <input
+                    <Textfield
+                        rows={1}
                         className="newArticleTitleInput flex-item"
                         id='titleInput'
                         type='text'
@@ -344,14 +389,11 @@ class EditArticle extends Component {
                         onBlur={this.onTitleChange}
                     />
                 </div>
-
-
-
-
                 <div className="summeryAndCategorysDiv flex-container">
                     <div className="summerybox flex-item flex-container">
                         <h2 className="flex-item">Summery</h2>
-                        <textarea
+                        <Textfield
+                            rows={10}
                             className="newArticleSummeryTextArea flex-item"
                             id='summeryInput'
                             type='text'
@@ -365,22 +407,14 @@ class EditArticle extends Component {
                         </div>
                         <div className="homaPageAndCategory flex-item flex-container">
                             <div className="showAtHomePageBox flex-item">
-                                <span>show at home page:</span>
-                                <input
-                                    id='homePageCheckbox'
-                                    type="checkbox"
-                                    className="homePageCheckbox"
-                                    onChange={this.onHomePageChange}
-                                />
+                                {showAtHomePage}
                             </div>
                             <div className="categoryBox flex-item">
-                                <span>Category</span>
-                                <select id='categoryOptions' onChange={this.onCategoryChange}>
-                                    <option>Chose a Category</option>
-                                    <option value="Science">Science</option>
-                                    <option value="Health">Health</option>
-                                    <option value="Technology">Technology</option>
-                                </select>
+                                <RadioGroup id='categoryOptions' onChange={this.onCategoryChange} container="ul" childContainer="li" name="demo2" value={this.state.article.category}>
+                                    <Radio value="Science">Science</Radio>
+                                    <Radio value="Health">Health</Radio>
+                                    <Radio value="Technology">Technology</Radio>
+                                </RadioGroup>
                             </div>
                         </div>
                         <h4 className="newArticleSubCategorysTitle">Sub Categorys</h4>
@@ -397,48 +431,6 @@ class EditArticle extends Component {
                         </div>
                     </div>
                 </div>
-
-
-
-
-
-                {/*<div className="summerybox">
-                    <h2>Summery</h2>
-                    <input
-                        id='summeryInput'
-                        type='text'
-                        onChange={this.onSummeryChange}
-                    />
-                </div>*/}
-
-
-
-                {/*<div className="showAtHomePageBox">
-                    <h4>show at home page:</h4>
-                    <input
-                        id='homePageCheckbox'
-                        type="checkbox"
-                        className="homePageCheckbox"
-                        onChange={this.onHomePageChange}
-                    />
-                </div>*/}
-                {/*<div className="categoryBox">
-                    <h3>Category</h3>
-                    <select id='categoryOptions' onChange={this.onCategoryChange}>
-                        <option>Chose a Category</option>
-                        <option value="Science">Science</option>
-                        <option value="Health">Health</option>
-                        <option value="Technology">Technology</option>
-                    </select>
-                </div>*/}
-                {/*<div>
-                    <h4>Sub Categorys</h4>
-                    {subCategorysRender}
-                </div>*/}
-
-
-
-
                 <div className="articleBodyBox" >
                     <h2>Artical Body</h2>
                     <Editor
@@ -447,17 +439,27 @@ class EditArticle extends Component {
                     />
                 </div>
                 <div className="publish">
-                    <button onClick={() => { this.props.onPublishClick(this.props.id, this.state.article) }}>
+                    <Button
+                        className="publishButton"
+                        raised
+                        ripple
+                        onClick={() => { this.props.onPublishClick(this.props.id, this.state.article) }}
+                    >
                         publish
-                    </button>
+                    </Button>
+                    <Button
+                        className="saveButton saveToInProcess"
+                        raised
+                        colored
+                        ripple
+                        onClick={() => {
+                            let newState = { ...this.state }
+                            newState.article.isHidden = true;
+                            this.props.updateArticlesInProcess(newState.article, this.props.id)
+                        }}>
+                        Save
+                </Button>
                 </div>
-                <button onClick={() => {
-                    let newState = { ...this.state }
-                    newState.article.isHidden = true;
-                    this.props.updateArticlesInProcess(newState.article, this.props.id)
-                }}>
-                    Save
-                </button>
             </div>
         );
     }
