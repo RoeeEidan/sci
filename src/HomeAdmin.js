@@ -7,7 +7,8 @@ import { Redirect, Link } from 'react-router-dom';
 import SingleFile from './Singlefile';
 import MyButton from './MyButton';
 // import FileInput from './FileInput';
-import SingleHomeArticle from './SingleHomeArticle'
+import SingleHomeArticle from './SingleHomeArticle';
+import Card from './Card';
 
 
 // Animation package 
@@ -282,6 +283,10 @@ class HomeAdmin extends Component {
                 }
             }
         }
+        if (hiddenListToRender.length === 0) {
+            let style = { backgroundColor: '#ffd180' }
+            hiddenListToRender.push(<div style={style} >There Are No Articles In Prossec</div>)
+        }
         return ({
             hiddenList: <div className="articleListBoxToRender flex-container">
                 <div className="articleListToRender flex-item flex-container">
@@ -289,19 +294,19 @@ class HomeAdmin extends Component {
                 </div>
             </div>,
             showenList: <div className="articleListBoxToRender articleListToRender flex-container flex-item">
-                <p className="atHomePage">AT HOME PAGE</p>
-                <p className="atHomePageCategory">SCIENCE</p>
+                <div className="atHomePage"><div className="homePageArticlessSpaners">AT HOME PAGE</div></div>
+                <div className="atHomePageCategory"><div className="homePageArticlessSpaners">SCIENCE</div></div>
                 {atHomePageScience}
-                <p className="atHomePageCategory">HEALTH</p>
+                <div className="atHomePageCategory"><div className="homePageArticlessSpaners">HEALTH</div></div>
                 {atHomePageHealth}
-                <p className="atHomePageCategory">TECHNOLOGY</p>
+                <div className="atHomePageCategory"><div className="homePageArticlessSpaners">TECHNOLOGY</div></div>
                 {atHomePageTechnology}
-                <p className="atHomePage">NOT AT HOME PAGE</p>
-                <p className="atHomePageCategory">SCIENCE</p>
+                <div className="atHomePage"><div className="homePageArticlessSpaners">NOT AT HOME PAGE</div></div>
+                <div className="atHomePageCategory"><div className="homePageArticlessSpaners">SCIENCE</div></div>
                 {notAtHomePageScience}
-                <p className="atHomePageCategory">HEALTH</p>
+                <div className="atHomePageCategory"><div className="homePageArticlessSpaners">HEALTH</div></div>
                 {notAtHomePageHealth}
-                <p className="atHomePageCategory">TECHNOLOGY</p>
+                <div className="atHomePageCategory"><div className="homePageArticlessSpaners">TECHNOLOGY</div></div>
                 {notAtHomePageTechnology}
             </div>
 
@@ -344,6 +349,12 @@ class HomeAdmin extends Component {
 
     componentDidMount() {
         window.addEventListener('keydown', this.onKeyDown, true);
+        if (this.isMobile && document.getElementById('homePageWindow')) {
+            document.getElementById('homePageWindow').style.maxHeight = '515px';
+            if (document.getElementById('homePageAddButton')) {
+                document.getElementById('homePageAddButton').style.padding = '0 0 13px 0';
+            }
+        }
     }
 
 
@@ -406,9 +417,9 @@ class HomeAdmin extends Component {
             }
             subCategorysRender.push(
                 <li className="flex-item" style={thisSubCategoryStyle} key={`${subCategorys[i]}`} key={`${i}`}>
-                    <span className="subCategorysText">
+                    <div className="subCategorysText">
                         {subCategorys[i]}
-                    </span>
+                    </div>
                     <Button
                         accent
                         onClick={() => {
@@ -419,7 +430,7 @@ class HomeAdmin extends Component {
                             }
                         }} >
                         <i className="material-icons">clear</i>
-                        </Button>
+                    </Button>
                 </li>
             )
         }
@@ -438,14 +449,16 @@ class HomeAdmin extends Component {
                 hiddenGroupList.push(
                     <div className="singleGroupList flex-item flex-container" style={thisGrouoStyle} key={`${i}`}>
                         <div className="singleGroupName">
-                            {groupsArray[i].name}
+                            <div className='groupArticleTextWrapper'>
+                                {groupsArray[i].name}
+                            </div>
                         </div>
                         <div className="singleGroupButtons">
                             <Button
                                 primary
                                 onClick={() => { this.props.editGroup(i) }}
                             >
-                            <i className="material-icons">edit</i>
+                                <i className="material-icons">edit</i>
                             </Button>
                             <Button
                                 accent
@@ -455,7 +468,7 @@ class HomeAdmin extends Component {
                                     }
                                 }} >
                                 <i className="material-icons">clear</i>
-                                </Button>
+                            </Button>
                         </div>
                     </div>
                 )
@@ -468,7 +481,9 @@ class HomeAdmin extends Component {
                 groupList1.push(
                     <div className="singleGroupList flex-item flex-container" style={thisGrouoStyle} key={`${i}`}>
                         <div className="singleGroupName">
-                            {groupsArray[i].name}
+                            <div className='groupArticleTextWrapper'>
+                                {groupsArray[i].name}
+                            </div>
                         </div>
                         <div className="singleGroupButtons">
                             <Button
@@ -485,11 +500,15 @@ class HomeAdmin extends Component {
                                     }
                                 }}>
                                 <i className="material-icons">clear</i>
-                                </Button>
+                            </Button>
                         </div>
                     </div>
                 )
             }
+        }
+        if (hiddenGroupList.length === 0) {
+            let style = { backgroundColor: '#ffd180', textAlign: 'center' }
+            hiddenGroupList.push(<div style={style}>There Are No Groups In Prossec</div>)
         }
 
 
@@ -508,13 +527,36 @@ class HomeAdmin extends Component {
         let filesList = [];
         for (let i = 0; i < heroList.length; i++) {
             let style = {};
+            let cardStyle = { backgroundColor: "#ffe8c0", width: '90%', margin: 'auto' , textAlign: 'center' };
+            let titleStyle = { color: '#fff', height: '300px', background: `url("${heroList[i].url}") center / cover` }
             if (i % 2 === 0) {
-                style = { backgroundColor: "#febc64", ':hover': { backgroundColor: 'rgba(254, 188, 100, 0.6)' } }
+                style = { backgroundColor: "#febc64", padding: '10px 0 ' /*':hover': { backgroundColor: 'rgba(254, 188, 100, 0.6)' }*/ }
             } else {
-                style = { backgroundColor: "#FFD180", ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' } }
+                style = { backgroundColor: "#FFD180", padding: '10px 0 '/* ':hover': { backgroundColor: 'rgba(255, 209, 128, 0.6)' } */ }
             }
+            if (this.isMobile) {
+                titleStyle.height = '150px'
+            }
+
             filesList.push(
-                <SingleFile
+                <div style={style} key={i}>
+                    <Card
+                        titleStyle={titleStyle}
+                        cardStyle={cardStyle}
+                        title={heroList[i].title}
+                        credit={heroList[i].credit}
+                        url={heroList[i].url}
+                        onDeleteClick={() => {
+                            console.log(heroList[i].url);
+                            if (confirm(`Are you sure you want to delete ${heroList[i].name} ?`) === true) {
+                                this.props.removeSingleHero(i)
+                            } else {
+                                console.log('ok')
+                            }
+                        }}
+                    />
+                </div>
+                /*<SingleFile
                     style={style}
                     singleFileTitle={heroList[i].title}
                     singleFileCredit={heroList[i].credit}
@@ -526,7 +568,7 @@ class HomeAdmin extends Component {
                             console.log('ok')
                         }
                     }}
-                />
+                />*/
             )
         }
 
@@ -559,19 +601,21 @@ class HomeAdmin extends Component {
             addHeroButton = (
                 <div className="uploadFiles flex-item">
                     <form id='uploadFilesForm' className="uploadFilesForm flex-container">
-                        <input
-                            className="flex-item custom-file-input"
-                            name="files[]"
-                            id='uploadFilesFile'
-                            type="file"
-                            accept="image/video"
-                            onChange={() => {
-                                let file = document.getElementById("uploadFilesFile").files[0]
-                                this.setState({
-                                    fileName: file.name
-                                })
-                            }}
-                        />
+                        <div className="mdl-button mdl-button--primary mdl-button--icon mdl-button--file uploader">
+                            <i className="material-icons uploadInputHome">attach_file</i>
+                            <input
+                                className="flex-item uploadInput"
+                                id='uploadFilesFile'
+                                type="file"
+                                accept="image/video"
+                                onChange={() => {
+                                    let file = document.getElementById("uploadFilesFile").files[0]
+                                    this.setState({
+                                        fileName: file.name
+                                    })
+                                }}
+                            />
+                        </div>
                         {this.state.fileName}
                         <p>
                             Title: {/* <textarea rows="2" type='text' id='uploadFilesTitle' className="uploadFilesTitleInput flex-item" />*/}
@@ -596,7 +640,7 @@ class HomeAdmin extends Component {
                         <p className="flex-item">
                             <MyButton
                                 miliSeconds='2000'
-                                onClick={()=>{this.props.onUploadFilesFormSubmit(); this.setState({fileName:"No File Chosen"})}}
+                                onClick={() => { this.props.onUploadFilesFormSubmit(); this.setState({ fileName: "No File Chosen" }) }}
                             />
                         </p>
                     </form>
@@ -652,14 +696,19 @@ class HomeAdmin extends Component {
                 } else {
                     articleStyle = foucsStyle;
                 }
+
                 homaPageAddButtonVar = (<div className="newArticleButton" >
                     <Link to="newarticle"><Button raised ripple>Add</Button></Link>
                 </div>);
                 myWindow = (
                     <div key="articleBox" className="homeArticlesDiv">
-                        <p className="articlesTitle">
-                            In Prossec
-                            </p>
+                        <div className="articlesTitle">
+                            <div >
+                                <span className="homePageArticlessSpaners">
+                                    IN PROSSEC
+                                </span>
+                            </div>
+                        </div>
                         <ReactCSSTransitionReplace transitionName="roll-up"
                             transitionEnterTimeout={1000} transitionLeaveTimeout={1000}>
                             <div key="articalsListKsy">
@@ -689,17 +738,21 @@ class HomeAdmin extends Component {
                 </div>)
                 myWindow = (
                     <div key="groupBox">
-                        <p className="groupsTitle">
-                            GROUPS IN PROSSEC
-                        </p>
+                        <div className="groupsTitle ">
+                            <div className="homePageGroupsSpaners">
+                                GROUPS IN PROSSEC
+                            </div>
+                        </div>
                         <div className="groupListDiv flex-container">
                             <div className="groupList flex-item ">
                                 {hiddenGroupList}
                             </div>
                         </div>
-                        <p className="groupsTitle">
-                            GROUPS
-                        </p>
+                        <div className="groupsTitle ">
+                            <div className="homePageGroupsSpaners">
+                                GROUPS
+                            </div>
+                        </div>
                         <div className="groupListDiv flex-container">
                             <div className="groupList flex-item flex-container">
                                 {groupList1}
@@ -717,9 +770,11 @@ class HomeAdmin extends Component {
                 homaPageAddButtonVar = newSubCategoryButton;
                 myWindow = (
                     <div key="categoryBox">
-                        <p className="subCategorysTitle">
-                            Sub Categories
-                        </p>
+                        <div className="subCategorysTitle">
+                            <div className="homePageGroupsSpaners">
+                                SUB CATEGORIES
+                            </div>
+                        </div>
                         <ul className="flex-contaiter subCategorysUl">
                             {subCategorysRender}
                         </ul>
@@ -789,7 +844,7 @@ class HomeAdmin extends Component {
                     </li>
                     </ul>
 
-                    <div className="flex-container homePageWindow">
+                    <div className="flex-container homePageWindow" id='homePageWindow'>
                         <div className="flex-container homePageWindowWrapper" style={windowStyle}>
                             <div
                                 style={arrowStyle}
@@ -806,12 +861,12 @@ class HomeAdmin extends Component {
                                     })
                                 }}
                             >
-                                
-                                <i className="material-icons orangeArrows">keyboard_arrow_left</i>                            
+
+                                <i className="material-icons orangeArrows">keyboard_arrow_left</i>
                             </div>
                             <div className="flex-item windowBox ">
                                 <ReactCSSTransitionReplace transitionName="carousel-swap"
-                                    transitionEnterTimeout={300} transitionLeaveTimeout={300} style={{ width: '100%', borderRadius: '2%' }} >
+                                    transitionEnterTimeout={300} transitionLeaveTimeout={300} style={{ width: '100%' }} >
                                     {myWindow}
                                 </ReactCSSTransitionReplace>
                             </div>
@@ -836,7 +891,7 @@ class HomeAdmin extends Component {
                         </div>
                         <Motion defaultStyle={{ x: 0 }} style={{ x: spring(10) }}>
                             {() => {
-                                return <div className="flex-item homePageAddButton flex-container">
+                                return <div className="flex-item homePageAddButton flex-container" id="homePageAddButton">
                                     {homaPageAddButtonVar}
                                 </div>
                             }}

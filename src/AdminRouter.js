@@ -17,6 +17,7 @@ import GroupHomeArticle from './GroupHomeArticle';
 import EditArticle from './EditArticle';
 import EditGroup from './EditGroup';
 import LogIn from './LogIn';
+import Card from './Card';
 
 //Functions
 
@@ -1182,11 +1183,13 @@ export class AdminRouter extends React.Component {
     };
 
 
-    async componentDidMount() {
+    componentWillMount() {
         if (!this.state.homePageState.articles) {
-            const homePageState = await getHomePageState();
-            this.setState({
+            getHomePageState().then(homePageState =>{
+                this.setState({
                 homePageState: homePageState,
+                didLoad: true,
+            })
             })
         }
     }
@@ -1246,6 +1249,7 @@ export class AdminRouter extends React.Component {
     render() {
         /*if (!this.state.isLogedIn) {
             return (
+                
                 <LogIn
                     onLogInClick={this.onLogInClick}
                     logInMassage={this.state.logInStatus.message}

@@ -43,12 +43,7 @@ const groupSchema = new Schema({
 const sciFareSchema = new Schema({
     subCategorys: Array,
     heroObjects: [heroSchema],
-    articlesInProcess:[articleSchema],
-    groupsInProcess:[groupSchema],
     allArticles: [articleSchema],
-    scince: [articleSchema],
-    health: [articleSchema],
-    technology: [articleSchema],
     groups: [groupSchema],
     users: Object,
 });

@@ -13,7 +13,8 @@ import { convertToRaw } from 'draft-js';
 //COMPONENTS
 
 import SingleFile from './Singlefile';
-import SingleGroupArticle from './EditGroupHomeArticle'
+import SingleGroupArticle from './EditGroupHomeArticle';
+import Loading from'./Loading';
 
 //React mdl
 import { Button, Textfield, Checkbox, Switch } from 'react-mdl';
@@ -24,6 +25,7 @@ class EditGroup extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            didLoad: false,
             group: {
                 heroObjects: [],// {type:'' , url: '' , title:'' , credit ''}
                 relatedArticles: [],
@@ -234,7 +236,8 @@ class EditGroup extends Component {
         axios.get(`http://localhost:8080/GetGroup/${this.props.id}`)
             .then(function (response) {
                 that.setState({
-                    group: response.data
+                    group: response.data,
+                    didLoad: true
                 }, () => {
                     document.getElementById("homePageCheckbox").checked = that.state.group.showAtHomePage;
                     document.getElementById("titleInput").value = that.state.group.title;
@@ -243,15 +246,12 @@ class EditGroup extends Component {
                     let ourSubCategorys = that.state.group.subCategorys;
                     for (let i = 0; i < ourSubCategorys.length; i++) {
                         if (document.getElementById(`${ourSubCategorys[i]}`)) {
-                            console.log('checkingggg')
                             document.getElementById(`${ourSubCategorys[i]}`).checked = true
                         }
                     }
                     if (that.state.group.articleBody) {
                         that.setState({
                             editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.group.articleBody).contentBlocks))
-                        }, () => {
-                            console.log('editorState Changedd!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', that.state)
                         })
                     }
                 })
@@ -267,6 +267,9 @@ class EditGroup extends Component {
         if (this.props.path === '/') {
             this.props.pathTo();
             return (<Redirect to='/' />)
+        }
+        if(!this.state.didLoad){
+            return(<Loading/>)
         }
 
 
@@ -360,7 +363,7 @@ class EditGroup extends Component {
                 <Link to="/">
                     <Button primary className="backHome">Back Home</Button>
                 </Link>
-                <h1>{this.state.group.name}</h1>
+                <h1>Edit Group</h1>
                 <div>
                     <p className="  ">All Articles</p>
                     {articlesButtonRender}

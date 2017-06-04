@@ -113,7 +113,7 @@ h2{
 }
 
 .singleFileName{
-    margin-top: auto;
+    margin: auto;
     text-align: letf;
     width: 25%;
 }
@@ -190,7 +190,7 @@ h2{
     text-align: center;
     background-color: #FC974C;
     height: 50px;
-    padding: 2%;
+    padding: 0;
     margin: 0;
 }
 
@@ -200,6 +200,7 @@ h2{
 }
 
 .subCategorysUl{
+    font-size: 17px;
     background-color: white;
     padding: 0;
     text-align: center;
@@ -208,6 +209,7 @@ h2{
     -webkit-flex-direction: column;
     flex-direction: column;
     .flex-item{
+        padding-left: 64px;
         &:hover {
         .mdl-button--accent.mdl-button--accent {
             color: rgba(252, 151, 76, 1);
@@ -221,7 +223,8 @@ h2{
 }
 
 .subCategorysText{
-    // padding: 5px;
+    display: inline-block;
+    padding-top: 6px;
     
 }
 
@@ -231,7 +234,7 @@ h2{
     margin: 0;
     background-color: #FC974C;
     height: 50px;
-    padding: 2%;
+    padding: 15px;
 }
 
 
@@ -301,6 +304,8 @@ h2{
 
 .groupsTitle{
     text-align: center;
+    color: white;
+    letter-spacing: 1.9px;
 }
 
 .newGroupButton{
@@ -435,6 +440,7 @@ h2{
         flex: 1;
     }
     .homaPageAndCategory{
+        padding-bottom: 30px;
         background-color: white;
         -webkit-flex: 2;
         flex: 2;
@@ -482,6 +488,7 @@ h2{
 }
 
 .newArticleSubCategorysTitle{
+    padding-top: 16px;
     text-align: center;
     margin: 0;
 
@@ -500,7 +507,7 @@ h2{
 
 .publish{
     text-align: center;
-    padding-top: 20px;
+    padding: 10px;
 }
 
 .articleBodyBox{
@@ -568,9 +575,10 @@ figure {
     .windowBox{
         @extend .myTransition; 
         // background-color: #fff3e0;
+        font-size: 17px;
         box-shadow: 0 0 10px white;
         overflow-y: scroll;
-        border-radius: 2%;
+        border-radius: 0;
         height: 97%;
         overflow-y: scroll;
         margin-top: 2%;
@@ -596,9 +604,9 @@ figure {
 .homePageWindow{
     @extend .myTransition;
     background-color: #2f395f;
-    border-radius: 2%;
+    border-radius: 0;
     box-shadow: 0px 10px 20px #888888;
-    height: 613px;
+    height: 650px;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: column;
@@ -610,7 +618,7 @@ figure {
     @extend .myTransition;
     padding: 0 2%;
     color: #C6C6C6;
-    font-size: larger;
+    font-size: 17px;
     min-height: 40px;
     display: -webkit-flex;
     display: flex;
@@ -655,7 +663,7 @@ figure {
     flex-direction: row; 
     justify-content: center;
     align-items: center;
-    padding: 1%;
+    padding-top: 13px;
 }
 
 .svg{
@@ -663,15 +671,15 @@ figure {
 }
 
 .uploadFiles{
-    text-align: center;
     -webkit-align-self: center;
     align-self: center;
-    position: absolute;
+    position: absolute; z-index: 2;
     top: 26.5%;
     background-color: #2f395f;
-    opacity: 0.8;
+    opacity: 0.9;
     width: 96%;
     color: white;
+    text-align: center;
 }
 
 .ladda-button{
@@ -709,7 +717,7 @@ figure {
     margin: 0;
     background-color: #FC974C;
     height: 50px;
-    padding: 2%;
+    padding: 0;
 }
 
 .atHomePage{
@@ -717,7 +725,8 @@ figure {
     margin: 0;
     background-color: #FC974C;
     height: 50px;
-    padding: 2%;
+    padding: 0;
+    border-bottom: 2px solid #ffd180;
 }
 
 
@@ -859,7 +868,7 @@ background: -webkit-linear-gradient(top, #365EE5 , #365EE5  );
     margin: 0;
     background-color: #FC974C;
     height: 50px;
-    padding: 2%;
+    padding: 0;
 }
 
 
@@ -884,7 +893,9 @@ background: -webkit-linear-gradient(top, #365EE5 , #365EE5  );
     .NewArticlePage{
         width: 87%;
         margin: auto;
-        box-shadow: 0px 0px 1500px #777;    
+        box-shadow: 0px 0px 10px #777; 
+        margin-bottom: 30px;
+        padding: 20px;   
     }
 
 
@@ -1008,3 +1019,50 @@ background: -webkit-linear-gradient(top, #365EE5 , #365EE5  );
 }
 //<--------------------------- Edit Article Style   End -------------------------->>
 
+.uploadInputHome{
+    color: white;
+    font-size: 30px;
+}
+
+
+// <-----------------Loading Sryle Start --------------->
+.Loading{
+    padding-top: 25%;
+    font-size: 50px;
+    text-align: center;
+}
+
+.loadingText{
+    margin-bottom: 40px;
+}
+
+
+// <-----------------Loading Sryle End --------------->
+
+
+.rdw-editor-wrapper{
+    padding: 0 25px;
+}
+
+
+
+
+
+.homePageArticlessSpaners{
+    margin-top: 15px;
+    color: white;
+    letter-spacing: 1.9px;
+}
+
+
+.homePageGroupsSpaners{
+    padding-top: 15px;
+    font-size: 18px;
+    color: white;
+    letter-spacing: 1.9px;
+}
+
+
+.groupArticleTextWrapper{
+    padding: 8px 0;
+}

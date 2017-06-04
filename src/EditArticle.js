@@ -13,17 +13,19 @@ import { convertToRaw } from 'draft-js';
 //COMPONENTS
 
 import SingleFile from './Singlefile';
+import Loading from'./Loading';
 
 
 // UI 
 
-import { Button, Textfield, Checkbox, Switch, RadioGroup, Radio } from 'react-mdl';
+import { Button, Textfield, Checkbox, Switch, RadioGroup, Radio , Spinner} from 'react-mdl';
 
 class EditArticle extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
+            didLoad: false,
             article: {
                 heroObjects: [],// {type:'' , url: '' , title:'' , credit ''}
                 title: undefined,
@@ -38,6 +40,9 @@ class EditArticle extends Component {
                 isHidden: undefined
             },
         };
+
+
+
         this.onEditorStateChange = this.onEditorStateChange.bind(this);
         this.addSubCategory = this.addSubCategory.bind(this);
         this.onTitleChange = this.onTitleChange.bind(this);
@@ -175,30 +180,20 @@ class EditArticle extends Component {
     }
 
 
-    componentDidMount() {
-        console.log("componentDidMount")
+    componentWillMount() {
+        this.props.setLocation(true);
         let that = this;
         if (!this.state.article.name && !this.state.article.category) {
             axios.get(`http://localhost:8080/GetArticle/${this.props.id}`)
                 .then(function (response) {
                     that.setState({
-                        article: response.data
+                        article: response.data,
+                        didLoad: true,
                     }, () => {
-                        // document.getElementById("homePageCheckbox").checked = that.state.article.showAtHomePage;
                         document.getElementById("titleInput").value = that.state.article.name;
                         document.getElementById("summeryInput").value = that.state.article.summery;
-                        // document.getElementById("categoryOptions").value = that.state.article.category;
-                        // let ourSubCategorys = that.state.article.subCategorys;
-                        // for (let i = 0; i < ourSubCategorys.length; i++) {
-                        //     console.log('checkingggg')
-                        //     if (document.getElementById(`${ourSubCategorys[i]}`)) {
-                        // document.getElementById(`${ourSubCategorys[i]}`).checked = true
-                        // }
-                        // }
                         that.setState({
-                            editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.article.articleBody).contentBlocks))
-                        }, () => {
-                            console.log('editorState Changedd', that.state)
+                            editorState: EditorState.createWithContent(ContentState.createFromBlockArray(htmlToDraft(that.state.article.articleBody).contentBlocks)),
                         })
                     })
 
@@ -209,9 +204,9 @@ class EditArticle extends Component {
         }
     }
 
-    componentWillMount() {
-        this.props.setLocation(true);
-    }
+    // componentWillMount() {
+    //     this.props.setLocation(true);
+    // }
     componentWillUnmount() {
         this.props.setLocation(false);
     }
@@ -222,6 +217,9 @@ class EditArticle extends Component {
         if (this.props.path === '/') {
             this.props.pathTo();
             return (<Redirect to='/' />)
+        }
+        if(!this.state.didLoad){
+            return(<Loading />)
         }
 
 
@@ -294,8 +292,13 @@ class EditArticle extends Component {
         let heroList = this.state.article.heroObjects;
         let filesList = []
         for (let i = 0; i < heroList.length; i++) {
+            let thisStyle = {};
+            if( i % 2 === 0 ){
+                thisStyle.backgroundColor = "rgba(239, 240 , 246 , 0.5)"
+            }
             filesList.push(
                 <SingleFile
+                    style={thisStyle}
                     singleFileTitle={heroList[i].title}
                     singleFileCredit={heroList[i].credit}
                     singleFileName={heroList[i].url}
@@ -310,7 +313,7 @@ class EditArticle extends Component {
                 <Link to="/">
                     <Button primary className="backHome">Back Home</Button>
                 </Link>
-                <h1>{this.state.article.name}</h1>
+                <h1>Edit Article</h1>
                 <div className="heroFilesWrapper flex-container">
                     <div className="uploadFiles2 flex-item">
                         <p>Upliad Files</p>
@@ -402,9 +405,9 @@ class EditArticle extends Component {
                         />
                     </div>
                     <div className="allCategorysDiv flex-item flex-container">
-                        <div className="filler flex-item">
+                        {/*<div className="filler flex-item">
 
-                        </div>
+                        </div>*/}
                         <div className="homaPageAndCategory flex-item flex-container">
                             <div className="showAtHomePageBox flex-item">
                                 {showAtHomePage}
